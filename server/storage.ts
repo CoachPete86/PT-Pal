@@ -26,6 +26,7 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new PostgresSessionStore({
       pool,
       createTableIfMissing: true,
+      tableName: 'session'
     });
   }
 
@@ -60,12 +61,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createMessage(message: Partial<Message>): Promise<Message> {
+    if (!message.content || !message.senderId || !message.recipientId) {
+      throw new Error("Missing required message fields");
+    }
+
     const [newMessage] = await db
       .insert(messages)
       .values({
-        content: message.content!,
-        senderId: message.senderId!,
-        recipientId: message.recipientId!,
+        content: message.content,
+        senderId: message.senderId,
+        recipientId: message.recipientId,
         timestamp: new Date()
       })
       .returning();
@@ -80,11 +85,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(booking: Partial<Booking>): Promise<Booking> {
+    if (!booking.userId || !booking.date) {
+      throw new Error("Missing required booking fields");
+    }
+
     const [newBooking] = await db
       .insert(bookings)
       .values({
-        userId: booking.userId!,
-        date: booking.date!,
+        userId: booking.userId,
+        date: booking.date,
         status: booking.status || "pending",
         notes: booking.notes || null
       })
