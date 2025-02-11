@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import Navbar from "@/components/navbar";
 import BookingForm from "@/components/booking-form";
 import MessagePanel from "@/components/message-panel";
+import FoodAnalysis from "@/components/food-analysis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -20,6 +21,7 @@ export default function DashboardPage() {
           <TabsList>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookings">
@@ -42,6 +44,10 @@ export default function DashboardPage() {
                 <MessagePanel />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="food-analysis">
+            <FoodAnalysis />
           </TabsContent>
         </Tabs>
       </main>
