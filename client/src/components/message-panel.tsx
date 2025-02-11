@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import type { Message } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export default function MessagePanel() {
   const { user } = useAuth();
@@ -55,7 +56,7 @@ export default function MessagePanel() {
             >
               <div className="text-sm">{message.content}</div>
               <div className="text-xs opacity-70 mt-1">
-                {format(new Date(message.timestamp), "PPp")}
+                {format(new Date(message.timestamp!), "PPp")}
               </div>
             </div>
           ))}
