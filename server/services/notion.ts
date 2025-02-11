@@ -19,18 +19,12 @@ export async function listDocuments(): Promise<NotionDocument[]> {
   try {
     const response = await notion.databases.query({
       database_id: databaseId!,
-      sorts: [
-        {
-          property: 'Created time',
-          direction: 'descending',
-        },
-      ],
     });
 
     return response.results.map((page: any) => ({
       id: page.id,
       title: page.properties.Name?.title[0]?.plain_text || 'Untitled',
-      type: page.properties.Type?.select?.name || 'Other',
+      type: page.properties.Category?.select?.name || 'Other',
       url: page.url,
       createdAt: page.created_time,
       lastEdited: page.last_edited_time,
@@ -55,7 +49,7 @@ export async function createDocument(title: string, type: string, content: strin
             },
           ],
         },
-        Type: {
+        Category: {
           select: {
             name: type,
           },
@@ -82,9 +76,9 @@ export async function createDocument(title: string, type: string, content: strin
       id: response.id,
       title,
       type,
-      url: response.url,
-      createdAt: response.created_time,
-      lastEdited: response.last_edited_time,
+      url: response.url || '',
+      createdAt: new Date().toISOString(),
+      lastEdited: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Failed to create document:', error);
