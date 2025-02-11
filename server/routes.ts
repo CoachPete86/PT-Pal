@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import OpenAI from "openai";
+import { listDocuments, createDocument, getDocument } from "./services/notion";
 
 const openai = new OpenAI();
 
@@ -39,6 +40,38 @@ export function registerRoutes(app: Express): Server {
       ...req.body,
     });
     res.json(booking);
+  });
+
+  // Document Management endpoints
+  app.get("/api/documents", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const documents = await listDocuments();
+      res.json(documents);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/documents", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { title, type, content } = req.body;
+      const document = await createDocument(title, type, content);
+      res.json(document);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/documents/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const content = await getDocument(req.params.id);
+      res.json({ content });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Food Analysis endpoint

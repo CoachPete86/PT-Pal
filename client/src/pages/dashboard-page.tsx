@@ -3,6 +3,7 @@ import Navbar from "@/components/navbar";
 import BookingForm from "@/components/booking-form";
 import MessagePanel from "@/components/message-panel";
 import FoodAnalysis from "@/components/food-analysis";
+import DocumentManagement from "@/components/document-management";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -22,6 +23,7 @@ export default function DashboardPage() {
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
             <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookings">
@@ -48,6 +50,10 @@ export default function DashboardPage() {
 
           <TabsContent value="food-analysis">
             <FoodAnalysis />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentManagement />
           </TabsContent>
         </Tabs>
       </main>
