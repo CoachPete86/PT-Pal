@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function AboutSection() {
   return (
-    <section id="about" className="py-20">
+    <section id="about" className="py-24 bg-white border-t">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
@@ -42,7 +42,7 @@ export default function AboutSection() {
           </div>
 
           <div
-            className="aspect-square rounded-lg bg-cover bg-center"
+            className="aspect-square rounded-lg bg-cover bg-center shadow-2xl"
             style={{
               backgroundImage:
                 'url("https://images.unsplash.com/photo-1507679799987-c73779587ccf")',

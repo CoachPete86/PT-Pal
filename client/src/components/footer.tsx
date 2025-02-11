@@ -10,7 +10,7 @@ export default function Footer() {
             <h3 className="font-bold text-lg mb-4">Coach Pete Ryan</h3>
             <p className="text-muted-foreground">
               Professional personal trainer dedicated to helping you achieve your
-              fitness goals.
+              fitness goals through expert movement and strength training.
             </p>
           </div>
 
@@ -45,8 +45,13 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-muted-foreground">
               <li>Email: pete@coachpeteryan.com</li>
-              <li>Phone: (555) 123-4567</li>
-              <li>Location: Los Angeles, CA</li>
+              <li>Phone: 07308 518428</li>
+              <li>Training Location:</li>
+              <li className="pl-4">PureGym West Byfleet</li>
+              <li>Business Address:</li>
+              <li className="pl-4">4 Mill Green Lane</li>
+              <li className="pl-4">Hatfield, AL9 5FD</li>
+              <li className="pl-4">United Kingdom</li>
             </ul>
           </div>
 
