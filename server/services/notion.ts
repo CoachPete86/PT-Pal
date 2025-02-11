@@ -24,7 +24,7 @@ export async function listDocuments(): Promise<NotionDocument[]> {
     return response.results.map((page: any) => ({
       id: page.id,
       title: page.properties.Name?.title[0]?.plain_text || 'Untitled',
-      type: page.properties.Category?.select?.name || 'Other',
+      type: page.properties.Status?.select?.name || 'Other',
       url: page.url,
       createdAt: page.created_time,
       lastEdited: page.last_edited_time,
@@ -49,7 +49,7 @@ export async function createDocument(title: string, type: string, content: strin
             },
           ],
         },
-        Category: {
+        Status: {
           select: {
             name: type,
           },

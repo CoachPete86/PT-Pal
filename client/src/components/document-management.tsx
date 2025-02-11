@@ -39,11 +39,22 @@ export default function DocumentManagement() {
 
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to Load Documents",
+        description: "There was an error loading your documents. Please try again later.",
+        variant: "destructive",
+      });
+    },
   });
 
   const createDocumentMutation = useMutation({
     mutationFn: async (data: { title: string; type: string; content: string }) => {
       const res = await apiRequest("POST", "/api/documents", data);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to create document");
+      }
       return res.json();
     },
     onSuccess: () => {
