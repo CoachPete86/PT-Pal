@@ -1,0 +1,89 @@
+Here’s a structured breakdown of Coach Pete Ryan’s business details that an AI can use to design your website. This includes branding, services, client demographics, and overall business goals.
+
+Coach Pete Ryan – Business Overview for AI Website Design
+
+1. Branding & Identity
+	•	Business Name: Coach Pete Ryan
+	•	Tagline: It’s about progress, not perfection.
+	•	Brand Colours: Dark, masculine tones – black, white, grey.
+	•	Logo: Use a clean, bold, and professional logo reflecting strength, resilience, and expertise.
+	•	Tone & Messaging: Straightforward, no-nonsense, supportive, and motivational.
+
+2. Services Offered
+
+1:1 Personal Training
+	•	In-person training at PureGym West Byfleet.
+	•	Focuses on strength, endurance, mobility, and rehabilitation.
+	•	Tailored plans based on movement analysis and biomechanics.
+
+Online Coaching & Training
+	•	Virtual coaching sessions with customised workout plans and check-ins.
+	•	Flexible session durations: 30 min, 45 min, or 1 hour.
+
+Outdoor Training
+	•	Training sessions conducted in outdoor environments.
+
+Group Fitness Classes
+	•	High-energy and structured classes targeting different fitness levels.
+	•	Includes HIIT, Strength, Core, Burn, and Spin classes.
+
+Nutrition Coaching
+	•	Custom meal plans and macro tracking guidance.
+	•	Integration with upcoming nutrition analysis app.
+
+Fitness Planning & Consultation
+	•	Detailed fitness plans for clients, focusing on long-term progression.
+	•	Movement assessment & goal-setting.
+
+3. Target Audience (Ideal Clients)
+	•	Ages: 18-60
+	•	Demographic: Primarily working professionals & parents, with a focus on women but also open to men and younger clients.
+	•	Client Type:
+	•	People looking to improve how they feel and move (not just aesthetics).
+	•	Those intimidated by the gym who need confidence-building coaching.
+	•	Clients with pain/movement issues needing corrective strategies.
+	•	Beginners and intermediate lifters wanting structured guidance.
+
+4. Competitive Edge & Unique Selling Points
+	•	20+ years of coaching experience (since 2008).
+	•	Former British Kickboxing Champion & Extreme Endurance Athlete (ultramarathons).
+	•	Deep expertise in movement, biomechanics, and injury prevention.
+	•	Treats clients like family, fostering long-term relationships (some clients have stayed for 15+ years).
+	•	Strong success stories (e.g., client trained through chemotherapy & became the fittest of her life).
+	•	Unique mindset coaching element alongside physical training.
+
+5. Location & Contact Information
+	•	Gym Location: PureGym West Byfleet, UK
+	•	Business Address: 4 Mill Green Lane, Hatfield, AL9 5FD
+	•	Email: pete@coachpeteryan.com
+	•	Phone: 07308 518428
+	•	Social Media (if applicable): (To be determined)
+
+6. Website Design Preferences
+	•	Style: Clean, professional, and easy to navigate.
+	•	User Experience: Simple layout with clear service offerings.
+	•	Sections Required:
+	1.	Home – Introduction & brand philosophy.
+	2.	About – Pete’s background, qualifications, & achievements.
+	3.	Services – Detailed breakdown of PT, online training, classes, nutrition, and planning.
+	4.	Success Stories – Testimonials & transformations.
+	5.	Blog/Resources (Optional) – Fitness tips & mindset coaching.
+	6.	Contact – Inquiry form & booking options.
+	•	Call to Action (CTA):
+	•	“Book a Free Consultation”
+	•	“Start Your Fitness Journey”
+	•	“Contact Pete”
+
+7. Technology for Future Integration
+	•	Nutrition Analysis App (Flutter frontend, Supabase backend).
+	•	Client Database for tracking progress & past workouts.
+	•	Automated Booking System (if needed).
+	•	Payment Processing System for coaching packages (Stripe or similar).
+
+8. Additional Notes for AI Design Consideration
+	•	Avoid overly flashy designs – keep it functional and clear.
+	•	Use high-quality images of Pete coaching, training, and interacting with clients.
+	•	Professional but approachable – mix of strength and warmth.
+	•	Should highlight Pete’s experience, results, and client loyalty.
+
+This structure provides all necessary details for an AI to build a website that represents your brand authentically and effectively. Let me know if you want to refine or add anything before you proceed! 🚀

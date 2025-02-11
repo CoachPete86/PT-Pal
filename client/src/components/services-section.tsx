@@ -5,35 +5,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dumbbell, Users, Smartphone, Heart } from "lucide-react";
+import { Dumbbell, Users, Globe, Sun, Brain, ChartBar } from "lucide-react";
 
 const services = [
   {
-    title: "Personal Training",
+    title: "1:1 Personal Training",
     description:
-      "One-to-one training sessions customised to your specific goals and needs",
+      "Expert training at PureGym West Byfleet, focusing on strength, endurance, and mobility. Movement analysis and biomechanics-based approach.",
     icon: Dumbbell,
-    image: "https://images.unsplash.com/photo-1593079831268-3381b0db4a77",
-  },
-  {
-    title: "Group Sessions",
-    description:
-      "High-intensity group workouts combining strength training and conditioning",
-    icon: Users,
-    image: "https://images.unsplash.com/photo-1599058917765-a780eda07a3e",
+    image: "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3",
   },
   {
     title: "Online Coaching",
     description:
-      "Remote training programmes with regular check-ins and virtual support",
-    icon: Smartphone,
-    image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc",
+      "Virtual coaching with customised workout plans and regular check-ins. Flexible session durations to fit your schedule.",
+    icon: Globe,
+    image: "https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d",
   },
   {
-    title: "Nutrition Guidance",
+    title: "Outdoor Training",
     description:
-      "Tailored meal plans and nutritional advice to optimise your performance",
-    icon: Heart,
+      "Dynamic outdoor sessions that challenge your body and mind in natural environments. Perfect for those who prefer training outside.",
+    icon: Sun,
+    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5",
+  },
+  {
+    title: "Group Fitness",
+    description:
+      "High-energy classes including HIIT, Strength, Core, Burn, and Spin. Suitable for all fitness levels.",
+    icon: Users,
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+  },
+  {
+    title: "Movement Analysis",
+    description:
+      "Detailed assessment of your movement patterns and biomechanics. Identify limitations and develop corrective strategies.",
+    icon: Brain,
+    image: "https://images.unsplash.com/photo-1576678927484-cc907957088c",
+  },
+  {
+    title: "Nutrition Coaching",
+    description:
+      "Personalised meal plans and macro tracking guidance. Evidence-based nutrition advice to support your fitness goals.",
+    icon: ChartBar,
     image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061",
   },
 ];
@@ -43,14 +57,14 @@ export default function ServicesSection() {
     <section id="services" className="py-20 bg-zinc-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Our Training Solutions</h2>
+          <h2 className="text-4xl font-bold mb-4">Training Solutions</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Professional training services engineered to help you reach peak
-            performance
+            Professional training services engineered to help you reach your full potential,
+            whether you're just starting or looking to break through plateaus.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
             <Card
               key={service.title}

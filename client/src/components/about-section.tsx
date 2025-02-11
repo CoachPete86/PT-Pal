@@ -8,33 +8,34 @@ export default function AboutSection() {
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">About Coach Pete Ryan</h2>
             <p className="text-muted-foreground">
-              With over a decade of experience in personal training and sports
-              science, I've helped hundreds of clients achieve their fitness goals
-              and transform their lives.
+              As a former British Kickboxing Champion and Extreme Endurance Athlete, 
+              I bring over 20 years of elite sports experience to my coaching practice. 
+              Since 2008, I've helped hundreds of clients achieve remarkable transformations 
+              through my unique approach to training and movement.
             </p>
             <p className="text-muted-foreground">
-              My approach combines cutting-edge training techniques with
-              personalised attention to create programmes that work for your unique
-              needs and lifestyle.
+              My expertise in biomechanics and movement analysis allows me to create 
+              highly effective, personalised programmes that not only achieve results 
+              but also improve how you move and feel in daily life.
             </p>
 
             <div className="grid grid-cols-3 gap-4">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">10+</div>
+                  <div className="text-3xl font-bold text-primary mb-2">20+</div>
                   <div className="text-sm">Years Experience</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">500+</div>
-                  <div className="text-sm">Clients Trained</div>
+                  <div className="text-3xl font-bold text-primary mb-2">15+</div>
+                  <div className="text-sm">Year Client Retention</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">100%</div>
-                  <div className="text-sm">Dedication</div>
+                  <div className="text-3xl font-bold text-primary mb-2">#1</div>
+                  <div className="text-sm">Kickboxing Champion</div>
                 </CardContent>
               </Card>
             </div>
