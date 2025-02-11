@@ -14,7 +14,7 @@ export default function AboutSection() {
             </p>
             <p className="text-muted-foreground">
               My approach combines cutting-edge training techniques with
-              personalized attention to create programs that work for your unique
+              personalised attention to create programmes that work for your unique
               needs and lifestyle.
             </p>
 
