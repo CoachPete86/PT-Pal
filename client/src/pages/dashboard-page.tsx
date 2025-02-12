@@ -3,6 +3,7 @@ import Navbar from "@/components/navbar";
 import BookingForm from "@/components/booking-form";
 import MessagePanel from "@/components/message-panel";
 import FoodAnalysis from "@/components/food-analysis";
+import FitnessTimeline from "@/components/fitness-timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -17,12 +18,24 @@ export default function DashboardPage() {
           Welcome, {user?.fullName || user?.username}
         </h1>
 
-        <Tabs defaultValue="bookings">
+        <Tabs defaultValue="fitness-journey">
           <TabsList>
+            <TabsTrigger value="fitness-journey">Fitness Journey</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
             <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="fitness-journey">
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Fitness Journey</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FitnessTimeline />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="bookings">
             <Card>

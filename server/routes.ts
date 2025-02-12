@@ -21,6 +21,22 @@ const openai = new OpenAI({
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // Fitness Journey endpoints
+  app.get("/api/fitness-journey", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const journey = await storage.getFitnessJourney(req.user.id);
+    res.json(journey);
+  });
+
+  app.post("/api/fitness-journey", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const entry = await storage.createFitnessJourneyEntry({
+      userId: req.user.id,
+      ...req.body,
+    });
+    res.json(entry);
+  });
+
   // Food Analysis endpoint
   app.post("/api/analyze-food", async (req, res) => {
     if (!req.user) return res.sendStatus(401);

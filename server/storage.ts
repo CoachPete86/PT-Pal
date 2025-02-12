@@ -1,7 +1,7 @@
-import { users, messages, bookings } from "@shared/schema";
-import type { User, InsertUser, Message, Booking } from "@shared/schema";
+import { users, messages, bookings, fitnessJourney } from "@shared/schema";
+import type { User, InsertUser, Message, Booking, FitnessJourney, InsertFitnessJourney } from "@shared/schema";
 import { db } from "./db";
-import { eq, or } from "drizzle-orm";
+import { eq, or, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -16,6 +16,8 @@ export interface IStorage {
   createMessage(message: Partial<Message>): Promise<Message>;
   getBookings(userId: number): Promise<Booking[]>;
   createBooking(booking: Partial<Booking>): Promise<Booking>;
+  getFitnessJourney(userId: number): Promise<FitnessJourney[]>;
+  createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney>;
   sessionStore: session.Store;
 }
 
@@ -99,6 +101,22 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return newBooking;
+  }
+
+  async getFitnessJourney(userId: number): Promise<FitnessJourney[]> {
+    return db
+      .select()
+      .from(fitnessJourney)
+      .where(eq(fitnessJourney.userId, userId))
+      .orderBy(desc(fitnessJourney.date));
+  }
+
+  async createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney> {
+    const [newEntry] = await db
+      .insert(fitnessJourney)
+      .values(entry)
+      .returning();
+    return newEntry;
   }
 }
 
