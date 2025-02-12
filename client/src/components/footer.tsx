@@ -48,9 +48,10 @@ export default function Footer() {
               <li>Phone: 07308 518428</li>
               <li>Training Location:</li>
               <li className="pl-4">PureGym West Byfleet</li>
-              <li className="pl-4">Old Woking Road</li>
-              <li className="pl-4">West Byfleet, Surrey</li>
-              <li className="pl-4">KT14 6LF</li>
+              <li className="pl-4">Unit 2 Wey Retail Park</li>
+              <li className="pl-4">Royston Road</li>
+              <li className="pl-4">West Byfleet</li>
+              <li className="pl-4">KT14 7NP</li>
             </ul>
           </div>
 
