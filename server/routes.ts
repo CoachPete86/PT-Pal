@@ -36,7 +36,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        model: "gpt-4-vision-preview-1106", // Updated model version
         messages: [
           {
             role: "user",
