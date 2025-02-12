@@ -5,6 +5,13 @@ export default function Footer() {
   return (
     <footer className="bg-muted">
       <div className="container mx-auto px-4 py-12">
+        <div className="mb-8 text-center">
+          <img 
+            src="/assets/Twitter_Header_Photo.png" 
+            alt="Coach Pete Ryan Logo" 
+            className="h-16 mx-auto mb-4"
+          />
+        </div>
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold text-lg mb-4">Coach Pete Ryan</h3>
