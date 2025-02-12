@@ -18,7 +18,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, Upload } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Code } from "@/components/ui/code";
+import { ChevronDown, ChevronUp, Loader2, Upload } from "lucide-react";
+
+interface MacroSources {
+  [key: string]: string;
+}
+
+interface MacroDetails {
+  total: string;
+  sources: MacroSources;
+}
+
+interface Macros {
+  protein: MacroDetails & { sources: MacroSources };
+  carbs: MacroDetails & { fiber: string; sugar: string; sources: MacroSources };
+  fats: MacroDetails & { saturated: string; unsaturated: string; sources: MacroSources };
+}
 
 interface AnalysisResult {
   mealName: string;
@@ -26,16 +47,17 @@ interface AnalysisResult {
   ingredients: string[];
   brandNames: string[];
   calories: number;
-  protein: string;
-  carbs: string;
-  fats: string;
+  macros: Macros;
   notes: string[];
   servingSize: string;
+  healthScore: number;
+  clientGoalsAnalysis: string[];
 }
 
 export default function FoodAnalysis() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
   const analyzeMutation = useMutation({
@@ -196,33 +218,6 @@ export default function FoodAnalysis() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ingredients:</h4>
-                    <ul className="list-disc pl-4 space-y-1">
-                      {analyzeMutation.data.ingredients.map((ingredient, index) => (
-                        <li key={index} className="text-sm">
-                          {ingredient}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {analyzeMutation.data.brandNames.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Brands:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {analyzeMutation.data.brandNames.map((brand, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-muted rounded-md text-sm"
-                          >
-                            {brand}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -233,31 +228,183 @@ export default function FoodAnalysis() {
                     <TableBody>
                       <TableRow>
                         <TableCell className="font-medium">Protein</TableCell>
-                        <TableCell>{analyzeMutation.data.protein}</TableCell>
+                        <TableCell>{analyzeMutation.data.macros.protein.total}</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">Carbohydrates</TableCell>
-                        <TableCell>{analyzeMutation.data.carbs}</TableCell>
+                        <TableCell>{analyzeMutation.data.macros.carbs.total}</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">Fats</TableCell>
-                        <TableCell>{analyzeMutation.data.fats}</TableCell>
+                        <TableCell>{analyzeMutation.data.macros.fats.total}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
 
-                  {analyzeMutation.data.notes && analyzeMutation.data.notes.length > 0 && (
-                    <div>
-                      <h4 className="font-medium mb-2">Additional Notes:</h4>
-                      <ul className="list-disc pl-4 space-y-1">
-                        {analyzeMutation.data.notes.map((note, index) => (
-                          <li key={index} className="text-sm text-muted-foreground">
-                            {note}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <Collapsible
+                    open={isDetailsOpen}
+                    onOpenChange={setIsDetailsOpen}
+                    className="space-y-4"
+                  >
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full flex items-center justify-between"
+                      >
+                        <span>Detailed Analysis</span>
+                        {isDetailsOpen ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Protein Sources */}
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Protein Sources</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <Code className="text-sm">
+                              {Object.entries(analyzeMutation.data.macros.protein.sources).map(([source, amount]) => (
+                                <div key={source} className="flex justify-between">
+                                  <span>{source}:</span>
+                                  <span>{amount}</span>
+                                </div>
+                              ))}
+                            </Code>
+                          </CardContent>
+                        </Card>
+
+                        {/* Carbohydrate Details */}
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Carbohydrates</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <Code className="text-sm">
+                              <div className="space-y-2">
+                                <div className="flex justify-between font-medium">
+                                  <span>Fiber:</span>
+                                  <span>{analyzeMutation.data.macros.carbs.fiber}</span>
+                                </div>
+                                <div className="flex justify-between font-medium">
+                                  <span>Sugar:</span>
+                                  <span>{analyzeMutation.data.macros.carbs.sugar}</span>
+                                </div>
+                                <div className="border-t pt-2">
+                                  {Object.entries(analyzeMutation.data.macros.carbs.sources).map(([source, amount]) => (
+                                    <div key={source} className="flex justify-between">
+                                      <span>{source}:</span>
+                                      <span>{amount}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </Code>
+                          </CardContent>
+                        </Card>
+
+                        {/* Fat Details */}
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Fats</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <Code className="text-sm">
+                              <div className="space-y-2">
+                                <div className="flex justify-between font-medium">
+                                  <span>Saturated:</span>
+                                  <span>{analyzeMutation.data.macros.fats.saturated}</span>
+                                </div>
+                                <div className="flex justify-between font-medium">
+                                  <span>Unsaturated:</span>
+                                  <span>{analyzeMutation.data.macros.fats.unsaturated}</span>
+                                </div>
+                                <div className="border-t pt-2">
+                                  {Object.entries(analyzeMutation.data.macros.fats.sources).map(([source, amount]) => (
+                                    <div key={source} className="flex justify-between">
+                                      <span>{source}:</span>
+                                      <span>{amount}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </Code>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Ingredients List */}
+                      <div className="rounded-lg border bg-muted/50 p-4">
+                        <h4 className="font-medium mb-2">Ingredients:</h4>
+                        <Code className="text-sm">
+                          <ul className="list-disc pl-4 space-y-1">
+                            {analyzeMutation.data.ingredients.map((ingredient, index) => (
+                              <li key={index}>{ingredient}</li>
+                            ))}
+                          </ul>
+                        </Code>
+                      </div>
+
+                      {/* Brand Names */}
+                      {analyzeMutation.data.brandNames.length > 0 && (
+                        <div className="rounded-lg border bg-muted/50 p-4">
+                          <h4 className="font-medium mb-2">Brands:</h4>
+                          <Code className="text-sm">
+                            <div className="flex flex-wrap gap-2">
+                              {analyzeMutation.data.brandNames.map((brand, index) => (
+                                <span
+                                  key={index}
+                                  className="px-2 py-1 bg-background rounded-md"
+                                >
+                                  {brand}
+                                </span>
+                              ))}
+                            </div>
+                          </Code>
+                        </div>
+                      )}
+
+                      {/* Client Goals Analysis */}
+                      <div className="rounded-lg border bg-muted/50 p-4">
+                        <h4 className="font-medium mb-2">
+                          Goals Analysis
+                          <span className="ml-2 text-sm text-muted-foreground">
+                            (Health Score: {analyzeMutation.data.healthScore}/10)
+                          </span>
+                        </h4>
+                        <Code className="text-sm">
+                          <ul className="list-disc pl-4 space-y-1">
+                            {analyzeMutation.data.clientGoalsAnalysis.map((analysis, index) => (
+                              <li key={index} className="text-muted-foreground">
+                                {analysis}
+                              </li>
+                            ))}
+                          </ul>
+                        </Code>
+                      </div>
+
+                      {/* Analysis Notes */}
+                      {analyzeMutation.data.notes && analyzeMutation.data.notes.length > 0 && (
+                        <div className="rounded-lg border bg-muted/50 p-4">
+                          <h4 className="font-medium mb-2">Analysis Notes:</h4>
+                          <Code className="text-sm">
+                            <ul className="list-disc pl-4 space-y-1">
+                              {analyzeMutation.data.notes.map((note, index) => (
+                                <li key={index} className="text-muted-foreground">
+                                  {note}
+                                </li>
+                              ))}
+                            </ul>
+                          </Code>
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
                 </CardContent>
               </Card>
             )}
