@@ -7,8 +7,7 @@ export default function HeroSection() {
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          backgroundImage:
-            'url("/A70C7418-B8CF-4B2D-9585-520E3FDC04CE.jpeg")',
+          backgroundImage: 'url("/A70C7418-B8CF-4B2D-9585-520E3FDC04CE.jpeg")',
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
@@ -26,13 +25,16 @@ export default function HeroSection() {
             </span>
           </h1>
           <p className="text-xl mb-8 text-gray-200">
-            Former British Kickboxing Champion and Extreme Endurance Athlete with 20+ years
-            of coaching experience. Specialising in strength, endurance, and movement
-            optimisation.
+            Former British Kickboxing Champion and Extreme Endurance Athlete
+            with 20+ years of coaching experience. Specialising in strength,
+            endurance, and movement optimisation.
           </p>
           <div className="flex gap-4">
             <Link href="/auth">
-              <Button size="lg" className="text-lg bg-primary hover:bg-primary/90 transition-all duration-300">
+              <Button
+                size="lg"
+                className="text-lg bg-primary hover:bg-primary/90 transition-all duration-300"
+              >
                 Start Your Journey
               </Button>
             </Link>

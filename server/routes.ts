@@ -49,7 +49,11 @@ export function registerRoutes(app: Express): Server {
       const documents = await listDocuments();
       res.json(documents);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error("Document list error:", error);
+      res.status(500).json({ 
+        error: error.message,
+        code: error.code
+      });
     }
   });
 
@@ -57,10 +61,20 @@ export function registerRoutes(app: Express): Server {
     if (!req.user) return res.sendStatus(401);
     try {
       const { title, type, content } = req.body;
+      if (!title || !type || !content) {
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          details: "Title, type, and content are required"
+        });
+      }
       const document = await createDocument(title, type, content);
       res.json(document);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error("Document creation error:", error);
+      res.status(500).json({ 
+        error: error.message,
+        code: error.code
+      });
     }
   });
 
@@ -70,7 +84,12 @@ export function registerRoutes(app: Express): Server {
       const content = await getDocument(req.params.id);
       res.json({ content });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error("Document fetch error:", error);
+      const status = error.message.includes("not found") ? 404 : 500;
+      res.status(status).json({ 
+        error: error.message,
+        code: error.code
+      });
     }
   });
 
@@ -109,9 +128,9 @@ export function registerRoutes(app: Express): Server {
       res.json({ analysis: response.choices[0].message.content });
     } catch (error: any) {
       console.error("Food analysis error:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to analyze food image",
-        details: error.message 
+        details: error.message,
       });
     }
   });

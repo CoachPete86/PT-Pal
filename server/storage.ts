@@ -26,7 +26,7 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new PostgresSessionStore({
       pool,
       createTableIfMissing: true,
-      tableName: 'session'
+      tableName: "session",
     });
   }
 
@@ -36,15 +36,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values({
-      ...insertUser,
-      role: "client"
-    }).returning();
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...insertUser,
+        role: "client",
+      })
+      .returning();
     return user;
   }
 
@@ -53,10 +59,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(messages)
       .where(
-        or(
-          eq(messages.senderId, userId),
-          eq(messages.recipientId, userId)
-        )
+        or(eq(messages.senderId, userId), eq(messages.recipientId, userId)),
       );
   }
 
@@ -71,17 +74,14 @@ export class DatabaseStorage implements IStorage {
         content: message.content,
         senderId: message.senderId,
         recipientId: message.recipientId,
-        timestamp: new Date()
+        timestamp: new Date(),
       })
       .returning();
     return newMessage;
   }
 
   async getBookings(userId: number): Promise<Booking[]> {
-    return db
-      .select()
-      .from(bookings)
-      .where(eq(bookings.userId, userId));
+    return db.select().from(bookings).where(eq(bookings.userId, userId));
   }
 
   async createBooking(booking: Partial<Booking>): Promise<Booking> {
@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
         userId: booking.userId,
         date: booking.date,
         status: booking.status || "pending",
-        notes: booking.notes || null
+        notes: booking.notes || null,
       })
       .returning();
     return newBooking;

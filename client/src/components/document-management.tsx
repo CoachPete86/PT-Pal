@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, FileText, ExternalLink } from "lucide-react";
+import { Loader2, FileText } from "lucide-react";
 import { format } from "date-fns";
 
 interface Document {
@@ -37,14 +37,15 @@ export default function DocumentManagement() {
   const [content, setContent] = useState("");
   const { toast } = useToast();
 
-  const { data: documents, isLoading } = useQuery<Document[]>({
+  const { data: documents = [], isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to Load Documents",
-        description: "There was an error loading your documents. Please try again later.",
-        variant: "destructive",
-      });
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/documents");
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to fetch documents");
+      }
+      return res.json();
     },
   });
 
@@ -60,13 +61,15 @@ export default function DocumentManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       setTitle("");
+      setType("workout");
       setContent("");
       toast({
         title: "Document Created",
-        description: "Your document has been created in Notion",
+        description: "Your document has been created successfully",
       });
     },
     onError: (error: Error) => {
+      console.error("Failed to create document:", error);
       toast({
         title: "Failed to Create Document",
         description: error.message,
@@ -94,7 +97,7 @@ export default function DocumentManagement() {
         <CardHeader>
           <CardTitle>Create Document</CardTitle>
           <CardDescription>
-            Add a new document to your Notion workspace
+            Create a new training or nutrition document
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -153,16 +156,14 @@ export default function DocumentManagement() {
       <Card>
         <CardHeader>
           <CardTitle>Your Documents</CardTitle>
-          <CardDescription>
-            View and manage your Notion documents
-          </CardDescription>
+          <CardDescription>View and manage your documents</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : documents?.length ? (
+          ) : documents.length > 0 ? (
             <div className="space-y-4">
               {documents.map((doc) => (
                 <div
@@ -178,15 +179,7 @@ export default function DocumentManagement() {
                       </p>
                     </div>
                   </div>
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-sm text-primary hover:underline"
-                  >
-                    Open in Notion
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
+                  <div className="text-sm text-muted-foreground">{doc.type}</div>
                 </div>
               ))}
             </div>

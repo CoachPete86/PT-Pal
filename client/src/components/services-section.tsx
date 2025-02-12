@@ -59,8 +59,9 @@ export default function ServicesSection() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Training Solutions</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Professional training services engineered to help you reach your full potential,
-            whether you're just starting or looking to break through plateaus.
+            Professional training services engineered to help you reach your
+            full potential, whether you're just starting or looking to break
+            through plateaus.
           </p>
         </div>
 
