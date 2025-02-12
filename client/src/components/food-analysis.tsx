@@ -10,7 +10,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Loader2, Upload } from "lucide-react";
+
+interface AnalysisResult {
+  calories: number;
+  protein: string;
+  carbs: string;
+  fats: string;
+  notes: string[];
+}
 
 export default function FoodAnalysis() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -25,12 +41,12 @@ export default function FoodAnalysis() {
         if (data.error) {
           throw new Error(data.details || data.error);
         }
-        return data;
+        return JSON.parse(data.analysis) as AnalysisResult;
       } catch (error: any) {
         throw new Error(error.message || "Failed to analyze food image");
       }
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Analysis Complete",
         description: "Your food image has been analyzed successfully.",
@@ -42,14 +58,12 @@ export default function FoodAnalysis() {
         description: error.message,
         variant: "destructive",
       });
-      // Don't reset the form on error to allow retrying
     },
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         toast({
           title: "Invalid file type",
@@ -59,7 +73,6 @@ export default function FoodAnalysis() {
         return;
       }
 
-      // Validate file size (4MB limit)
       if (file.size > 4 * 1024 * 1024) {
         toast({
           title: "File too large",
@@ -161,12 +174,60 @@ export default function FoodAnalysis() {
             )}
 
             {analyzeMutation.data && (
-              <div className="mt-4 rounded-lg bg-muted p-4">
-                <h4 className="font-medium mb-2">Analysis Results:</h4>
-                <div className="whitespace-pre-wrap text-sm">
-                  {analyzeMutation.data.analysis}
-                </div>
-              </div>
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Nutritional Analysis</CardTitle>
+                  <CardDescription>
+                    Estimated nutritional content of your meal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-primary">
+                      {analyzeMutation.data.calories}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Estimated Calories
+                    </div>
+                  </div>
+
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nutrient</TableHead>
+                        <TableHead>Amount</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium">Protein</TableCell>
+                        <TableCell>{analyzeMutation.data.protein}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Carbohydrates</TableCell>
+                        <TableCell>{analyzeMutation.data.carbs}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Fats</TableCell>
+                        <TableCell>{analyzeMutation.data.fats}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+
+                  {analyzeMutation.data.notes && analyzeMutation.data.notes.length > 0 && (
+                    <div>
+                      <h4 className="font-medium mb-2">Additional Notes:</h4>
+                      <ul className="list-disc pl-4 space-y-1">
+                        {analyzeMutation.data.notes.map((note, index) => (
+                          <li key={index} className="text-sm text-muted-foreground">
+                            {note}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             )}
           </div>
         </CardContent>
