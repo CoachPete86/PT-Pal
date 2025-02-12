@@ -45,6 +45,7 @@ export const documents = pgTable("documents", {
   content: text("content").notNull(), // Rich text content
   parentId: integer("parent_id"), // For folder hierarchy, null means root
   type: text("type", { enum: ["document", "folder"] }).default("document").notNull(),
+  notionId: text("notion_id"), // New field for Notion integration
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -79,6 +80,7 @@ export const insertDocumentSchema = createInsertSchema(documents)
   .extend({
     content: z.string().min(1, "Content cannot be empty"),
     parentId: z.number().nullable(),
+    notionId: z.string().optional(),
   });
 
 export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)

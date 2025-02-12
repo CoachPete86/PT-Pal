@@ -1,67 +1,57 @@
 import { Client } from "@notionhq/client";
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { Document } from "@shared/schema";
 
 class NotionService {
   private notion: Client;
+  private databaseId: string;
 
   constructor() {
-    this.notion = new Client({
-      auth: import.meta.env.VITE_NOTION_TOKEN,
-    });
+    const token = import.meta.env.VITE_NOTION_TOKEN;
+    this.databaseId = import.meta.env.VITE_NOTION_DATABASE_ID;
+
+    if (!token || !this.databaseId) {
+      throw new Error("Notion configuration is incomplete. Please ensure both VITE_NOTION_TOKEN and VITE_NOTION_DATABASE_ID are set.");
+    }
+
+    this.notion = new Client({ auth: token });
   }
 
-  async syncDatabase() {
+  async syncDatabase(): Promise<Partial<Document>[]> {
     try {
       const response = await this.notion.databases.query({
-        database_id: import.meta.env.VITE_NOTION_DATABASE_ID,
+        database_id: this.databaseId,
       });
 
-      const pages = response.results.map((page: any) => ({
-        id: page.id,
-        title: page.properties.Name?.title[0]?.plain_text || "Untitled",
-        content: page.properties.Content?.rich_text[0]?.plain_text || "",
-        type: "document",
-        parentId: null,
-        createdAt: new Date(page.created_time),
-        updatedAt: new Date(page.last_edited_time),
-      }));
+      return response.results.map((page) => {
+        const typedPage = page as PageObjectResponse;
+        const title = typedPage.properties.Name?.type === 'title' 
+          ? typedPage.properties.Name.title[0]?.plain_text 
+          : 'Untitled';
+        const content = typedPage.properties.Content?.type === 'rich_text' 
+          ? typedPage.properties.Content.rich_text[0]?.plain_text 
+          : '';
 
-      return pages;
+        return {
+          title: title || "Untitled",
+          content: content || "",
+          type: "document" as const,
+          parentId: null,
+          notionId: page.id,
+        };
+      });
     } catch (error: any) {
       console.error("Error syncing with Notion:", error);
-      throw new Error(error.message);
+      if (error.code === 'unauthorized') {
+        throw new Error("Invalid Notion token. Please check your configuration.");
+      } else if (error.code === 'object_not_found') {
+        throw new Error("Notion database not found. Please check your database ID.");
+      }
+      throw new Error(error.message || "Failed to sync with Notion");
     }
   }
 
-  async createPage(title: string, content: string) {
-    try {
-      const response = await this.notion.pages.create({
-        parent: { database_id: import.meta.env.VITE_NOTION_DATABASE_ID },
-        properties: {
-          Name: {
-            title: [{ text: { content: title } }],
-          },
-          Content: {
-            rich_text: [{ text: { content } }],
-          },
-        },
-      });
-
-      return {
-        id: response.id,
-        title,
-        content,
-        type: "document" as const,
-        parentId: null,
-        createdAt: new Date(response.created_time),
-        updatedAt: new Date(response.last_edited_time),
-      };
-    } catch (error: any) {
-      console.error("Error creating Notion page:", error);
-      throw new Error(error.message);
-    }
-  }
-
-  async updatePage(pageId: string, title: string, content: string) {
+  async updatePage(pageId: string, title: string, content: string): Promise<void> {
     try {
       await this.notion.pages.update({
         page_id: pageId,
@@ -76,7 +66,12 @@ class NotionService {
       });
     } catch (error: any) {
       console.error("Error updating Notion page:", error);
-      throw new Error(error.message);
+      if (error.code === 'unauthorized') {
+        throw new Error("Invalid Notion token. Please check your configuration.");
+      } else if (error.code === 'object_not_found') {
+        throw new Error("Notion page not found. Please check the page ID.");
+      }
+      throw new Error(error.message || "Failed to update Notion page");
     }
   }
 }

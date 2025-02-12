@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import OpenAI from "openai";
+import { insertDocumentSchema } from "../shared/schema";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -20,6 +21,75 @@ const openai = new OpenAI({
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // Document endpoints
+  app.get("/api/documents", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const documents = await storage.getDocuments(req.user.id);
+      res.json(documents);
+    } catch (error: any) {
+      console.error("Error fetching documents:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/documents/sync", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { documents } = req.body;
+      if (!Array.isArray(documents)) {
+        return res.status(400).json({ error: "Invalid documents format" });
+      }
+
+      const results = await Promise.all(
+        documents.map(async (doc) => {
+          const parsedDoc = insertDocumentSchema.parse({
+            ...doc,
+            userId: req.user!.id,
+          });
+          return storage.upsertDocument(parsedDoc);
+        })
+      );
+
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error syncing documents:", error);
+      res.status(500).json({ 
+        error: "Failed to sync documents",
+        details: error.message 
+      });
+    }
+  });
+
+  app.post("/api/documents", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const document = await storage.createDocument({
+        ...req.body,
+        userId: req.user.id,
+      });
+      res.json(document);
+    } catch (error: any) {
+      console.error("Error creating document:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/documents/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const document = await storage.updateDocument(
+        parseInt(req.params.id),
+        req.user.id,
+        req.body
+      );
+      res.json(document);
+    } catch (error: any) {
+      console.error("Error updating document:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Fitness Journey endpoints
   app.get("/api/fitness-journey", async (req, res) => {

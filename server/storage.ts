@@ -1,5 +1,5 @@
-import { users, messages, bookings, fitnessJourney } from "@shared/schema";
-import type { User, InsertUser, Message, Booking, FitnessJourney, InsertFitnessJourney } from "@shared/schema";
+import { users, messages, bookings, fitnessJourney, documents } from "@shared/schema";
+import type { User, InsertUser, Message, Booking, FitnessJourney, InsertFitnessJourney, Document, InsertDocument } from "@shared/schema";
 import { db } from "./db";
 import { eq, or, desc } from "drizzle-orm";
 import session from "express-session";
@@ -18,6 +18,10 @@ export interface IStorage {
   createBooking(booking: Partial<Booking>): Promise<Booking>;
   getFitnessJourney(userId: number): Promise<FitnessJourney[]>;
   createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney>;
+  getDocuments(userId: number): Promise<Document[]>;
+  upsertDocument(document: InsertDocument): Promise<Document>;
+  createDocument(document: InsertDocument): Promise<Document>;
+  updateDocument(id: number, userId: number, document: Partial<InsertDocument>): Promise<Document>;
   sessionStore: session.Store;
 }
 
@@ -95,7 +99,7 @@ export class DatabaseStorage implements IStorage {
       .insert(bookings)
       .values({
         userId: booking.userId,
-        date: new Date(booking.date), // Ensure date is properly converted
+        date: new Date(booking.date),
         status: booking.status || "pending",
         notes: booking.notes || null
       })
@@ -112,7 +116,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney> {
-    // Ensure the date is properly converted to a Date object
     const [newEntry] = await db
       .insert(fitnessJourney)
       .values({
@@ -121,6 +124,90 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return newEntry;
+  }
+
+  async getDocuments(userId: number): Promise<Document[]> {
+    return db
+      .select()
+      .from(documents)
+      .where(eq(documents.userId, userId))
+      .orderBy(desc(documents.updatedAt));
+  }
+
+  async upsertDocument(document: InsertDocument): Promise<Document> {
+    if (!document.content || !document.title || !document.userId) {
+      throw new Error("Missing required document fields");
+    }
+
+    let existingDoc: Document | undefined;
+    if (document.notionId) {
+      [existingDoc] = await db
+        .select()
+        .from(documents)
+        .where(eq(documents.notionId, document.notionId));
+    }
+
+    if (existingDoc) {
+      const [updatedDoc] = await db
+        .update(documents)
+        .set({
+          ...document,
+          updatedAt: new Date(),
+        })
+        .where(eq(documents.id, existingDoc.id))
+        .returning();
+      return updatedDoc;
+    } else {
+      const [newDoc] = await db
+        .insert(documents)
+        .values({
+          ...document,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      return newDoc;
+    }
+  }
+
+  async createDocument(document: InsertDocument): Promise<Document> {
+    if (!document.content || !document.title || !document.userId) {
+      throw new Error("Missing required document fields");
+    }
+
+    const [newDoc] = await db
+      .insert(documents)
+      .values({
+        ...document,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return newDoc;
+  }
+
+  async updateDocument(id: number, userId: number, document: Partial<InsertDocument>): Promise<Document> {
+    const [existingDoc] = await db
+      .select()
+      .from(documents)
+      .where(
+        eq(documents.id, id) &&
+        eq(documents.userId, userId)
+      );
+
+    if (!existingDoc) {
+      throw new Error("Document not found or access denied");
+    }
+
+    const [updatedDoc] = await db
+      .update(documents)
+      .set({
+        ...document,
+        updatedAt: new Date(),
+      })
+      .where(eq(documents.id, id))
+      .returning();
+    return updatedDoc;
   }
 }
 
