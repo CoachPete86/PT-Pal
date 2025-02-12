@@ -21,12 +21,16 @@ export default function FoodAnalysis() {
     mutationFn: async (base64Image: string) => {
       try {
         const res = await apiRequest("POST", "/api/analyze-food", { image: base64Image });
-        return await res.json();
+        const data = await res.json();
+        if (data.error) {
+          throw new Error(data.details || data.error);
+        }
+        return data;
       } catch (error: any) {
         throw new Error(error.message || "Failed to analyze food image");
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Analysis Complete",
         description: "Your food image has been analyzed successfully.",
@@ -38,15 +42,24 @@ export default function FoodAnalysis() {
         description: error.message,
         variant: "destructive",
       });
-      // Reset the form on error
-      setSelectedFile(null);
-      setPreview(null);
+      // Don't reset the form on error to allow retrying
     },
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file (JPEG, PNG, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (4MB limit)
       if (file.size > 4 * 1024 * 1024) {
         toast({
           title: "File too large",
@@ -60,6 +73,13 @@ export default function FoodAnalysis() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
+      };
+      reader.onerror = () => {
+        toast({
+          title: "Error reading file",
+          description: "Failed to read the selected image",
+          variant: "destructive",
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -106,6 +126,9 @@ export default function FoodAnalysis() {
                       <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">
                         Click to upload food image
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Max size: 4MB
                       </p>
                     </div>
                   )}
