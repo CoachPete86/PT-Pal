@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { notionService } from "@/lib/notion-service";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface DocumentListProps {
@@ -29,8 +28,7 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
 
   const syncMutation = useMutation({
     mutationFn: async () => {
-      const notionDocs = await notionService.syncDatabase();
-      const res = await apiRequest("POST", "/api/documents/sync", { documents: notionDocs });
+      const res = await apiRequest("POST", "/api/documents/sync");
       return res.json();
     },
     onSuccess: () => {
@@ -114,7 +112,7 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
         >
           <Icon className="h-4 w-4" />
           <span className="truncate">{document.title}</span>
-          {isFolder && document.children?.length > 0 && (
+          {isFolder && document.children && document.children.length > 0 && (
             <ChevronRight className="h-4 w-4 ml-auto" />
           )}
         </Button>

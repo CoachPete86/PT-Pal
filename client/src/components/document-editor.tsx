@@ -1,8 +1,8 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
-import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Button } from "@/components/ui/button";
 import {
   Bold,
@@ -19,7 +19,6 @@ import { InsertDocument } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { notionService } from "@/lib/notion-service";
 
 interface DocumentEditorProps {
   initialContent?: string;
@@ -58,9 +57,13 @@ export default function DocumentEditor({
       const endpoint = documentId ? `/api/documents/${documentId}` : "/api/documents";
       const method = documentId ? "PATCH" : "POST";
 
-      // If we have a Notion page ID, update it in Notion as well
+      // If we have a Notion page ID and notionSync is true, sync with Notion
       if (notionPageId && data.notionSync) {
-        await notionService.updatePage(notionPageId, data.title || "Untitled", data.content);
+        await apiRequest("POST", `/api/documents/${documentId}/notion-sync`, {
+          title: data.title,
+          content: data.content,
+          notionPageId,
+        });
       }
 
       const res = await apiRequest(method, endpoint, data);
@@ -163,21 +166,23 @@ export default function DocumentEditor({
       <EditorContent editor={editor} className="min-h-[500px]" />
 
       <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={() =>
-            saveMutation.mutate({
-              title: "Untitled Document",
-              content: editor.getHTML(),
-              type: "document",
-              parentId: null,
-              notionSync: true,
-            })
-          }
-          disabled={saveMutation.isPending}
-        >
-          Save & Sync to Notion
-        </Button>
+        {notionPageId && (
+          <Button
+            variant="outline"
+            onClick={() =>
+              saveMutation.mutate({
+                title: "Untitled Document",
+                content: editor.getHTML(),
+                type: "document",
+                parentId: null,
+                notionSync: true,
+              })
+            }
+            disabled={saveMutation.isPending}
+          >
+            Save & Sync to Notion
+          </Button>
+        )}
         <Button
           onClick={() =>
             saveMutation.mutate({

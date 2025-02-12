@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import OpenAI from "openai";
 import { insertDocumentSchema } from "../shared/schema";
+import { Client } from "@notionhq/client";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -19,8 +20,79 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
+  throw new Error("Notion configuration is incomplete. Please ensure both NOTION_TOKEN and NOTION_DATABASE_ID are set.");
+}
+
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
+
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // Notion sync endpoint
+  app.post("/api/documents/sync", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const response = await notion.databases.query({
+        database_id: process.env.NOTION_DATABASE_ID!,
+      });
+
+      const documents = response.results.map((page: any) => {
+        const title = page.properties.Name?.title[0]?.plain_text || 'Untitled';
+        const content = page.properties.Content?.rich_text[0]?.plain_text || '';
+
+        return {
+          title,
+          content,
+          type: "document" as const,
+          parentId: null,
+          notionId: page.id,
+          userId: req.user!.id,
+        };
+      });
+
+      const results = await Promise.all(
+        documents.map(doc => storage.upsertDocument(doc))
+      );
+
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error syncing with Notion:", error);
+      res.status(500).json({ 
+        error: "Failed to sync with Notion",
+        details: error.message 
+      });
+    }
+  });
+
+  // Update Notion page endpoint
+  app.post("/api/documents/:id/notion-sync", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { title, content } = req.body;
+      const { id } = req.params; // Corrected parameter name
+
+      await notion.pages.update({
+        page_id: id, // Using corrected parameter
+        properties: {
+          Name: {
+            title: [{ text: { content: title } }],
+          },
+          Content: {
+            rich_text: [{ text: { content } }],
+          },
+        },
+      });
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error updating Notion page:", error);
+      res.status(500).json({ 
+        error: "Failed to update Notion page",
+        details: error.message 
+      });
+    }
+  });
 
   // Document endpoints
   app.get("/api/documents", async (req, res) => {
@@ -31,34 +103,6 @@ export function registerRoutes(app: Express): Server {
     } catch (error: any) {
       console.error("Error fetching documents:", error);
       res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/api/documents/sync", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    try {
-      const { documents } = req.body;
-      if (!Array.isArray(documents)) {
-        return res.status(400).json({ error: "Invalid documents format" });
-      }
-
-      const results = await Promise.all(
-        documents.map(async (doc) => {
-          const parsedDoc = insertDocumentSchema.parse({
-            ...doc,
-            userId: req.user!.id,
-          });
-          return storage.upsertDocument(parsedDoc);
-        })
-      );
-
-      res.json(results);
-    } catch (error: any) {
-      console.error("Error syncing documents:", error);
-      res.status(500).json({ 
-        error: "Failed to sync documents",
-        details: error.message 
-      });
     }
   });
 
