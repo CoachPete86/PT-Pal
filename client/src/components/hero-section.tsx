@@ -8,7 +8,7 @@ export default function HeroSection() {
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1507679799987-c73779587ccf")',
+            'url("/assets/coach-pete.jpeg")',
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
