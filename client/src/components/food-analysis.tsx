@@ -19,8 +19,12 @@ export default function FoodAnalysis() {
 
   const analyzeMutation = useMutation({
     mutationFn: async (base64Image: string) => {
-      const res = await apiRequest("POST", "/api/analyze-food", { image: base64Image });
-      return res.json();
+      try {
+        const res = await apiRequest("POST", "/api/analyze-food", { image: base64Image });
+        return await res.json();
+      } catch (error: any) {
+        throw new Error(error.message || "Failed to analyze food image");
+      }
     },
     onSuccess: () => {
       toast({
@@ -34,6 +38,9 @@ export default function FoodAnalysis() {
         description: error.message,
         variant: "destructive",
       });
+      // Reset the form on error
+      setSelectedFile(null);
+      setPreview(null);
     },
   });
 
@@ -59,7 +66,14 @@ export default function FoodAnalysis() {
   };
 
   const handleAnalyze = async () => {
-    if (!preview) return;
+    if (!preview) {
+      toast({
+        title: "No image selected",
+        description: "Please select an image to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
     analyzeMutation.mutate(preview);
   };
 
