@@ -19,16 +19,19 @@ import { InsertDocument } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { notionService } from "@/lib/notion-service";
 
 interface DocumentEditorProps {
   initialContent?: string;
   documentId?: number;
+  notionPageId?: string;
   onSave?: (document: InsertDocument) => void;
 }
 
 export default function DocumentEditor({
   initialContent = "",
   documentId,
+  notionPageId,
   onSave,
 }: DocumentEditorProps) {
   const { toast } = useToast();
@@ -51,9 +54,15 @@ export default function DocumentEditor({
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: InsertDocument) => {
+    mutationFn: async (data: InsertDocument & { notionSync?: boolean }) => {
       const endpoint = documentId ? `/api/documents/${documentId}` : "/api/documents";
       const method = documentId ? "PATCH" : "POST";
+
+      // If we have a Notion page ID, update it in Notion as well
+      if (notionPageId && data.notionSync) {
+        await notionService.updatePage(notionPageId, data.title || "Untitled", data.content);
+      }
+
       const res = await apiRequest(method, endpoint, data);
       return res.json();
     },
@@ -153,20 +162,36 @@ export default function DocumentEditor({
 
       <EditorContent editor={editor} className="min-h-[500px]" />
 
-      <Button
-        className="ml-auto"
-        onClick={() =>
-          saveMutation.mutate({
-            title: "Untitled Document",
-            content: editor.getHTML(),
-            type: "document",
-            parentId: null,
-          })
-        }
-        disabled={saveMutation.isPending}
-      >
-        Save Document
-      </Button>
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() =>
+            saveMutation.mutate({
+              title: "Untitled Document",
+              content: editor.getHTML(),
+              type: "document",
+              parentId: null,
+              notionSync: true,
+            })
+          }
+          disabled={saveMutation.isPending}
+        >
+          Save & Sync to Notion
+        </Button>
+        <Button
+          onClick={() =>
+            saveMutation.mutate({
+              title: "Untitled Document",
+              content: editor.getHTML(),
+              type: "document",
+              parentId: null,
+            })
+          }
+          disabled={saveMutation.isPending}
+        >
+          Save Locally
+        </Button>
+      </div>
     </div>
   );
 }

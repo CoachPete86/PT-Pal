@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Document } from "@shared/schema";
 import {
   ChevronRight,
@@ -7,10 +7,14 @@ import {
   FolderOpen,
   Loader2,
   Plus,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { notionService } from "@/lib/notion-service";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface DocumentListProps {
   onSelect: (document: Document) => void;
@@ -18,8 +22,31 @@ interface DocumentListProps {
 }
 
 export default function DocumentList({ onSelect, selectedId }: DocumentListProps) {
+  const { toast } = useToast();
   const { data: documents, isLoading } = useQuery<Document[]>({
     queryKey: ["/api/documents"],
+  });
+
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const notionDocs = await notionService.syncDatabase();
+      const res = await apiRequest("POST", "/api/documents/sync", { documents: notionDocs });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+      toast({
+        title: "Success",
+        description: "Documents synced with Notion successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -34,10 +61,25 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
     return (
       <div className="text-center p-4">
         <p className="text-sm text-muted-foreground mb-4">No documents yet</p>
-        <Button variant="outline" size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Document
-        </Button>
+        <div className="space-y-2">
+          <Button variant="outline" size="sm" className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Document
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+          >
+            <RefreshCw className={cn(
+              "h-4 w-4 mr-2",
+              syncMutation.isPending && "animate-spin"
+            )} />
+            Sync with Notion
+          </Button>
+        </div>
       </div>
     );
   }
@@ -54,7 +96,7 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
 
   const documentTree = buildTree(documents);
 
-  const DocumentNode = ({ document, level = 0 }: { document: Document; level?: number }) => {
+  const DocumentNode = ({ document, level = 0 }: { document: Document & { children?: Document[] }; level?: number }) => {
     const isFolder = document.type === "folder";
     const isSelected = document.id === selectedId;
     const Icon = isFolder ? FolderOpen : File;
@@ -85,12 +127,28 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
   };
 
   return (
-    <ScrollArea className="h-[calc(100vh-12rem)]">
-      <div className="space-y-1 p-2">
-        {documentTree.map((document) => (
-          <DocumentNode key={document.id} document={document} />
-        ))}
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => syncMutation.mutate()}
+          disabled={syncMutation.isPending}
+        >
+          <RefreshCw className={cn(
+            "h-4 w-4 mr-2",
+            syncMutation.isPending && "animate-spin"
+          )} />
+          Sync
+        </Button>
       </div>
-    </ScrollArea>
+      <ScrollArea className="h-[calc(100vh-12rem)]">
+        <div className="space-y-1 p-2">
+          {documentTree.map((document) => (
+            <DocumentNode key={document.id} document={document} />
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
