@@ -64,7 +64,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
   .omit({ id: true })
   .extend({
-    date: z.coerce.date(),
+    date: z.date(),
   });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

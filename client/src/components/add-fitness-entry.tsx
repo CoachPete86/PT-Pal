@@ -57,10 +57,10 @@ export default function AddFitnessEntry() {
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Convert the date to ISO string before sending to the server
+      // Ensure we have a valid date object
       const formattedData = {
         ...data,
-        date: data.date.toISOString(),
+        date: new Date(data.date), // Convert to Date object if it isn't already
       };
       const res = await apiRequest("POST", "/api/fitness-journey", formattedData);
       return res.json();

@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
       .insert(bookings)
       .values({
         userId: booking.userId,
-        date: booking.date,
+        date: new Date(booking.date), // Ensure date is properly converted
         status: booking.status || "pending",
         notes: booking.notes || null
       })
@@ -112,9 +112,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney> {
+    // Ensure the date is properly converted to a Date object
     const [newEntry] = await db
       .insert(fitnessJourney)
-      .values(entry)
+      .values({
+        ...entry,
+        date: new Date(entry.date)
+      })
       .returning();
     return newEntry;
   }
