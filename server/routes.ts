@@ -52,15 +52,20 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Invalid image format. Please provide a valid base64 encoded image." });
       }
 
+      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
+          {
+            role: "system",
+            content: "You are a nutrition analysis expert. Analyze food images and provide detailed nutritional information in JSON format."
+          },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Analyze this food image and provide nutritional information including: estimated calories, macronutrients (protein, carbs, fats), and any notable healthy or concerning aspects. Format the response in a clear, structured way.",
+                text: "Analyze this food image and provide nutritional information in JSON format including: estimated calories, macronutrients (protein, carbs, fats), and any notable healthy or concerning aspects. Return the response as a JSON object with the following structure: { calories: number, protein: string, carbs: string, fats: string, notes: string[] }",
               },
               {
                 type: "image_url",
