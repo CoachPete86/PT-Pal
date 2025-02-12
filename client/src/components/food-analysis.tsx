@@ -19,9 +19,7 @@ export default function FoodAnalysis() {
 
   const analyzeMutation = useMutation({
     mutationFn: async (base64Image: string) => {
-      const res = await apiRequest("POST", "/api/analyze-food", {
-        image: base64Image,
-      });
+      const res = await apiRequest("POST", "/api/analyze-food", { image: base64Image });
       return res.json();
     },
     onSuccess: () => {
@@ -71,8 +69,7 @@ export default function FoodAnalysis() {
         <CardHeader>
           <CardTitle>Food Analysis</CardTitle>
           <CardDescription>
-            Upload a photo of your meal to get nutritional insights powered by
-            AI
+            Upload a photo of your meal to get nutritional insights powered by AI
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -51,7 +51,7 @@ export default function MessagePanel() {
                 "p-4 rounded-lg max-w-[80%]",
                 message.senderId === user?.id
                   ? "ml-auto bg-primary text-primary-foreground"
-                  : "bg-muted",
+                  : "bg-muted"
               )}
             >
               <div className="text-sm">{message.content}</div>

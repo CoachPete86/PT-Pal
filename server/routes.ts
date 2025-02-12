@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import OpenAI from "openai";
-import { listDocuments, createDocument, getDocument } from "./services/notion";
 
 const openai = new OpenAI();
 
@@ -42,57 +41,6 @@ export function registerRoutes(app: Express): Server {
     res.json(booking);
   });
 
-  // Document Management endpoints
-  app.get("/api/documents", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    try {
-      const documents = await listDocuments();
-      res.json(documents);
-    } catch (error: any) {
-      console.error("Document list error:", error);
-      res.status(500).json({ 
-        error: error.message,
-        code: error.code
-      });
-    }
-  });
-
-  app.post("/api/documents", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    try {
-      const { title, type, content } = req.body;
-      if (!title || !type || !content) {
-        return res.status(400).json({ 
-          error: "Missing required fields",
-          details: "Title, type, and content are required"
-        });
-      }
-      const document = await createDocument(title, type, content);
-      res.json(document);
-    } catch (error: any) {
-      console.error("Document creation error:", error);
-      res.status(500).json({ 
-        error: error.message,
-        code: error.code
-      });
-    }
-  });
-
-  app.get("/api/documents/:id", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    try {
-      const content = await getDocument(req.params.id);
-      res.json({ content });
-    } catch (error: any) {
-      console.error("Document fetch error:", error);
-      const status = error.message.includes("not found") ? 404 : 500;
-      res.status(status).json({ 
-        error: error.message,
-        code: error.code
-      });
-    }
-  });
-
   // Food Analysis endpoint
   app.post("/api/analyze-food", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
@@ -128,9 +76,9 @@ export function registerRoutes(app: Express): Server {
       res.json({ analysis: response.choices[0].message.content });
     } catch (error: any) {
       console.error("Food analysis error:", error);
-      res.status(500).json({
+      res.status(500).json({ 
         error: "Failed to analyze food image",
-        details: error.message,
+        details: error.message 
       });
     }
   });

@@ -9,8 +9,8 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-lg mb-4">Coach Pete Ryan</h3>
             <p className="text-muted-foreground">
-              Professional personal trainer dedicated to helping you achieve
-              your fitness goals through expert movement and strength training.
+              Professional personal trainer dedicated to helping you achieve your
+              fitness goals through expert movement and strength training.
             </p>
           </div>
 
@@ -84,10 +84,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-          <p>
-            &copy; {new Date().getFullYear()} Coach Pete Ryan. All rights
-            reserved.
-          </p>
+          <p>&copy; {new Date().getFullYear()} Coach Pete Ryan. All rights reserved.</p>
         </div>
       </div>
     </footer>

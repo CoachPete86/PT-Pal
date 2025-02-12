@@ -56,12 +56,12 @@ export default function AuthPage() {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
-
+              
               <TabsContent value="login">
                 <Form {...loginForm}>
                   <form
                     onSubmit={loginForm.handleSubmit((data) =>
-                      loginMutation.mutate(data),
+                      loginMutation.mutate(data)
                     )}
                     className="space-y-4"
                   >
@@ -106,7 +106,7 @@ export default function AuthPage() {
                 <Form {...registerForm}>
                   <form
                     onSubmit={registerForm.handleSubmit((data) =>
-                      registerMutation.mutate(data),
+                      registerMutation.mutate(data)
                     )}
                     className="space-y-4"
                   >
@@ -174,8 +174,8 @@ export default function AuthPage() {
           <div className="text-white">
             <h2 className="text-3xl font-bold mb-4">Transform Your Life</h2>
             <p className="text-lg">
-              Join our community and get access to personalized training
-              programs, expert guidance, and support on your fitness journey.
+              Join our community and get access to personalized training programs,
+              expert guidance, and support on your fitness journey.
             </p>
           </div>
         </div>
