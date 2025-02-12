@@ -45,7 +45,7 @@ export default function AboutSection() {
             className="aspect-square rounded-lg bg-cover bg-center shadow-2xl"
             style={{
               backgroundImage:
-                'url("https://images.unsplash.com/photo-1507679799987-c73779587ccf")',
+                'url("/assets/coach-pete.jpeg")',
             }}
           />
         </div>
