@@ -38,6 +38,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Food Analysis endpoint
+  // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
   app.post("/api/analyze-food", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
@@ -52,7 +53,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4-vision-preview",
+        model: "gpt-4o",
         messages: [
           {
             role: "user",
@@ -71,6 +72,7 @@ export function registerRoutes(app: Express): Server {
           },
         ],
         max_tokens: 500,
+        response_format: { type: "json_object" }
       });
 
       res.json({ analysis: response.choices[0].message.content });
@@ -87,6 +89,11 @@ export function registerRoutes(app: Express): Server {
         res.status(500).json({ 
           error: "Service temporarily unavailable",
           details: "The service is currently unavailable. Please try again later."
+        });
+      } else if (error.code === 'model_not_found') {
+        res.status(500).json({
+          error: "Model configuration error",
+          details: "The AI model is currently unavailable. Please try again later."
         });
       } else {
         res.status(500).json({ 
