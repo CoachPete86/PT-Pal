@@ -6,6 +6,7 @@ import FoodAnalysis from "@/components/food-analysis";
 import FitnessTimeline from "@/components/fitness-timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AddFitnessEntry from "@/components/add-fitness-entry";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -26,7 +27,16 @@ export default function DashboardPage() {
             <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="fitness-journey">
+          <TabsContent value="fitness-journey" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Add New Entry</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AddFitnessEntry />
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Your Fitness Journey</CardTitle>
