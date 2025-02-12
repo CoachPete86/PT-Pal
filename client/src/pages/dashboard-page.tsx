@@ -4,12 +4,17 @@ import BookingForm from "@/components/booking-form";
 import MessagePanel from "@/components/message-panel";
 import FoodAnalysis from "@/components/food-analysis";
 import FitnessTimeline from "@/components/fitness-timeline";
+import DocumentEditor from "@/components/document-editor";
+import DocumentList from "@/components/document-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddFitnessEntry from "@/components/add-fitness-entry";
+import { useState } from "react";
+import type { Document } from "@shared/schema";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,6 +30,7 @@ export default function DashboardPage() {
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
             <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="fitness-journey" className="space-y-6">
@@ -71,6 +77,35 @@ export default function DashboardPage() {
 
           <TabsContent value="food-analysis">
             <FoodAnalysis />
+          </TabsContent>
+
+          <TabsContent value="documents" className="grid grid-cols-4 gap-6">
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Documents</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DocumentList
+                  onSelect={setSelectedDocument}
+                  selectedId={selectedDocument?.id}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>
+                  {selectedDocument ? selectedDocument.title : "New Document"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <DocumentEditor
+                  initialContent={selectedDocument?.content}
+                  documentId={selectedDocument?.id}
+                  onSave={() => setSelectedDocument(null)}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

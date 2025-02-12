@@ -35,7 +35,20 @@ export const bookings = pgTable("bookings", {
   notes: text("notes"),
 });
 
-// New table for fitness journey milestones
+// New table for documents
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  userId: serial("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(), // Rich text content
+  parentId: integer("parent_id"), // For folder hierarchy, null means root
+  type: text("type", { enum: ["document", "folder"] }).default("document").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const fitnessJourney = pgTable("fitness_journey", {
   id: serial("id").primaryKey(),
   userId: serial("user_id")
@@ -47,8 +60,8 @@ export const fitnessJourney = pgTable("fitness_journey", {
   category: text("category", {
     enum: ["weight", "strength", "endurance", "milestone", "measurement"]
   }).notNull(),
-  value: text("value"), // Store numeric values as text to support different formats
-  unit: text("unit"), // e.g., "kg", "lbs", "km", etc.
+  value: text("value"),
+  unit: text("unit"),
   status: text("status", { enum: ["achieved", "in_progress", "planned"] })
     .default("in_progress")
     .notNull(),
@@ -60,6 +73,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   fullName: true,
 });
+
+export const insertDocumentSchema = createInsertSchema(documents)
+  .omit({ id: true, createdAt: true, updatedAt: true })
+  .extend({
+    content: z.string().min(1, "Content cannot be empty"),
+    parentId: z.number().nullable(),
+  });
 
 export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
   .omit({ id: true })
@@ -73,3 +93,5 @@ export type Message = typeof messages.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type FitnessJourney = typeof fitnessJourney.$inferSelect;
 export type InsertFitnessJourney = z.infer<typeof insertFitnessJourneySchema>;
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
