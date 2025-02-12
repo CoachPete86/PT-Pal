@@ -21,11 +21,16 @@ import {
 import { Loader2, Upload } from "lucide-react";
 
 interface AnalysisResult {
+  mealName: string;
+  mealType: string;
+  ingredients: string[];
+  brandNames: string[];
   calories: number;
   protein: string;
   carbs: string;
   fats: string;
   notes: string[];
+  servingSize: string;
 }
 
 export default function FoodAnalysis() {
@@ -176,9 +181,9 @@ export default function FoodAnalysis() {
             {analyzeMutation.data && (
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Nutritional Analysis</CardTitle>
+                  <CardTitle>{analyzeMutation.data.mealName}</CardTitle>
                   <CardDescription>
-                    Estimated nutritional content of your meal
+                    {analyzeMutation.data.mealType} - {analyzeMutation.data.servingSize}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -190,6 +195,33 @@ export default function FoodAnalysis() {
                       Estimated Calories
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Ingredients:</h4>
+                    <ul className="list-disc pl-4 space-y-1">
+                      {analyzeMutation.data.ingredients.map((ingredient, index) => (
+                        <li key={index} className="text-sm">
+                          {ingredient}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {analyzeMutation.data.brandNames.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Brands:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {analyzeMutation.data.brandNames.map((brand, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-muted rounded-md text-sm"
+                          >
+                            {brand}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <Table>
                     <TableHeader>
