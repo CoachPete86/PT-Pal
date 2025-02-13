@@ -168,54 +168,7 @@ Available Equipment:
         messages: [
           {
             role: "user",
-            content: `${generatePrompt} Structure the response as a JSON object with the following format:
-{
-  "classDetails": {
-    "className": "${sessionType === 'group' ? classType : 'Personal Training'}",
-    "coach": "Coach Pete Ryan",
-    "date": "current date",
-    "duration": 45,
-    "location": "PureGym West Byfleet"
-  },
-  "equipmentNeeded": ["list of equipment"],
-  "description": "Brief explanation of the session and circuits",
-  "warmup": [
-    {
-      "exercise": "exercise name",
-      "duration": "duration",
-      "notes": "optional notes"
-    }
-  ],
-  "mainWorkout": [
-    {
-      "circuitNumber": 1,
-      "explanation": "circuit goals and instructions",
-      "exercises": [
-        {
-          "exercise": "exercise name",
-          "reps": "number of reps",
-          "sets": "number of sets",
-          "men": "men's weight/variation",
-          "woman": "women's weight/variation",
-          "notes": "optional notes"
-        }
-      ]
-    }
-  ],
-  "cooldown": [
-    {
-      "exercise": "stretch/exercise name",
-      "duration": "duration",
-      "notes": "optional notes"
-    }
-  ],
-  "closingMessage": "Overview highlighting key elements and recovery principles"${planType === 'program' ? `,
-  "progression": {
-    "weeklyFocus": "Focus for each week",
-    "progressionStrategy": "How to progress over the 12 weeks",
-    "loadingPatterns": "Description of loading patterns"
-  }` : ''}
-}`
+            content: generatePrompt
           }
         ],
         temperature: 0.7,
@@ -228,9 +181,21 @@ Available Equipment:
       const currentDate = format(new Date(), 'dd/MM/yyyy');
       plan.classDetails.date = currentDate;
 
-      // Save to Notion
+      // Save to Notion with chunked content
       const workoutTitle = `${plan.classDetails.className} - ${currentDate}`;
-      const workoutContent = JSON.stringify(plan, null, 2);
+
+      // Create a summary for Notion that fits within limits
+      const notionSummary = {
+        title: workoutTitle,
+        type: sessionType === 'group' ? 'Group Class' : 'Personal Training',
+        date: currentDate,
+        duration: '45 minutes',
+        fitnessLevel,
+        exercises: plan.mainWorkout.map(circuit => 
+          circuit.exercises.map(ex => ex.exercise).join(", ")
+        ).join("; "),
+        equipment: plan.equipmentNeeded.join(", ")
+      };
 
       let notionPageId = null;
 
@@ -242,11 +207,16 @@ Available Equipment:
               title: [{ text: { content: workoutTitle } }],
             },
             Content: {
-              rich_text: [{ text: { content: workoutContent } }],
+              rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2) } }],
             },
             Type: {
               select: {
                 name: "Workout Plan"
+              }
+            },
+            Date: {
+              date: { 
+                start: new Date().toISOString()
               }
             }
           }
@@ -260,8 +230,8 @@ Available Equipment:
       try {
         await storage.createDocument({
           title: workoutTitle,
-          content: workoutContent,
-          type: "workout",
+          content: JSON.stringify(plan, null, 2),
+          type: "document", 
           notionId: notionPageId,
           userId: req.user.id,
           parentId: null,
