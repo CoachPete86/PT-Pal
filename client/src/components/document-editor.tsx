@@ -38,16 +38,41 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   Command,
-  CommandDialog,
+  CommandList,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
-  CommandList,
   CommandSeparator,
+  Command as CommandComponent, //Rename to avoid conflict
+  CommandInput,
 } from "@/components/ui/command";
+import { useState } from "react";
+import { Extension } from '@tiptap/core'
+import Suggestion from '@tiptap/suggestion'
 
 const lowlight = createLowlight(common)
+
+const SlashCommand = Extension.create({
+  name: 'slashCommand',
+  addOptions() {
+    return {
+      suggestion: {
+        char: '/',
+        command: ({ editor, range, props }) => {
+          props.command({ editor, range })
+        },
+      }
+    }
+  },
+  addProseMirrorPlugins() {
+    return [
+      Suggestion({
+        editor: this.editor,
+        ...this.options.suggestion,
+      }),
+    ]
+  },
+});
 
 interface DocumentEditorProps {
   initialContent?: string;
@@ -63,6 +88,8 @@ export default function DocumentEditor({
   onSave,
 }: DocumentEditorProps) {
   const { toast } = useToast();
+  const [showCommandMenu, setShowCommandMenu] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -88,6 +115,27 @@ export default function DocumentEditor({
       }),
       Placeholder.configure({
         placeholder: 'Type "/" for commands or "@coach" for AI assistance...',
+      }),
+      SlashCommand.configure({
+        suggestion: {
+          items: () => [
+            { title: 'Heading 1', command: () => insertBlock('heading-1') },
+            { title: 'Heading 2', command: () => insertBlock('heading-2') },
+            { title: 'Task List', command: () => insertBlock('task-list') },
+            { title: 'Table', command: () => insertBlock('table') },
+            { title: 'Code Block', command: () => insertBlock('code-block') },
+            { title: 'Ask Coach Pete', command: () => handleAiCommand('help') },
+            { title: 'Explain Exercise', command: () => handleAiCommand('explain-exercise') },
+            { title: 'Suggest Workout', command: () => handleAiCommand('suggest-workout') },
+            { title: 'Optimize Nutrition', command: () => handleAiCommand('optimize-nutrition') },
+            { title: 'Form Check', command: () => handleAiCommand('form-check') },
+            { title: 'Simplify', command: () => handleAiCommand('simplify') },
+          ],
+          render: () => {
+            setShowCommandMenu(true)
+            return null
+          },
+        },
       }),
     ],
     content: initialContent,
@@ -151,7 +199,6 @@ export default function DocumentEditor({
     },
     onSuccess: (data) => {
       if (editor) {
-        // Insert AI response at current cursor position
         editor.chain().focus().insertContent(data.response).run();
       }
       toast({
@@ -197,6 +244,7 @@ export default function DocumentEditor({
         editor.chain().focus().toggleHeading({ level: 3 }).run();
         break;
     }
+    setShowCommandMenu(false);
   };
 
   const handleAiCommand = (command: string) => {
@@ -209,13 +257,13 @@ export default function DocumentEditor({
       "help": "How can I help you with your fitness journey today?",
     };
 
-    aiAssistMutation.mutate(aiCommands[command] || command);
+    aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
+    setShowCommandMenu(false);
   };
 
   return (
     <div className="space-y-4">
       <div className="border-b pb-4 flex flex-wrap gap-2">
-        {/* Existing toolbar buttons */}
         <div className="flex items-center gap-1">
           <Toggle
             size="sm"
@@ -332,63 +380,65 @@ export default function DocumentEditor({
         </div>
       </div>
 
-      <CommandDialog open={editor.isActive('/')} onOpenChange={() => {}}>
-        <CommandInput placeholder="Type a command..." />
-        <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Blocks">
-            <CommandItem onSelect={() => insertBlock("heading-1")}>
-              <Heading1 className="mr-2 h-4 w-4" />
-              Heading 1
-            </CommandItem>
-            <CommandItem onSelect={() => insertBlock("heading-2")}>
-              <Heading2 className="mr-2 h-4 w-4" />
-              Heading 2
-            </CommandItem>
-            <CommandItem onSelect={() => insertBlock("task-list")}>
-              <CheckSquare className="mr-2 h-4 w-4" />
-              Task List
-            </CommandItem>
-            <CommandItem onSelect={() => insertBlock("table")}>
-              <TableIcon className="mr-2 h-4 w-4" />
-              Table
-            </CommandItem>
-            <CommandItem onSelect={() => insertBlock("code-block")}>
-              <Code className="mr-2 h-4 w-4" />
-              Code Block
-            </CommandItem>
-          </CommandGroup>
+      {showCommandMenu && (
+        <CommandComponent className="fixed inset-x-0 top-1/4 z-50 mx-auto max-w-xl rounded-lg border bg-popover shadow-md">
+          <CommandInput placeholder="Type a command..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup heading="Blocks">
+              <CommandItem onSelect={() => insertBlock("heading-1")}>
+                <Heading1 className="mr-2 h-4 w-4" />
+                Heading 1
+              </CommandItem>
+              <CommandItem onSelect={() => insertBlock("heading-2")}>
+                <Heading2 className="mr-2 h-4 w-4" />
+                Heading 2
+              </CommandItem>
+              <CommandItem onSelect={() => insertBlock("task-list")}>
+                <CheckSquare className="mr-2 h-4 w-4" />
+                Task List
+              </CommandItem>
+              <CommandItem onSelect={() => insertBlock("table")}>
+                <TableIcon className="mr-2 h-4 w-4" />
+                Table
+              </CommandItem>
+              <CommandItem onSelect={() => insertBlock("code-block")}>
+                <Code className="mr-2 h-4 w-4" />
+                Code Block
+              </CommandItem>
+            </CommandGroup>
 
-          <CommandSeparator />
+            <CommandSeparator />
 
-          <CommandGroup heading="AI Coach Pete">
-            <CommandItem onSelect={() => handleAiCommand("explain-exercise")}>
-              <Brain className="mr-2 h-4 w-4" />
-              Explain Exercise
-            </CommandItem>
-            <CommandItem onSelect={() => handleAiCommand("suggest-workout")}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Suggest Workout Plan
-            </CommandItem>
-            <CommandItem onSelect={() => handleAiCommand("optimize-nutrition")}>
-              <Brain className="mr-2 h-4 w-4" />
-              Optimize Nutrition
-            </CommandItem>
-            <CommandItem onSelect={() => handleAiCommand("form-check")}>
-              <Brain className="mr-2 h-4 w-4" />
-              Form Check
-            </CommandItem>
-            <CommandItem onSelect={() => handleAiCommand("simplify")}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Simplify This
-            </CommandItem>
-            <CommandItem onSelect={() => handleAiCommand("help")}>
-              <Brain className="mr-2 h-4 w-4" />
-              Ask Coach Pete
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+            <CommandGroup heading="AI Coach Pete">
+              <CommandItem onSelect={() => handleAiCommand("explain-exercise")}>
+                <Brain className="mr-2 h-4 w-4" />
+                Explain Exercise
+              </CommandItem>
+              <CommandItem onSelect={() => handleAiCommand("suggest-workout")}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Suggest Workout Plan
+              </CommandItem>
+              <CommandItem onSelect={() => handleAiCommand("optimize-nutrition")}>
+                <Brain className="mr-2 h-4 w-4" />
+                Optimize Nutrition
+              </CommandItem>
+              <CommandItem onSelect={() => handleAiCommand("form-check")}>
+                <Brain className="mr-2 h-4 w-4" />
+                Form Check
+              </CommandItem>
+              <CommandItem onSelect={() => handleAiCommand("simplify")}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Simplify This
+              </CommandItem>
+              <CommandItem onSelect={() => handleAiCommand("help")}>
+                <Brain className="mr-2 h-4 w-4" />
+                Ask Coach Pete
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </CommandComponent>
+      )}
 
       {editor && (
         <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
