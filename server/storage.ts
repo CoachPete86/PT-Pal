@@ -9,6 +9,7 @@ import { eq, or, and, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { notion } from "./notion"; // Assuming notion client is imported here
 
 const PostgresSessionStore = connectPg(session);
 
@@ -41,6 +42,7 @@ export interface IStorage {
   updateDocument(id: number, document: Partial<InsertDocument>): Promise<Document>;
 
   sessionStore: session.Store;
+  setupNotionForUser(userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -221,6 +223,34 @@ export class DatabaseStorage implements IStorage {
       .where(eq(documents.id, id))
       .returning();
     return updatedDoc;
+  }
+
+  async setupNotionForUser(userId: number): Promise<void> {
+    try {
+      const user = await this.getUser(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const database = await notion.databases.retrieve({
+        database_id: process.env.NOTION_DATABASE_ID!
+      });
+
+      if (!database.properties['UserId']) {
+        await notion.databases.update({
+          database_id: process.env.NOTION_DATABASE_ID!,
+          properties: {
+            ...database.properties,
+            UserId: {
+              rich_text: {}
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Failed to setup Notion for user:", error);
+      throw error;
+    }
   }
 }
 

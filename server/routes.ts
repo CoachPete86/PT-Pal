@@ -268,6 +268,9 @@ The response must be a valid JSON object with this exact structure:
                 date: { 
                   start: new Date().toISOString()
                 }
+              },
+              UserId: {
+                rich_text: [{ text: { content: req.user.id.toString() } }]
               }
             }
           });
@@ -310,8 +313,19 @@ The response must be a valid JSON object with this exact structure:
   app.post("/api/documents/sync", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
+      // Query Notion database with user filter
       const response = await notion.databases.query({
         database_id: process.env.NOTION_DATABASE_ID!,
+        filter: {
+          and: [
+            {
+              property: "UserId",
+              rich_text: {
+                equals: req.user.id.toString()
+              }
+            }
+          ]
+        }
       });
 
       const documents = response.results.map((page: any) => {
