@@ -9,9 +9,9 @@ import { Dumbbell, Users, Globe, Sun, Brain, ChartBar, Sparkles } from "lucide-r
 
 const services = [
   {
-    title: "AI Workout Plans",
+    title: "Smart Workout Plans",
     description:
-      "Access our cutting-edge AI workout generator that creates professional, structured workout plans following Coach Pete's proven methodology. Perfect for trainers and dedicated athletes.",
+      "Access our cutting-edge workout generator that creates professional, structured workout plans following Coach Pete's proven methodology. Perfect for trainers and dedicated athletes.",
     icon: Sparkles,
     image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2",
     premium: true,

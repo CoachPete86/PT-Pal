@@ -40,8 +40,8 @@ const anthropic = new Anthropic({
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
-  // AI Coach endpoint
-  app.post("/api/ai-coach", async (req, res) => {
+  // Expert Coach endpoint
+  app.post("/api/expert-coach", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
     try {
@@ -55,7 +55,7 @@ export function registerRoutes(app: Express): Server {
       if (req.user.role !== "premium") {
         return res.status(403).json({ 
           error: "Premium subscription required",
-          message: "This feature requires a premium subscription. Please upgrade your plan to access AI Coach Pete."
+          message: "This feature requires a premium subscription. Please upgrade your plan to access Coach Pete's expert system."
         });
       }
 
@@ -93,16 +93,16 @@ Document Context: ${context || "No context provided"}`
 
       res.json({ response: response.choices[0].message.content });
     } catch (error: any) {
-      console.error("AI Coach error:", error);
+      console.error("Expert coach error:", error);
 
       if (error.code === 'insufficient_quota') {
         res.status(500).json({ 
           error: "Service temporarily unavailable",
-          message: "The AI service is currently unavailable. Please try again later."
+          message: "The service is currently unavailable. Please try again later."
         });
       } else {
         res.status(500).json({ 
-          error: "Failed to get AI response",
+          error: "Failed to get response",
           message: error.message
         });
       }
