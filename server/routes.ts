@@ -169,7 +169,6 @@ Available Equipment:
           {
             role: "user",
             content: `${generatePrompt} Structure the response as a JSON object with the following format:
-
 {
   "classDetails": {
     "className": "${sessionType === 'group' ? classType : 'Personal Training'}",
@@ -233,8 +232,10 @@ Available Equipment:
       const workoutTitle = `${plan.classDetails.className} - ${currentDate}`;
       const workoutContent = JSON.stringify(plan, null, 2);
 
+      let notionPageId = null;
+
       try {
-        await notion.pages.create({
+        const notionResponse = await notion.pages.create({
           parent: { database_id: process.env.NOTION_DATABASE_ID! },
           properties: {
             Name: {
@@ -250,9 +251,23 @@ Available Equipment:
             }
           }
         });
+        notionPageId = notionResponse.id;
       } catch (notionError) {
         console.error("Failed to save to Notion:", notionError);
-        // Continue with the response even if Notion save fails
+      }
+
+      // Save to local documents
+      try {
+        await storage.createDocument({
+          title: workoutTitle,
+          content: workoutContent,
+          type: "workout",
+          notionId: notionPageId,
+          userId: req.user.id,
+          parentId: null,
+        });
+      } catch (storageError) {
+        console.error("Failed to save to local storage:", storageError);
       }
 
       res.json({ plan });
