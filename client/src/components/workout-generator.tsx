@@ -48,9 +48,9 @@ const workoutFormSchema = z.object({
   classType: z.string().optional(),
   fitnessLevel: z.enum(["beginner", "intermediate", "advanced"]),
   participantInfo: z.object({
-    count: z.number().min(1).max(30).optional(),
+    count: z.string().transform((val) => parseInt(val) || 0),
     format: z.enum(["individual", "partner", "groups"]).optional(),
-    groupSize: z.number().min(2).max(6).optional(),
+    groupSize: z.string().transform((val) => parseInt(val) || 0).optional(),
   }).optional(),
   circuitPreferences: z.object({
     types: z.array(z.string()),
@@ -95,15 +95,16 @@ const availableEquipment = [
   { id: "yogamat", label: "Yoga Matt" },
 ];
 
+// Update circuit types to focus on timing formats
 const circuitTypes = [
-  { id: "strength", label: "Strength Focused" },
-  { id: "cardio", label: "Cardio/Endurance" },
-  { id: "hiit", label: "HIIT" },
-  { id: "technical", label: "Technical/Skill Work" },
-  { id: "mobility", label: "Mobility/Flexibility" },
-  { id: "power", label: "Power/Explosive" },
-  { id: "bodyweight", label: "Bodyweight Only" },
-  { id: "mixed", label: "Mixed Equipment" },
+  { id: "timed", label: "Timed Circuits (Fixed Work/Rest)" },
+  { id: "superset", label: "Supersets (Back-to-back Exercises)" },
+  { id: "tabata", label: "Tabata (20s Work/10s Rest)" },
+  { id: "amrap", label: "AMRAP (As Many Rounds As Possible)" },
+  { id: "emom", label: "EMOM (Every Minute On the Minute)" },
+  { id: "intervals", label: "High-Intensity Intervals" },
+  { id: "resistance-cardio", label: "Alternating Resistance/Cardio" },
+  { id: "pyramid", label: "Pyramid (Increasing/Decreasing Reps)" },
 ];
 
 interface WorkoutPlan {
@@ -412,7 +413,13 @@ ${generateMutation.data.closingMessage}`;
                         <FormItem>
                           <FormLabel>Expected Number of Participants</FormLabel>
                           <FormControl>
-                            <Input type="number" min="1" max="30" {...field} />
+                            <Input 
+                              type="number"
+                              min="1"
+                              max="30"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
                           </FormControl>
                           <FormDescription>
                             This helps optimize station rotations and equipment allocation
@@ -454,7 +461,13 @@ ${generateMutation.data.closingMessage}`;
                           <FormItem>
                             <FormLabel>Participants per Group</FormLabel>
                             <FormControl>
-                              <Input type="number" min="2" max="6" {...field} />
+                              <Input 
+                                type="number"
+                                min="2"
+                                max="6"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                              />
                             </FormControl>
                           </FormItem>
                         )}
