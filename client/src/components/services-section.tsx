@@ -5,9 +5,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dumbbell, Users, Globe, Sun, Brain, ChartBar } from "lucide-react";
+import { Dumbbell, Users, Globe, Sun, Brain, ChartBar, Sparkles } from "lucide-react";
 
 const services = [
+  {
+    title: "AI Workout Plans",
+    description:
+      "Access our cutting-edge AI workout generator that creates professional, structured workout plans following Coach Pete's proven methodology. Perfect for trainers and dedicated athletes.",
+    icon: Sparkles,
+    image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2",
+    premium: true,
+  },
   {
     title: "1:1 Personal Training",
     description:
@@ -43,13 +51,6 @@ const services = [
     icon: Brain,
     image: "https://images.unsplash.com/photo-1576678927484-cc907957088c",
   },
-  {
-    title: "Nutrition Coaching",
-    description:
-      "Personalised meal plans and macro tracking guidance. Evidence-based nutrition advice to support your fitness goals.",
-    icon: ChartBar,
-    image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061",
-  },
 ];
 
 export default function ServicesSection() {
@@ -75,6 +76,11 @@ export default function ServicesSection() {
                 style={{ backgroundImage: `url(${service.image})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                {service.premium && (
+                  <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                    Premium
+                  </div>
+                )}
               </div>
               <CardHeader className="relative">
                 <CardTitle className="flex items-center gap-2 text-lg">

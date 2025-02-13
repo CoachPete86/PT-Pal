@@ -5,6 +5,7 @@ import { setupAuth } from "./auth";
 import OpenAI from "openai";
 import { insertDocumentSchema } from "../shared/schema";
 import { Client } from "@notionhq/client";
+import Anthropic from '@anthropic-ai/sdk';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -25,6 +26,15 @@ if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
 }
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
+
+if (!process.env.ANTHROPIC_API_KEY) {
+  throw new Error("ANTHROPIC_API_KEY environment variable is not set");
+}
+
+// the newest Anthropic model is "claude-3-5-sonnet-20241022" which was released October 22, 2024
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -95,6 +105,93 @@ Document Context: ${context || "No context provided"}`
           message: error.message
         });
       }
+    }
+  });
+
+  // Workout Plan Generation endpoint
+  app.post("/api/generate-workout", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const { classType, equipment, duration = 45 } = req.body;
+
+      const response = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        messages: [
+          {
+            role: "system",
+            content: `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
+
+Rules to follow:
+1. Always use the exact sections and format from the blueprint
+2. Only include exercises possible with the available equipment
+3. Follow CrossFit-style or circuit-based approach
+4. Ensure exercise selection aligns with equipment quantities
+5. No gym-based exercises requiring unavailable equipment
+6. Duration must be exactly 45 minutes
+7. Location is always PureGym West Byfleet
+
+Available Equipment:
+- Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
+- Kettlebells (kg): 8, 12, 16, 20, 24
+- Plyo Boxes
+- Concept 2 Rowers (3 available)
+- Ski Erg Machines (2 available)
+- Watt Bike
+- Spin Bike
+- Sledge
+- Battle Ropes (2 available)
+- Bodybar with plates
+- Step up Box
+- Yoga Matt`
+          },
+          {
+            role: "user",
+            content: `Generate a complete workout plan for a ${classType} class that's ${duration} minutes long using only the available equipment. Follow this exact format:
+
+## CLASS DETAILS
+- Group Class Name: [class type]
+- Coach: Coach Pete Ryan
+- Date: [current date]
+- Duration: [duration] Minutes
+- Location: PureGym West Byfleet
+
+## Equipment Needed
+[List specific equipment needed for this workout]
+
+## Description
+[Brief explanation of the session and circuits]
+
+## WARM-UP
+[Table with Exercise, Duration, Notes columns]
+
+## MAIN WORKOUT
+[For each circuit]:
+Circuit [number]
+[Explanation of circuit goals and instructions]
+[Table with Exercise, Reps, Sets, Men, Woman, Notes columns]
+
+## COOL DOWN & STRETCH
+[Table with Stretch/Exercise, Duration, Notes columns]
+
+## CLOSING MESSAGE
+[Overview highlighting key elements and recovery principles]
+
+Output the workout plan in JSON format including all sections.`
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500,
+        response_format: { type: "json_object" }
+      });
+
+      res.json({ plan: JSON.parse(response.content[0].text) });
+    } catch (error: any) {
+      console.error("Workout generation error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate workout plan",
+        details: error.message 
+      });
     }
   });
 

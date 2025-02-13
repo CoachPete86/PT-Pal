@@ -1,0 +1,174 @@
+GROUP CLASS BLUEPRINT
+
+## CLASS DETAILS
+
+- Group Class Name (select one):
+□ GLC
+□ BURN
+□ HIIT
+□ LIFT
+□ METCON
+□ CORE
+
+---
+
+---
+
+- Coach: Coach Pete Ryan
+- Date:
+- Duration: 45 Minutes
+- Location: PureGym West Byfleet
+
+---
+
+---
+
+- [ ]  Available Equipment (select all that apply):
+- [ ]  Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
+- [ ]  Kettlebells (kg): 8, 12, 16, 20, 24
+- [ ]  Plyo Boxes
+- [ ]  Concept 2 Rowers (3 available)
+- [ ]  Ski Erg Machines (2 available)
+- [ ]  Watt Bike
+- [ ]  Spin Bike
+- [ ]  Sledge
+- [ ]  Battle Ropes (2 available)
+- [ ]  Bodybar with plates
+- [ ]  Step up Box
+- [ ]  Yoga Matt
+
+---
+
+---
+
+- Equipment Needed:
+
+---
+
+---
+
+**#Description and Explanation of the session as a whole and then a very brief description of each circuit.**
+
+---
+
+---
+
+## **2. WARM-UP**
+
+**Exercise**	**Duration**
+
+| **Exercise** | **Duration** | **Notes** |
+| --- | --- | --- |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+---
+
+---
+
+**3. MAIN WORKOUT**
+
+**Circuit 1**
+
+**# Explain circuit**: Add a explanation and any instruction needed for the upcoming circuit including  the main workout goals, purpose, and equipment needed.
+
+| **Exercise** | **Reps** | **Sets** | Men | Woman | **Notes** |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+
+---
+
+---
+
+---
+
+**Circuit 2**
+
+**# Explain circuit**: Add a explanation and any instruction needed for the upcoming circuit including  the main workout goals, purpose, and equipment needed.
+
+| **Exercise** | **Reps** | **Sets** | Men | Woman | **Notes** |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+
+---
+
+---
+
+**Circuit 3**
+
+**# Explain circuit**: Add a explanation and any instruction needed for the upcoming circuit including  the main workout goals, purpose, and equipment needed.
+
+| **Exercise** | **Reps** | **Sets** | Men | Woman | **Notes** |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+|  |  |  |  |  |  |
+
+# Add as many circuits and descriptions at start of each as needed.
+
+---
+
+---
+
+**4. COOL DOWN & STRETCH**
+
+**Exercise(s):**
+
+| **Stretch/Exercise** | **Duration** | **Notes** |
+| --- | --- | --- |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+---
+
+---
+
+**5. CLOSING MESSAGE**
+
+Add an overview of the session highlighting key elements of plan, suggest further training or recovery principles from the effects of plan
+
+---
+
+---
+
+---
+
+<aside>
+💡
+
+This is not to be included in final document creation, but an instruction in the document setup creation process.
+
+**STANDARDS FOR GROUP CLASSES AND PERSONAL TRAINING**
+
+•	**Coach**: Coach Pete Ryan
+
+•	**Location**: PureGym West Byfleet
+
+•	**Duration**: 45 Minutes
+
+•	**Session Types**: Group Classes (LBT, Sweat45, Strength45, Tone, Bootcamp, Metcon) or Personal Training
+
+•	**Equipment**: Equipment list in drop down
+
+- **Rules**:
+    - Classes must follow a **CrossFit-style** or **circuit-based approach**.
+    - Gym-based exercises requiring unavailable equipment (e.g., benches) are **not allowed**.
+    - Exercise selection must align with available equipment quantities. For example, if only 2 pairs of 15kg dumbbells are available, circuits should not require more than 2 participants to use 15kg dumbbells simultaneously.
+</aside>
