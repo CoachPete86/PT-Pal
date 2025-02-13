@@ -6,6 +6,7 @@ import OpenAI from "openai";
 import { insertDocumentSchema } from "../shared/schema";
 import { Client } from "@notionhq/client";
 import Anthropic from '@anthropic-ai/sdk';
+import { format } from "date-fns";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -123,7 +124,7 @@ Document Context: ${context || "No context provided"}`
       } = req.body;
 
       // Create base system prompt
-      const baseSystemPrompt = `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
+      const baseSystemPrompt = `You are Coach Pete Ryan's AI Assistant, specialised in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
 
 Rules to follow:
 1. Always use the exact sections and format from the blueprint
@@ -135,12 +136,13 @@ Rules to follow:
 7. Location is always PureGym West Byfleet
 8. Always respond in valid JSON format
 9. Consider client's fitness level: ${fitnessLevel}
-${clientDetails ? `10. Adapt to client profile:
+10. Use British English spelling (e.g., customise, specialise, etc.)
+${clientDetails ? `11. Adapt to client profile:
     - Age: ${clientDetails.age}
     - Gender: ${clientDetails.gender}
     - Goals: ${clientDetails.goals}
     - Limitations: ${clientDetails.limitations || 'None'}` : ''}
-${planType === 'program' ? `11. Include periodization principles for ${programDetails.sessionsPerWeek} sessions per week over 12 weeks` : ''}
+${planType === 'program' ? `12. Include periodisation principles for ${programDetails.sessionsPerWeek} sessions per week over 12 weeks` : ''}
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
@@ -158,7 +160,7 @@ Available Equipment:
 
       const generatePrompt = planType === 'oneoff'
         ? `Generate a complete workout plan for a ${sessionType === 'group' ? classType + ' class' : 'personal training session'} that's 45 minutes long using only the available equipment.`
-        : `Generate Week 1 of a 12-week progressive program with ${programDetails.sessionsPerWeek} sessions per week. Focus on proper periodization and progressive overload.`;
+        : `Generate Week 1 of a 12-week progressive programme with ${programDetails.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
 
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
@@ -222,6 +224,37 @@ Available Equipment:
       });
 
       const plan = JSON.parse(response.content[0].text);
+
+      // Format the current date in UK format
+      const currentDate = format(new Date(), 'dd/MM/yyyy');
+      plan.classDetails.date = currentDate;
+
+      // Save to Notion
+      const workoutTitle = `${plan.classDetails.className} - ${currentDate}`;
+      const workoutContent = JSON.stringify(plan, null, 2);
+
+      try {
+        await notion.pages.create({
+          parent: { database_id: process.env.NOTION_DATABASE_ID! },
+          properties: {
+            Name: {
+              title: [{ text: { content: workoutTitle } }],
+            },
+            Content: {
+              rich_text: [{ text: { content: workoutContent } }],
+            },
+            Type: {
+              select: {
+                name: "Workout Plan"
+              }
+            }
+          }
+        });
+      } catch (notionError) {
+        console.error("Failed to save to Notion:", notionError);
+        // Continue with the response even if Notion save fails
+      }
+
       res.json({ plan });
     } catch (error: any) {
       console.error("Workout generation error:", error);

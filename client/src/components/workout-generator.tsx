@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -37,12 +38,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Loader2, Download } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -52,7 +47,13 @@ const workoutFormSchema = z.object({
   planType: z.enum(["oneoff", "program"]),
   classType: z.string().optional(),
   fitnessLevel: z.enum(["beginner", "intermediate", "advanced"]),
-  focusAreas: z.array(z.string()),
+  groupFormat: z.object({
+    type: z.enum(["amrap", "emom", "tabata", "custom"]),
+    workInterval: z.number().optional(),
+    restInterval: z.number().optional(),
+    rounds: z.number().optional(),
+  }).optional(),
+  equipment: z.array(z.string()),
   clientDetails: z.object({
     age: z.string(),
     gender: z.enum(["male", "female", "other"]),
@@ -67,6 +68,21 @@ const workoutFormSchema = z.object({
 });
 
 type WorkoutFormValues = z.infer<typeof workoutFormSchema>;
+
+const availableEquipment = [
+  { id: "dumbbells", label: "Dumbbells (5-22.5kg)" },
+  { id: "kettlebells", label: "Kettlebells (8-24kg)" },
+  { id: "plyoboxes", label: "Plyo Boxes" },
+  { id: "rowers", label: "Concept 2 Rowers" },
+  { id: "skierg", label: "Ski Erg Machines" },
+  { id: "wattbike", label: "Watt Bike" },
+  { id: "spinbike", label: "Spin Bike" },
+  { id: "sledge", label: "Sledge" },
+  { id: "battleropes", label: "Battle Ropes" },
+  { id: "bodybar", label: "Bodybar with plates" },
+  { id: "stepbox", label: "Step up Box" },
+  { id: "yogamat", label: "Yoga Matt" },
+];
 
 interface WorkoutPlan {
   classDetails: {
@@ -104,7 +120,6 @@ interface WorkoutPlan {
 }
 
 export default function WorkoutGenerator() {
-  const [planType, setPlanType] = useState<"oneoff" | "program">("oneoff");
   const [sessionType, setSessionType] = useState<"group" | "personal">("group");
   const { toast } = useToast();
 
@@ -112,9 +127,15 @@ export default function WorkoutGenerator() {
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
       sessionType: "group",
-      planType: "oneoff", // Always oneoff for group sessions
+      planType: "oneoff",
       fitnessLevel: "intermediate",
-      focusAreas: [],
+      equipment: [],
+      groupFormat: {
+        type: "amrap",
+        workInterval: 40,
+        restInterval: 20,
+        rounds: 5,
+      },
     },
   });
 
@@ -127,19 +148,21 @@ export default function WorkoutGenerator() {
 
   const generateMutation = useMutation({
     mutationFn: async (values: WorkoutFormValues) => {
-      // For group sessions, force oneoff plan type
       const finalValues = {
         ...values,
         planType: values.sessionType === "group" ? "oneoff" : values.planType,
       };
 
-      const res = await apiRequest("POST", "/api/generate-workout", {
-        ...finalValues,
-        duration: 45,
-      });
+      const res = await apiRequest("POST", "/api/generate-workout", finalValues);
       const data = await res.json();
       if (data.error) throw new Error(data.details || data.error);
       return data.plan as WorkoutPlan;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Workout Plan Generated",
+        description: "Your workout plan has been generated and saved to Notion.",
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -211,7 +234,7 @@ ${generateMutation.data.closingMessage}`;
         <CardHeader>
           <CardTitle>AI Workout Generator</CardTitle>
           <CardDescription>
-            Generate professional workout plans powered by Coach Pete's methodology
+            Generate professional workout plans powered by Coach Pete's methodology. Plans are automatically saved to Notion.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -254,20 +277,142 @@ ${generateMutation.data.closingMessage}`;
                 )}
               />
 
-              {/* Only show plan type for personal training */}
-              {sessionType === "personal" && (
-                <FormField
-                  control={form.control}
-                  name="planType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Plan Type</FormLabel>
-                      <FormControl>
+              {sessionType === "group" ? (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="classType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Class Type</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select class type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="GLC">GLC</SelectItem>
+                            <SelectItem value="BURN">BURN</SelectItem>
+                            <SelectItem value="HIIT">HIIT</SelectItem>
+                            <SelectItem value="LIFT">LIFT</SelectItem>
+                            <SelectItem value="METCON">METCON</SelectItem>
+                            <SelectItem value="CORE">CORE</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="groupFormat.type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Class Format</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select format" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="amrap">AMRAP (As Many Rounds As Possible)</SelectItem>
+                            <SelectItem value="emom">EMOM (Every Minute On the Minute)</SelectItem>
+                            <SelectItem value="tabata">Tabata</SelectItem>
+                            <SelectItem value="custom">Custom Work/Rest Intervals</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch("groupFormat.type") === "custom" && (
+                    <div className="grid grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="groupFormat.workInterval"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Work Interval (seconds)</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="10" max="300" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="groupFormat.restInterval"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Rest Interval (seconds)</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="5" max="120" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="groupFormat.rounds"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Number of Rounds</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="1" max="20" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  <FormField
+                    control={form.control}
+                    name="fitnessLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Group Fitness Level</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select fitness level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="beginner">Beginner-Friendly</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          This will adjust the difficulty and complexity of exercises for the whole group
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ) : (
+                // Personal Training fields
+                <>
+                  <FormField
+                    control={form.control}
+                    name="planType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Plan Type</FormLabel>
                         <RadioGroup
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            setPlanType(value as "oneoff" | "program");
-                          }}
+                          onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex gap-4"
                         >
@@ -288,166 +433,150 @@ ${generateMutation.data.closingMessage}`;
                             </FormLabel>
                           </FormItem>
                         </RadioGroup>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {sessionType === "group" && (
-                <FormField
-                  control={form.control}
-                  name="classType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Class Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select class type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="GLC">GLC</SelectItem>
-                          <SelectItem value="BURN">BURN</SelectItem>
-                          <SelectItem value="HIIT">HIIT</SelectItem>
-                          <SelectItem value="LIFT">LIFT</SelectItem>
-                          <SelectItem value="METCON">METCON</SelectItem>
-                          <SelectItem value="CORE">CORE</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              <FormField
-                control={form.control}
-                name="fitnessLevel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fitness Level</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select fitness level" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">Intermediate</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              <div className="space-y-4">
-                <FormLabel>Client Details</FormLabel>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="clientDetails.age"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Age</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="clientDetails.gender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gender</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                  {/* Client Details - Only for Personal Training */}
+                  <div className="space-y-4">
+                    <FormLabel>Client Details</FormLabel>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="clientDetails.age"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Age</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                <FormField
-                  control={form.control}
-                  name="clientDetails.goals"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fitness Goals</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Weight loss, muscle gain, endurance"
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                      <FormField
+                        control={form.control}
+                        name="clientDetails.gender"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Gender</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="male">Male</SelectItem>
+                                <SelectItem value="female">Female</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                <FormField
-                  control={form.control}
-                  name="clientDetails.limitations"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Limitations or Injuries</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Any physical limitations or injuries"
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {planType === "program" && (
-                <div className="space-y-4">
-                  <FormLabel>Program Details</FormLabel>
-                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="programDetails.sessionsPerWeek"
+                      name="clientDetails.goals"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Sessions per Week</FormLabel>
+                          <FormLabel>Fitness Goals</FormLabel>
                           <FormControl>
                             <Input
-                              type="number"
-                              min="1"
-                              max="7"
+                              placeholder="e.g., Weight loss, muscle gain, endurance"
                               {...field}
                             />
                           </FormControl>
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="clientDetails.limitations"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Limitations or Injuries</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Any physical limitations or injuries"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="clientDetails.experience"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Experience Level</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Describe their experience" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                </div>
+                </>
               )}
+
+              {/* Equipment Selection - Common for both types */}
+              <FormField
+                control={form.control}
+                name="equipment"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel>Available Equipment</FormLabel>
+                      <FormDescription>
+                        Select the equipment you want to include in the workout
+                      </FormDescription>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {availableEquipment.map((item) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name="equipment"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={item.id}
+                                className="flex flex-row items-start space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, item.id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== item.id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {item.label}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </FormItem>
+                )}
+              />
 
               <Button
                 type="submit"
@@ -460,7 +589,7 @@ ${generateMutation.data.closingMessage}`;
                     Generating...
                   </>
                 ) : (
-                  `Generate ${planType === "oneoff" ? "Workout" : "Program"}`
+                  `Generate ${sessionType === "group" ? "Class Plan" : form.watch("planType") === "oneoff" ? "Session" : "Program"}`
                 )}
               </Button>
             </form>
