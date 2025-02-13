@@ -43,14 +43,20 @@ import {
   CommandGroup,
   CommandItem,
   CommandSeparator,
-  Command as CommandComponent, //Rename to avoid conflict
   CommandInput,
 } from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Extension } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
 
 const lowlight = createLowlight(common)
+
+interface DocumentEditorProps {
+  initialContent?: string;
+  documentId?: number;
+  notionPageId?: string;
+  onSave?: (document: InsertDocument) => void;
+}
 
 const SlashCommand = Extension.create({
   name: 'slashCommand',
@@ -58,7 +64,7 @@ const SlashCommand = Extension.create({
     return {
       suggestion: {
         char: '/',
-        command: ({ editor, range, props }) => {
+        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
           props.command({ editor, range })
         },
       }
@@ -74,13 +80,6 @@ const SlashCommand = Extension.create({
   },
 });
 
-interface DocumentEditorProps {
-  initialContent?: string;
-  documentId?: number;
-  notionPageId?: string;
-  onSave?: (document: InsertDocument) => void;
-}
-
 export default function DocumentEditor({
   initialContent = "",
   documentId,
@@ -90,65 +89,45 @@ export default function DocumentEditor({
   const { toast } = useToast();
   const [showCommandMenu, setShowCommandMenu] = useState(false);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
-      Highlight,
-      Link,
-      Typography,
-      Table.configure({
-        resizable: true,
-      }),
-      TableRow,
-      TableHeader,
-      TableCell,
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      CodeBlockLowlight.configure({
-        lowlight,
-      }),
-      Placeholder.configure({
-        placeholder: 'Type "/" for commands or "@coach" for AI assistance...',
-      }),
-      SlashCommand.configure({
-        suggestion: {
-          items: () => [
-            { title: 'Heading 1', command: () => insertBlock('heading-1') },
-            { title: 'Heading 2', command: () => insertBlock('heading-2') },
-            { title: 'Task List', command: () => insertBlock('task-list') },
-            { title: 'Table', command: () => insertBlock('table') },
-            { title: 'Code Block', command: () => insertBlock('code-block') },
-            { title: 'Ask Coach Pete', command: () => handleAiCommand('help') },
-            { title: 'Explain Exercise', command: () => handleAiCommand('explain-exercise') },
-            { title: 'Suggest Workout', command: () => handleAiCommand('suggest-workout') },
-            { title: 'Optimize Nutrition', command: () => handleAiCommand('optimize-nutrition') },
-            { title: 'Form Check', command: () => handleAiCommand('form-check') },
-            { title: 'Simplify', command: () => handleAiCommand('simplify') },
-          ],
-          render: () => {
-            setShowCommandMenu(true)
-            return null
-          },
-        },
-      }),
-    ],
-    content: initialContent,
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] px-4 py-2",
-      },
-    },
-    onCreate: ({ editor }) => {
-      editor.commands.focus('end');
-    },
-  });
+  const handleAiCommand = useCallback((command: string) => {
+    const aiCommands = {
+      "explain-exercise": "Explain how to properly perform the exercise mentioned in the current section.",
+      "suggest-workout": "Suggest a workout plan based on the goals mentioned in this document.",
+      "optimize-nutrition": "Analyze and suggest improvements for the nutrition plan in this document.",
+      "form-check": "Review the exercise form described and provide corrections and tips.",
+      "simplify": "Explain this fitness concept in simpler terms.",
+      "help": "How can I help you with your fitness journey today?",
+    };
+
+    aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
+    setShowCommandMenu(false);
+  }, []);
+
+  const insertBlock = useCallback((type: string) => {
+    if (!editor) return;
+
+    switch (type) {
+      case "table":
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        break;
+      case "task-list":
+        editor.chain().focus().toggleTaskList().run();
+        break;
+      case "code-block":
+        editor.chain().focus().toggleCodeBlock().run();
+        break;
+      case "heading-1":
+        editor.chain().focus().toggleHeading({ level: 1 }).run();
+        break;
+      case "heading-2":
+        editor.chain().focus().toggleHeading({ level: 2 }).run();
+        break;
+      case "heading-3":
+        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        break;
+    }
+    setShowCommandMenu(false);
+  }, []);
 
   const saveMutation = useMutation({
     mutationFn: async (data: InsertDocument & { notionSync?: boolean }) => {
@@ -215,51 +194,69 @@ export default function DocumentEditor({
     },
   });
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Highlight,
+      Link,
+      Typography,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+      Placeholder.configure({
+        placeholder: 'Type "/" for commands or "@coach" for AI assistance...',
+      }),
+      SlashCommand.configure({
+        suggestion: {
+          items: () => [
+            { title: 'Heading 1', command: () => insertBlock('heading-1') },
+            { title: 'Heading 2', command: () => insertBlock('heading-2') },
+            { title: 'Task List', command: () => insertBlock('task-list') },
+            { title: 'Table', command: () => insertBlock('table') },
+            { title: 'Code Block', command: () => insertBlock('code-block') },
+            { title: 'Ask Coach Pete', command: () => handleAiCommand('help') },
+            { title: 'Explain Exercise', command: () => handleAiCommand('explain-exercise') },
+            { title: 'Suggest Workout', command: () => handleAiCommand('suggest-workout') },
+            { title: 'Optimize Nutrition', command: () => handleAiCommand('optimize-nutrition') },
+            { title: 'Form Check', command: () => handleAiCommand('form-check') },
+            { title: 'Simplify', command: () => handleAiCommand('simplify') },
+          ],
+          render: () => {
+            setShowCommandMenu(true);
+            return null;
+          },
+        },
+      }),
+    ],
+    content: initialContent,
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] px-4 py-2",
+      },
+    },
+    onCreate: ({ editor }) => {
+      editor.commands.focus('end');
+    },
+  });
+
   if (!editor) {
     return null;
   }
-
-  const insertBlock = (type: string) => {
-    switch (type) {
-      case "table":
-        editor
-          .chain()
-          .focus()
-          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-          .run();
-        break;
-      case "task-list":
-        editor.chain().focus().toggleTaskList().run();
-        break;
-      case "code-block":
-        editor.chain().focus().toggleCodeBlock().run();
-        break;
-      case "heading-1":
-        editor.chain().focus().toggleHeading({ level: 1 }).run();
-        break;
-      case "heading-2":
-        editor.chain().focus().toggleHeading({ level: 2 }).run();
-        break;
-      case "heading-3":
-        editor.chain().focus().toggleHeading({ level: 3 }).run();
-        break;
-    }
-    setShowCommandMenu(false);
-  };
-
-  const handleAiCommand = (command: string) => {
-    const aiCommands = {
-      "explain-exercise": "Explain how to properly perform the exercise mentioned in the current section.",
-      "suggest-workout": "Suggest a workout plan based on the goals mentioned in this document.",
-      "optimize-nutrition": "Analyze and suggest improvements for the nutrition plan in this document.",
-      "form-check": "Review the exercise form described and provide corrections and tips.",
-      "simplify": "Explain this fitness concept in simpler terms.",
-      "help": "How can I help you with your fitness journey today?",
-    };
-
-    aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
-    setShowCommandMenu(false);
-  };
 
   return (
     <div className="space-y-4">
@@ -381,63 +378,65 @@ export default function DocumentEditor({
       </div>
 
       {showCommandMenu && (
-        <CommandComponent className="fixed inset-x-0 top-1/4 z-50 mx-auto max-w-xl rounded-lg border bg-popover shadow-md">
-          <CommandInput placeholder="Type a command..." />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading="Blocks">
-              <CommandItem onSelect={() => insertBlock("heading-1")}>
-                <Heading1 className="mr-2 h-4 w-4" />
-                Heading 1
-              </CommandItem>
-              <CommandItem onSelect={() => insertBlock("heading-2")}>
-                <Heading2 className="mr-2 h-4 w-4" />
-                Heading 2
-              </CommandItem>
-              <CommandItem onSelect={() => insertBlock("task-list")}>
-                <CheckSquare className="mr-2 h-4 w-4" />
-                Task List
-              </CommandItem>
-              <CommandItem onSelect={() => insertBlock("table")}>
-                <TableIcon className="mr-2 h-4 w-4" />
-                Table
-              </CommandItem>
-              <CommandItem onSelect={() => insertBlock("code-block")}>
-                <Code className="mr-2 h-4 w-4" />
-                Code Block
-              </CommandItem>
-            </CommandGroup>
+        <div className="fixed inset-x-0 top-1/4 z-50 mx-auto max-w-xl">
+          <Command className="rounded-lg border bg-popover shadow-md">
+            <CommandInput placeholder="Type a command..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup heading="Blocks">
+                <CommandItem onSelect={() => insertBlock("heading-1")}>
+                  <Heading1 className="mr-2 h-4 w-4" />
+                  Heading 1
+                </CommandItem>
+                <CommandItem onSelect={() => insertBlock("heading-2")}>
+                  <Heading2 className="mr-2 h-4 w-4" />
+                  Heading 2
+                </CommandItem>
+                <CommandItem onSelect={() => insertBlock("task-list")}>
+                  <CheckSquare className="mr-2 h-4 w-4" />
+                  Task List
+                </CommandItem>
+                <CommandItem onSelect={() => insertBlock("table")}>
+                  <TableIcon className="mr-2 h-4 w-4" />
+                  Table
+                </CommandItem>
+                <CommandItem onSelect={() => insertBlock("code-block")}>
+                  <Code className="mr-2 h-4 w-4" />
+                  Code Block
+                </CommandItem>
+              </CommandGroup>
 
-            <CommandSeparator />
+              <CommandSeparator />
 
-            <CommandGroup heading="AI Coach Pete">
-              <CommandItem onSelect={() => handleAiCommand("explain-exercise")}>
-                <Brain className="mr-2 h-4 w-4" />
-                Explain Exercise
-              </CommandItem>
-              <CommandItem onSelect={() => handleAiCommand("suggest-workout")}>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Suggest Workout Plan
-              </CommandItem>
-              <CommandItem onSelect={() => handleAiCommand("optimize-nutrition")}>
-                <Brain className="mr-2 h-4 w-4" />
-                Optimize Nutrition
-              </CommandItem>
-              <CommandItem onSelect={() => handleAiCommand("form-check")}>
-                <Brain className="mr-2 h-4 w-4" />
-                Form Check
-              </CommandItem>
-              <CommandItem onSelect={() => handleAiCommand("simplify")}>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Simplify This
-              </CommandItem>
-              <CommandItem onSelect={() => handleAiCommand("help")}>
-                <Brain className="mr-2 h-4 w-4" />
-                Ask Coach Pete
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </CommandComponent>
+              <CommandGroup heading="AI Coach Pete">
+                <CommandItem onSelect={() => handleAiCommand("explain-exercise")}>
+                  <Brain className="mr-2 h-4 w-4" />
+                  Explain Exercise
+                </CommandItem>
+                <CommandItem onSelect={() => handleAiCommand("suggest-workout")}>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Suggest Workout Plan
+                </CommandItem>
+                <CommandItem onSelect={() => handleAiCommand("optimize-nutrition")}>
+                  <Brain className="mr-2 h-4 w-4" />
+                  Optimize Nutrition
+                </CommandItem>
+                <CommandItem onSelect={() => handleAiCommand("form-check")}>
+                  <Brain className="mr-2 h-4 w-4" />
+                  Form Check
+                </CommandItem>
+                <CommandItem onSelect={() => handleAiCommand("simplify")}>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Simplify This
+                </CommandItem>
+                <CommandItem onSelect={() => handleAiCommand("help")}>
+                  <Brain className="mr-2 h-4 w-4" />
+                  Ask Coach Pete
+                </CommandItem>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </div>
       )}
 
       {editor && (
