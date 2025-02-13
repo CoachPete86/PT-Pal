@@ -41,6 +41,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, Download } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Activity,
+  Clock,
+  Dumbbell,
+  FlameKindling,
+  Heart,
+  LayoutGrid,
+  ListChecks,
+  ScrollText,
+  Snowflake,
+  Target,
+  Timer,
+  Users,
+} from "lucide-react";
 
 const workoutFormSchema = z.object({
   sessionType: z.enum(["group", "personal"]),
@@ -81,18 +95,61 @@ const workoutFormSchema = z.object({
 type WorkoutFormValues = z.infer<typeof workoutFormSchema>;
 
 const availableEquipment = [
-  { id: "dumbbells", label: "Dumbbells (5-22.5kg)" },
-  { id: "kettlebells", label: "Kettlebells (8-24kg)" },
-  { id: "plyoboxes", label: "Plyo Boxes" },
-  { id: "rowers", label: "Concept 2 Rowers" },
-  { id: "skierg", label: "Ski Erg Machines" },
-  { id: "wattbike", label: "Watt Bike" },
-  { id: "spinbike", label: "Spin Bike" },
-  { id: "sledge", label: "Sledge" },
-  { id: "battleropes", label: "Battle Ropes" },
-  { id: "bodybar", label: "Bodybar with plates" },
-  { id: "stepbox", label: "Step up Box" },
-  { id: "yogamat", label: "Yoga Matt" },
+  {
+    category: "Free Weights",
+    icon: Dumbbell,
+    items: [
+      { id: "dumbbells-light", label: "Dumbbells (2-10kg)", count: "Multiple pairs" },
+      { id: "dumbbells-medium", label: "Dumbbells (12.5-22.5kg)", count: "Multiple pairs" },
+      { id: "kettlebells-light", label: "Kettlebells (8-16kg)", count: "2 of each" },
+      { id: "kettlebells-heavy", label: "Kettlebells (20-24kg)", count: "2 of each" },
+      { id: "plates", label: "Weight Plates (1.25-20kg)", count: "Multiple sets" },
+      { id: "bodybar", label: "Weighted Bars (5-20kg)", count: "4 available" },
+    ],
+  },
+  {
+    category: "Cardio Equipment",
+    icon: Activity,
+    items: [
+      { id: "rower", label: "Concept 2 Rowers", count: "3 available" },
+      { id: "skierg", label: "SkiErg Machines", count: "2 available" },
+      { id: "assault-bike", label: "Assault Bike", count: "1 available" },
+      { id: "wattbike", label: "Watt Bike", count: "1 available" },
+      { id: "spinbike", label: "Spin Bikes", count: "2 available" },
+    ],
+  },
+  {
+    category: "Functional Training",
+    icon: Target,
+    items: [
+      { id: "plyobox", label: "Plyo Boxes (20/24/30\")", count: "2 sets" },
+      { id: "stepbox", label: "Adjustable Step Platform", count: "4 available" },
+      { id: "battleropes", label: "Battle Ropes (15m)", count: "2 sets" },
+      { id: "sledge", label: "Training Sledge", count: "1 available" },
+      { id: "trx", label: "TRX Suspension Trainers", count: "2 sets" },
+      { id: "resistance-bands", label: "Resistance Bands (Light/Medium/Heavy)", count: "Multiple sets" },
+    ],
+  },
+  {
+    category: "Recovery & Mobility",
+    icon: Heart,
+    items: [
+      { id: "foam-roller", label: "Foam Rollers", count: "4 available" },
+      { id: "yogamat", label: "Yoga/Exercise Mats", count: "10 available" },
+      { id: "mobility-bands", label: "Mobility Bands", count: "Multiple sets" },
+      { id: "massage-balls", label: "Massage/Trigger Point Balls", count: "Set of 6" },
+    ],
+  },
+  {
+    category: "Accessories",
+    icon: LayoutGrid,
+    items: [
+      { id: "timer", label: "Gym Timer", count: "2 available" },
+      { id: "cones", label: "Training Cones", count: "Set of 12" },
+      { id: "agility-ladder", label: "Agility Ladder", count: "2 available" },
+      { id: "medicine-balls", label: "Medicine Balls (2-10kg)", count: "Set of 6" },
+    ],
+  },
 ];
 
 // Update circuit types to focus on timing formats
@@ -413,7 +470,7 @@ ${generateMutation.data.closingMessage}`;
                         <FormItem>
                           <FormLabel>Expected Number of Participants</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                               type="number"
                               min="1"
                               max="30"
@@ -461,7 +518,7 @@ ${generateMutation.data.closingMessage}`;
                           <FormItem>
                             <FormLabel>Participants per Group</FormLabel>
                             <FormControl>
-                              <Input 
+                              <Input
                                 type="number"
                                 min="2"
                                 max="6"
@@ -766,39 +823,54 @@ ${generateMutation.data.closingMessage}`;
                         Select the equipment you want to include in the workout
                       </FormDescription>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      {availableEquipment.map((item) => (
-                        <FormField
-                          key={item.id}
-                          control={form.control}
-                          name="equipment"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
+                    <div className="space-y-6">
+                      {availableEquipment.map((category) => (
+                        <div key={category.category} className="space-y-4">
+                          <div className="flex items-center gap-2">
+                            <category.icon className="h-5 w-5 text-muted-foreground" />
+                            <h4 className="font-medium">{category.category}</h4>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {category.items.map((item) => (
+                              <FormField
                                 key={item.id}
-                                className="flex flex-row items-start space-x-3 space-y-0"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(item.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, item.id])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (value) => value !== item.id
-                                            )
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {item.label}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
+                                control={form.control}
+                                name="equipment"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={item.id}
+                                      className="flex items-start space-x-3 space-y-0 rounded-lg border p-4 hover:bg-accent transition-colors"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(item.id)}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([...field.value, item.id])
+                                              : field.onChange(
+                                                  field.value?.filter(
+                                                    (value) => value !== item.id
+                                                  )
+                                                )
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <div className="space-y-1 leading-none">
+                                        <FormLabel className="text-sm font-medium">
+                                          {item.label}
+                                        </FormLabel>
+                                        <FormDescription className="text-xs">
+                                          {item.count}
+                                        </FormDescription>
+                                      </div>
+                                    </FormItem>
+                                  )
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </FormItem>
@@ -823,131 +895,225 @@ ${generateMutation.data.closingMessage}`;
           </Form>
 
           {generateMutation.data && (
-            <Card className="mt-6">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>{generateMutation.data.classDetails.className}</CardTitle>
-                  <CardDescription>
-                    {generateMutation.data.classDetails.date} - {generateMutation.data.classDetails.duration} Minutes
-                  </CardDescription>
-                </div>
-                <Button variant="outline" size="icon" onClick={handleDownload}>
-                  <Download className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Equipment */}
-                <div>
-                  <h3 className="font-medium mb-2">Equipment Needed</h3>
-                  <ul className="list-disc pl-4">
-                    {generateMutation.data.equipmentNeeded.map((item, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <h3 className="font-medium mb-2">Description</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {generateMutation.data.description}
-                  </p>
-                </div>
-
-                {/* Warm-up */}
-                <div>
-                  <h3 className="font-medium mb-2">Warm-up</h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Exercise</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead>Notes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {generateMutation.data.warmup.map((exercise, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{exercise.exercise}</TableCell>
-                          <TableCell>{exercise.duration}</TableCell>
-                          <TableCell>{exercise.notes}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Main Workout */}
-                <div className="space-y-4">
-                  <h3 className="font-medium">Main Workout</h3>
-                  {generateMutation.data.mainWorkout.map((circuit, index) => (
-                    <div key={index} className="space-y-2">
-                      <h4 className="font-medium">Circuit {circuit.circuitNumber}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {circuit.explanation}
-                      </p>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Exercise</TableHead>
-                            <TableHead>Sets</TableHead>
-                            <TableHead>Reps</TableHead>
-                            <TableHead>Men</TableHead>
-                            <TableHead>Women</TableHead>
-                            <TableHead>Notes</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {circuit.exercises.map((exercise, exIndex) => (
-                            <TableRow key={exIndex}>
-                              <TableCell>{exercise.exercise}</TableCell>
-                              <TableCell>{exercise.sets}</TableCell>
-                              <TableCell>{exercise.reps}</TableCell>
-                              <TableCell>{exercise.men}</TableCell>
-                              <TableCell>{exercise.woman}</TableCell>
-                              <TableCell>{exercise.notes}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+            <div className="mt-6 space-y-6">
+              <Card>
+                <CardHeader className="bg-primary/5 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Activity className="h-5 w-5" />
+                        {generateMutation.data.classDetails.className}
+                      </CardTitle>
+                      <CardDescription>
+                        {generateMutation.data.classDetails.date} at {generateMutation.data.classDetails.location}
+                      </CardDescription>
                     </div>
-                  ))}
-                </div>
+                    <Button onClick={handleDownload} variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Plan
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-8">
+                    {/* Overview Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="flex items-center gap-3">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Duration</p>
+                          <p className="text-sm text-muted-foreground">
+                            {generateMutation.data.classDetails.duration} minutes
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Coach</p>
+                          <p className="text-sm text-muted-foreground">
+                            {generateMutation.data.classDetails.coach}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <LayoutGrid className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Equipment</p>
+                          <p className="text-sm text-muted-foreground">
+                            {generateMutation.data.equipmentNeeded.length} items needed
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* Cool Down */}
-                <div>
-                  <h3 className="font-medium mb-2">Cool Down & Stretch</h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Exercise</TableHead>
-                        <TableHead>Duration</TableHead>
-                        <TableHead>Notes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {generateMutation.data.cooldown.map((exercise, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{exercise.exercise}</TableCell>
-                          <TableCell>{exercise.duration}</TableCell>
-                          <TableCell>{exercise.notes}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    {/* Description */}
+                    <div className="prose prose-sm max-w-none">
+                      <h3 className="flex items-center gap-2 text-lg font-semibold">
+                        <ScrollText className="h-5 w-5" />
+                        Overview
+                      </h3>
+                      <p>{generateMutation.data.description}</p>
+                    </div>
 
-                {/* Closing Message */}
-                <div>
-                  <h3 className="font-medium mb-2">Closing Message</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {generateMutation.data.closingMessage}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                    {/* Equipment List */}
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+                        <Dumbbell className="h-5 w-5" />
+                        Equipment Needed
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {generateMutation.data.equipmentNeeded.map((item, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 text-sm p-2 rounded-md bg-secondary/20"
+                          >
+                            <ListChecks className="h-4 w-4" />
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Warm-up Section */}
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+                        <FlameKindling className="h-5 w-5 text-orange-500" />
+                        Warm-up
+                      </h3>
+                      <div className="space-y-3">
+                        {generateMutation.data.warmup.map((exercise, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-4 p-4 rounded-lg bg-orange-500/5 border border-orange-500/10"
+                          >
+                            <div className="mt-1">
+                              <Timer className="h-4 w-4 text-orange-500" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium">{exercise.exercise}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Duration: {exercise.duration}
+                              </p>
+                              {exercise.notes && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {exercise.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Main Workout Section */}
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+                        <Target className="h-5 w-5 text-primary" />
+                        Main Workout
+                      </h3>
+                      <div className="space-y-6">
+                        {generateMutation.data.mainWorkout.map((circuit, circuitIndex) => (
+                          <div
+                            key={circuitIndex}
+                            className="rounded-lg border bg-card"
+                          >
+                            <div className="border-b bg-primary/5 p-4">
+                              <h4 className="font-semibold">
+                                Circuit {circuit.circuitNumber}
+                              </h4>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {circuit.explanation}
+                              </p>
+                            </div>
+                            <div className="p-4">
+                              <div className="grid gap-4">
+                                {circuit.exercises.map((exercise, exerciseIndex) => (
+                                  <div
+                                    key={exerciseIndex}
+                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-lg bg-secondary/10"
+                                  >
+                                    <div>
+                                      <p className="text-sm font-medium">Exercise</p>
+                                      <p className="text-sm">{exercise.exercise}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium">Sets × Reps</p>
+                                      <p className="text-sm">
+                                        {exercise.sets} × {exercise.reps}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium">Weight/Variation</p>
+                                      <div className="grid grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                          <span className="text-muted-foreground">M: </span>
+                                          {exercise.men}
+                                        </div>
+                                        <div>
+                                          <span className="text-muted-foreground">W: </span>
+                                          {exercise.woman}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {exercise.notes && (
+                                      <div>
+                                        <p className="textsm font-medium">Notes</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {exercise.notes}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Cool Down Section */}
+                    <div>
+                      <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+                        <Snowflake className="h-5 w-5 text-blue-500" />
+                        Cool Down
+                      </h3>
+                      <div className="space-y-3">
+                        {generateMutation.data.cooldown.map((exercise, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-4 p-4 rounded-lg bg-blue-500/5 border border-blue-500/10"
+                          >
+                            <div className="mt-1">
+                              <Heart className="h-4 w-4 text-blue-500" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium">{exercise.exercise}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Duration: {exercise.duration}
+                              </p>
+                              {exercise.notes && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {exercise.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Closing Message */}
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-muted-foreground italic">
+                        {generateMutation.data.closingMessage}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </CardContent>
       </Card>
