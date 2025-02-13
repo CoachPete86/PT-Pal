@@ -127,6 +127,7 @@ Rules to follow:
 5. No gym-based exercises requiring unavailable equipment
 6. Duration must be exactly 45 minutes
 7. Location is always PureGym West Byfleet
+8. Always respond in valid JSON format
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
@@ -144,45 +145,58 @@ Available Equipment:
         messages: [
           {
             role: "user",
-            content: `Generate a complete workout plan for a ${classType} class that's ${duration} minutes long using only the available equipment. Follow this exact format:
+            content: `Generate a complete workout plan for a ${classType} class that's ${duration} minutes long using only the available equipment. Structure the response as a JSON object with the following format:
 
-## CLASS DETAILS
-- Group Class Name: [class type]
-- Coach: Coach Pete Ryan
-- Date: [current date]
-- Duration: [duration] Minutes
-- Location: PureGym West Byfleet
-
-## Equipment Needed
-[List specific equipment needed for this workout]
-
-## Description
-[Brief explanation of the session and circuits]
-
-## WARM-UP
-[Table with Exercise, Duration, Notes columns]
-
-## MAIN WORKOUT
-[For each circuit]:
-Circuit [number]
-[Explanation of circuit goals and instructions]
-[Table with Exercise, Reps, Sets, Men, Woman, Notes columns]
-
-## COOL DOWN & STRETCH
-[Table with Stretch/Exercise, Duration, Notes columns]
-
-## CLOSING MESSAGE
-[Overview highlighting key elements and recovery principles]
-
-Output the workout plan in JSON format including all sections.`
+{
+  "classDetails": {
+    "className": "${classType}",
+    "coach": "Coach Pete Ryan",
+    "date": "current date",
+    "duration": ${duration},
+    "location": "PureGym West Byfleet"
+  },
+  "equipmentNeeded": ["list of equipment"],
+  "description": "Brief explanation of the session and circuits",
+  "warmup": [
+    {
+      "exercise": "exercise name",
+      "duration": "duration",
+      "notes": "optional notes"
+    }
+  ],
+  "mainWorkout": [
+    {
+      "circuitNumber": 1,
+      "explanation": "circuit goals and instructions",
+      "exercises": [
+        {
+          "exercise": "exercise name",
+          "reps": "number of reps",
+          "sets": "number of sets",
+          "men": "men's weight/variation",
+          "woman": "women's weight/variation",
+          "notes": "optional notes"
+        }
+      ]
+    }
+  ],
+  "cooldown": [
+    {
+      "exercise": "stretch/exercise name",
+      "duration": "duration",
+      "notes": "optional notes"
+    }
+  ],
+  "closingMessage": "Overview highlighting key elements and recovery principles"
+}`
           }
         ],
         temperature: 0.7,
-        max_tokens: 1500,
-        response_format: { type: "json_object" }
+        max_tokens: 1500
       });
 
-      res.json({ plan: JSON.parse(response.content[0].text) });
+      const plan = JSON.parse(response.content[0].text);
+      res.json({ plan });
     } catch (error: any) {
       console.error("Workout generation error:", error);
       res.status(500).json({ 
