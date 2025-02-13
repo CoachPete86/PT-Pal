@@ -117,10 +117,7 @@ Document Context: ${context || "No context provided"}`
 
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
-        messages: [
-          {
-            role: "system",
-            content: `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
+        system: `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
 
 Rules to follow:
 1. Always use the exact sections and format from the blueprint
@@ -143,8 +140,8 @@ Available Equipment:
 - Battle Ropes (2 available)
 - Bodybar with plates
 - Step up Box
-- Yoga Matt`
-          },
+- Yoga Matt`,
+        messages: [
           {
             role: "user",
             content: `Generate a complete workout plan for a ${classType} class that's ${duration} minutes long using only the available equipment. Follow this exact format:
