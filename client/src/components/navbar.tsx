@@ -6,53 +6,178 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import { motion } from "framer-motion";
+import {
+  BarChart,
+  BookOpen,
+  ChevronDown,
+  Home,
+  LogOut,
+  Menu,
+  User,
+  X,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+const mainNavItems = [
+  { href: "/#services", label: "Services" },
+  { href: "/#about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
+];
 
 export default function Navbar() {
   const { user, logoutMutation } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="border-b">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/">
-          <a className="text-xl font-bold">Coach Pete Ryan</a>
-        </Link>
-
-        <NavigationMenu>
-          <NavigationMenuList className="hidden md:flex gap-6">
-            <NavigationMenuItem>
-              <Link href="/#services">
-                <a className="text-sm font-medium">Services</a>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/#about">
-                <a className="text-sm font-medium">About</a>
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-
-        <div className="flex items-center gap-4">
-          {user ? (
-            <>
-              <Link href="/dashboard">
-                <Button variant="outline">Dashboard</Button>
-              </Link>
-              <Button
-                variant="ghost"
-                onClick={() => logoutMutation.mutate()}
-                disabled={logoutMutation.isPending}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <Link href="/auth">
-              <Button>Get Started</Button>
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <Link href="/">
+              <a className="flex items-center space-x-2">
+                <BarChart className="h-6 w-6 text-primary" />
+                <span className="text-xl font-bold">Coach Pete Ryan</span>
+              </a>
             </Link>
-          )}
+          </div>
+
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList className="gap-6">
+              {mainNavItems.map((item) => (
+                <NavigationMenuItem key={item.href}>
+                  <Link href={item.href}>
+                    <a className="text-sm font-medium transition-colors hover:text-primary">
+                      {item.label}
+                    </a>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <div className="hidden md:flex items-center gap-4">
+                  <Link href="/dashboard">
+                    <Button variant="outline" size="sm">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <User className="h-4 w-4" />
+                        <span className="hidden sm:inline">{user.username}</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile">
+                          <a className="flex items-center">
+                            <User className="mr-2 h-4 w-4" />
+                            Profile
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/documents">
+                          <a className="flex items-center">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            Documents
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => logoutMutation.mutate()}
+                        disabled={logoutMutation.isPending}
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                  <SheetTrigger asChild className="md:hidden">
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>Menu</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6 space-y-4">
+                      {mainNavItems.map((item) => (
+                        <Link key={item.href} href={item.href}>
+                          <a
+                            className="flex items-center py-2 text-sm font-medium"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {item.label}
+                          </a>
+                        </Link>
+                      ))}
+                      <Link href="/dashboard">
+                        <a
+                          className="flex items-center py-2 text-sm font-medium text-primary"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          Dashboard
+                        </a>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logoutMutation.mutate();
+                          setIsOpen(false);
+                        }}
+                        disabled={logoutMutation.isPending}
+                        className="flex w-full items-center py-2 text-sm font-medium text-red-600"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </>
+            ) : (
+              <Link href="/auth">
+                <Button size="sm">Get Started</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
