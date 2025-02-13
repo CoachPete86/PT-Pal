@@ -110,7 +110,7 @@ Document Context: ${context || "No context provided"}`
   });
 
   // Workout Plan Generation endpoint
-  app.post("/api/generate-workout", async (req, res) => {
+  const generateWorkoutPlan = async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
     try {
@@ -142,7 +142,7 @@ ${clientDetails ? `11. Adapt to client profile:
     - Gender: ${clientDetails.gender}
     - Goals: ${clientDetails.goals}
     - Limitations: ${clientDetails.limitations || 'None'}` : ''}
-${planType === 'program' ? `12. Include periodisation principles for ${programDetails.sessionsPerWeek} sessions per week over 12 weeks` : ''}
+${planType === 'program' ? `12. Include periodisation principles for ${programDetails?.sessionsPerWeek} sessions per week over 12 weeks` : ''}
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
@@ -156,11 +156,46 @@ Available Equipment:
 - Battle Ropes (2 available)
 - Bodybar with plates
 - Step up Box
-- Yoga Matt`;
+- Yoga Matt
+
+The response must be a valid JSON object with this exact structure:
+{
+  "classDetails": {
+    "className": string,
+    "coach": "Coach Pete Ryan",
+    "duration": 45,
+    "location": "PureGym West Byfleet"
+  },
+  "equipmentNeeded": string[],
+  "description": string,
+  "warmup": Array<{
+    "exercise": string,
+    "duration": string,
+    "notes"?: string
+  }>,
+  "mainWorkout": Array<{
+    "circuitNumber": number,
+    "explanation": string,
+    "exercises": Array<{
+      "exercise": string,
+      "reps": string,
+      "sets": string,
+      "men": string,
+      "woman": string,
+      "notes"?: string
+    }>
+  }>,
+  "cooldown": Array<{
+    "exercise": string,
+    "duration": string,
+    "notes"?: string
+  }>,
+  "closingMessage": string
+}`;
 
       const generatePrompt = planType === 'oneoff'
         ? `Generate a complete workout plan for a ${sessionType === 'group' ? classType + ' class' : 'personal training session'} that's 45 minutes long using only the available equipment.`
-        : `Generate Week 1 of a 12-week progressive programme with ${programDetails.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
+        : `Generate Week 1 of a 12-week progressive programme with ${programDetails?.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
 
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
@@ -175,72 +210,83 @@ Available Equipment:
         max_tokens: 1500
       });
 
-      const plan = JSON.parse(response.content[0].text);
-
-      // Format the current date in UK format
-      const currentDate = format(new Date(), 'dd/MM/yyyy');
-      plan.classDetails.date = currentDate;
-
-      // Save to Notion with chunked content
-      const workoutTitle = `${plan.classDetails.className} - ${currentDate}`;
-
-      // Create a summary for Notion that fits within limits
-      const notionSummary = {
-        title: workoutTitle,
-        type: sessionType === 'group' ? 'Group Class' : 'Personal Training',
-        date: currentDate,
-        duration: '45 minutes',
-        fitnessLevel,
-        exercises: plan.mainWorkout.map(circuit => 
-          circuit.exercises.map(ex => ex.exercise).join(", ")
-        ).join("; "),
-        equipment: plan.equipmentNeeded.join(", ")
-      };
-
-      let notionPageId = null;
-
+      let plan;
       try {
-        const notionResponse = await notion.pages.create({
-          parent: { database_id: process.env.NOTION_DATABASE_ID! },
-          properties: {
-            Name: {
-              title: [{ text: { content: workoutTitle } }],
-            },
-            Content: {
-              rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2) } }],
-            },
-            Type: {
-              select: {
-                name: "Workout Plan"
-              }
-            },
-            Date: {
-              date: { 
-                start: new Date().toISOString()
+        plan = JSON.parse(response.content[0].text);
+
+        // Validate required structure
+        if (!plan.classDetails || !plan.mainWorkout) {
+          throw new Error("Invalid response structure from AI");
+        }
+
+        // Add current date in UK format
+        const currentDate = format(new Date(), 'dd/MM/yyyy');
+        plan.classDetails = {
+          ...plan.classDetails,
+          date: currentDate
+        };
+
+        // Create a summary for Notion that fits within limits
+        const notionSummary = {
+          title: `${plan.classDetails.className} - ${currentDate}`,
+          type: sessionType === 'group' ? 'Group Class' : 'Personal Training',
+          date: currentDate,
+          duration: '45 minutes',
+          fitnessLevel,
+          exercises: plan.mainWorkout.map(circuit => 
+            circuit.exercises.map(ex => ex.exercise).join(", ")
+          ).join("; "),
+          equipment: plan.equipmentNeeded.join(", ")
+        };
+
+        let notionPageId = null;
+
+        try {
+          const notionResponse = await notion.pages.create({
+            parent: { database_id: process.env.NOTION_DATABASE_ID! },
+            properties: {
+              Name: {
+                title: [{ text: { content: notionSummary.title } }],
+              },
+              Content: {
+                rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2) } }],
+              },
+              Type: {
+                select: {
+                  name: "Workout Plan"
+                }
+              },
+              Date: {
+                date: { 
+                  start: new Date().toISOString()
+                }
               }
             }
-          }
-        });
-        notionPageId = notionResponse.id;
-      } catch (notionError) {
-        console.error("Failed to save to Notion:", notionError);
-      }
+          });
+          notionPageId = notionResponse.id;
+        } catch (notionError) {
+          console.error("Failed to save to Notion:", notionError);
+        }
 
-      // Save to local documents
-      try {
-        await storage.createDocument({
-          title: workoutTitle,
-          content: JSON.stringify(plan, null, 2),
-          type: "document", 
-          notionId: notionPageId,
-          userId: req.user.id,
-          parentId: null,
-        });
-      } catch (storageError) {
-        console.error("Failed to save to local storage:", storageError);
-      }
+        // Save to local documents
+        try {
+          await storage.createDocument({
+            title: notionSummary.title,
+            content: JSON.stringify(plan, null, 2),
+            type: "document",
+            notionId: notionPageId,
+            userId: req.user.id,
+            parentId: null,
+          });
+        } catch (storageError) {
+          console.error("Failed to save to local storage:", storageError);
+        }
 
-      res.json({ plan });
+        res.json({ plan });
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", parseError);
+        res.status(500).json({ error: "Invalid response from AI service" });
+      }
     } catch (error: any) {
       console.error("Workout generation error:", error);
       res.status(500).json({ 
@@ -248,7 +294,9 @@ Available Equipment:
         details: error.message 
       });
     }
-  });
+  };
+
+  app.post("/api/generate-workout", generateWorkoutPlan);
 
   // Notion sync endpoint
   app.post("/api/documents/sync", async (req, res) => {
