@@ -6,6 +6,7 @@ import FoodAnalysis from "@/components/food-analysis";
 import FitnessTimeline from "@/components/fitness-timeline";
 import DocumentEditor from "@/components/document-editor";
 import DocumentList from "@/components/document-list";
+import WorkoutGenerator from "@/components/workout-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddFitnessEntry from "@/components/add-fitness-entry";
@@ -27,6 +28,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="fitness-journey">
           <TabsList>
             <TabsTrigger value="fitness-journey">Fitness Journey</TabsTrigger>
+            <TabsTrigger value="workout-plans">Workout Plans</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
             <TabsTrigger value="food-analysis">Food Analysis</TabsTrigger>
@@ -51,6 +53,10 @@ export default function DashboardPage() {
                 <FitnessTimeline />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="workout-plans">
+            <WorkoutGenerator />
           </TabsContent>
 
           <TabsContent value="bookings">
