@@ -58,28 +58,6 @@ interface DocumentEditorProps {
   onSave?: (document: InsertDocument) => void;
 }
 
-const SlashCommand = Extension.create({
-  name: 'slashCommand',
-  addOptions() {
-    return {
-      suggestion: {
-        char: '/',
-        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
-          props.command({ editor, range })
-        },
-      }
-    }
-  },
-  addProseMirrorPlugins() {
-    return [
-      Suggestion({
-        editor: this.editor,
-        ...this.options.suggestion,
-      }),
-    ]
-  },
-});
-
 export default function DocumentEditor({
   initialContent = "",
   documentId,
@@ -88,6 +66,7 @@ export default function DocumentEditor({
 }: DocumentEditorProps) {
   const { toast } = useToast();
   const [showCommandMenu, setShowCommandMenu] = useState(false);
+  const [commandMenuPosition, setCommandMenuPosition] = useState<{ left: number; top: number } | null>(null);
 
   const handleAiCommand = useCallback((command: string) => {
     const aiCommands = {
@@ -101,6 +80,7 @@ export default function DocumentEditor({
 
     aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
     setShowCommandMenu(false);
+    setCommandMenuPosition(null);
   }, []);
 
   const insertBlock = useCallback((type: string) => {
@@ -127,6 +107,7 @@ export default function DocumentEditor({
         break;
     }
     setShowCommandMenu(false);
+    setCommandMenuPosition(null);
   }, []);
 
   const saveMutation = useMutation({
@@ -222,6 +203,10 @@ export default function DocumentEditor({
       }),
       SlashCommand.configure({
         suggestion: {
+          char: '/',
+          command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
+            props.command({ editor, range });
+          },
           items: () => [
             { title: 'Heading 1', command: () => insertBlock('heading-1') },
             { title: 'Heading 2', command: () => insertBlock('heading-2') },
@@ -235,9 +220,28 @@ export default function DocumentEditor({
             { title: 'Form Check', command: () => handleAiCommand('form-check') },
             { title: 'Simplify', command: () => handleAiCommand('simplify') },
           ],
-          render: () => {
+          render: ({ editor, range, decorationNode }) => {
+            const domNode = decorationNode.type.spec.inline
+              ? decorationNode
+              : decorationNode.firstChild;
+
+            if (!domNode) {
+              setShowCommandMenu(false);
+              setCommandMenuPosition(null);
+              return null;
+            }
+
+            const rect = domNode.getBoundingClientRect();
+            setCommandMenuPosition({
+              left: rect.left,
+              top: rect.bottom + window.scrollY,
+            });
             setShowCommandMenu(true);
             return null;
+          },
+          onExit: () => {
+            setShowCommandMenu(false);
+            setCommandMenuPosition(null);
           },
         },
       }),
@@ -377,9 +381,15 @@ export default function DocumentEditor({
         </div>
       </div>
 
-      {showCommandMenu && (
-        <div className="fixed inset-x-0 top-1/4 z-50 mx-auto max-w-xl">
-          <Command className="rounded-lg border bg-popover shadow-md">
+      {showCommandMenu && commandMenuPosition && (
+        <div
+          className="fixed z-50"
+          style={{
+            left: commandMenuPosition.left,
+            top: commandMenuPosition.top,
+          }}
+        >
+          <Command className="rounded-lg border bg-popover shadow-md w-[300px]">
             <CommandInput placeholder="Type a command..." />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
