@@ -39,8 +39,8 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-  CommandSeparator,
   CommandInput,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { useState, useCallback } from "react";
 import { Extension } from '@tiptap/core'
@@ -63,25 +63,26 @@ interface SuggestionItem {
   command: (props: CommandProps) => void;
 }
 
-// Define the SlashCommand extension before using it
 const SlashCommand = Extension.create({
   name: 'slashCommand',
+
   addOptions() {
     return {
       suggestion: {
         char: '/',
-        command: ({ editor, range, props }: { editor: Editor; range: Range; props: any }) => {
+        command: ({ editor, range, props }: { editor: Editor; range: Range; props: SuggestionItem }) => {
           props.command({ editor, range })
         },
       }
     }
   },
+
   addProseMirrorPlugins() {
     return [
       Suggestion({
         editor: this.editor,
         ...this.options.suggestion,
-      }),
+      })
     ]
   },
 })
@@ -238,7 +239,7 @@ export default function DocumentEditor({
       }),
       SlashCommand.configure({
         suggestion: {
-          items: ({ query }: { query: string }) => {
+          items: ({ query }: { query: string }): SuggestionItem[] => {
             const items: SuggestionItem[] = [
               {
                 title: 'Heading 1',
@@ -290,7 +291,7 @@ export default function DocumentEditor({
               item.title.toLowerCase().includes(query.toLowerCase())
             );
           },
-          render: ({ editor, decorationNode }) => {
+          render: ({ decorationNode }) => {
             const dom = decorationNode.type.spec.inline
               ? decorationNode
               : decorationNode.firstChild;
