@@ -8,25 +8,13 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name"),
-  role: text("role", { enum: ["trainer", "client"] }).default("client").notNull(),
+  role: text("role", { enum: ["coach", "client"] }).default("client").notNull(),
   bio: text("bio"),
   profileImage: text("profile_image"),
-  specialization: text("specialization"), // For trainers: e.g., "Strength Training", "Yoga"
-});
-
-export const trainerClients = pgTable("trainer_clients", {
-  id: serial("id").primaryKey(),
-  trainerId: serial("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  clientId: serial("client_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  status: text("status", { enum: ["active", "pending", "inactive"] })
-    .default("pending")
-    .notNull(),
-  startDate: timestamp("start_date").defaultNow().notNull(),
-  notes: text("notes"),
+  goals: text("goals"), // Client's fitness goals
+  fitnessLevel: text("fitness_level", { 
+    enum: ["beginner", "intermediate", "advanced"] 
+  }),
 });
 
 export const messages = pgTable("messages", {
@@ -44,9 +32,6 @@ export const messages = pgTable("messages", {
 
 export const workoutPlans = pgTable("workout_plans", {
   id: serial("id").primaryKey(),
-  trainerId: serial("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
   clientId: serial("client_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
@@ -61,9 +46,6 @@ export const workoutPlans = pgTable("workout_plans", {
 
 export const bookings = pgTable("bookings", {
   id: serial("id").primaryKey(),
-  trainerId: serial("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
   clientId: serial("client_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
@@ -76,9 +58,6 @@ export const bookings = pgTable("bookings", {
 
 export const documents = pgTable("documents", {
   id: serial("id").primaryKey(),
-  trainerId: serial("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
   clientId: serial("client_id")
     .references(() => users.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
@@ -93,9 +72,6 @@ export const documents = pgTable("documents", {
 export const fitnessJourney = pgTable("fitness_journey", {
   id: serial("id").primaryKey(),
   clientId: serial("client_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  trainerId: serial("trainer_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   title: text("title").notNull(),
@@ -118,11 +94,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   fullName: true,
   role: true,
   bio: true,
-  specialization: true,
+  goals: true,
+  fitnessLevel: true,
 });
-
-export const insertTrainerClientSchema = createInsertSchema(trainerClients)
-  .omit({ id: true, startDate: true });
 
 export const insertWorkoutPlanSchema = createInsertSchema(workoutPlans)
   .omit({ id: true })
@@ -135,7 +109,6 @@ export const insertDocumentSchema = createInsertSchema(documents)
   .omit({ id: true, createdAt: true, updatedAt: true })
   .extend({
     content: z.string().min(1, "Content cannot be empty"),
-    clientId: z.number().nullable(),
   });
 
 export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
@@ -147,8 +120,6 @@ export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type TrainerClient = typeof trainerClients.$inferSelect;
-export type InsertTrainerClient = z.infer<typeof insertTrainerClientSchema>;
 export type Message = typeof messages.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type WorkoutPlan = typeof workoutPlans.$inferSelect;

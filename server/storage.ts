@@ -1,8 +1,8 @@
-import { users, messages, bookings, fitnessJourney, documents, trainerClients, workoutPlans } from "@shared/schema";
+import { users, messages, bookings, fitnessJourney, documents, workoutPlans } from "@shared/schema";
 import type { 
   User, InsertUser, Message, Booking, FitnessJourney, 
   InsertFitnessJourney, Document, InsertDocument,
-  TrainerClient, InsertTrainerClient, WorkoutPlan, InsertWorkoutPlan 
+  WorkoutPlan, InsertWorkoutPlan 
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, or, and, desc } from "drizzle-orm";
@@ -17,14 +17,10 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-
-  // Trainer-Client relationship
-  getTrainerClients(trainerId: number): Promise<TrainerClient[]>;
-  getClientTrainers(clientId: number): Promise<TrainerClient[]>;
-  addTrainerClient(relationship: InsertTrainerClient): Promise<TrainerClient>;
+  getClients(): Promise<User[]>;
 
   // Workout Plans
-  getWorkoutPlans(trainerId: number, clientId?: number): Promise<WorkoutPlan[]>;
+  getWorkoutPlans(clientId: number): Promise<WorkoutPlan[]>;
   createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan>;
 
   // Messages
@@ -32,7 +28,7 @@ export interface IStorage {
   createMessage(message: Partial<Message>): Promise<Message>;
 
   // Bookings
-  getBookings(userId: number, role: "trainer" | "client"): Promise<Booking[]>;
+  getBookings(clientId: number): Promise<Booking[]>;
   createBooking(booking: Partial<Booking>): Promise<Booking>;
 
   // Fitness Journey
@@ -40,9 +36,9 @@ export interface IStorage {
   createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney>;
 
   // Documents
-  getDocuments(trainerId: number, clientId?: number): Promise<Document[]>;
+  getDocuments(clientId?: number): Promise<Document[]>;
   createDocument(document: InsertDocument): Promise<Document>;
-  updateDocument(id: number, trainerId: number, document: Partial<InsertDocument>): Promise<Document>;
+  updateDocument(id: number, document: Partial<InsertDocument>): Promise<Document>;
 
   sessionStore: session.Store;
 }
@@ -74,43 +70,21 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Trainer-Client Relationship
-  async getTrainerClients(trainerId: number): Promise<TrainerClient[]> {
+  async getClients(): Promise<User[]> {
     return db
       .select()
-      .from(trainerClients)
-      .where(eq(trainerClients.trainerId, trainerId))
-      .orderBy(desc(trainerClients.startDate));
-  }
-
-  async getClientTrainers(clientId: number): Promise<TrainerClient[]> {
-    return db
-      .select()
-      .from(trainerClients)
-      .where(eq(trainerClients.clientId, clientId))
-      .orderBy(desc(trainerClients.startDate));
-  }
-
-  async addTrainerClient(relationship: InsertTrainerClient): Promise<TrainerClient> {
-    const [result] = await db
-      .insert(trainerClients)
-      .values(relationship)
-      .returning();
-    return result;
+      .from(users)
+      .where(eq(users.role, "client"))
+      .orderBy(desc(users.id));
   }
 
   // Workout Plans
-  async getWorkoutPlans(trainerId: number, clientId?: number): Promise<WorkoutPlan[]> {
-    let query = db
+  async getWorkoutPlans(clientId: number): Promise<WorkoutPlan[]> {
+    return db
       .select()
       .from(workoutPlans)
-      .where(eq(workoutPlans.trainerId, trainerId));
-
-    if (clientId) {
-      query = query.where(eq(workoutPlans.clientId, clientId));
-    }
-
-    return query.orderBy(desc(workoutPlans.startDate));
+      .where(eq(workoutPlans.clientId, clientId))
+      .orderBy(desc(workoutPlans.startDate));
   }
 
   async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> {
@@ -154,27 +128,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Bookings
-  async getBookings(userId: number, role: "trainer" | "client"): Promise<Booking[]> {
+  async getBookings(clientId: number): Promise<Booking[]> {
     return db
       .select()
       .from(bookings)
-      .where(
-        role === "trainer" 
-          ? eq(bookings.trainerId, userId)
-          : eq(bookings.clientId, userId)
-      )
+      .where(eq(bookings.clientId, clientId))
       .orderBy(desc(bookings.date));
   }
 
   async createBooking(booking: Partial<Booking>): Promise<Booking> {
-    if (!booking.trainerId || !booking.clientId || !booking.date) {
+    if (!booking.clientId || !booking.date) {
       throw new Error("Missing required booking fields");
     }
 
     const [newBooking] = await db
       .insert(bookings)
       .values({
-        trainerId: booking.trainerId,
         clientId: booking.clientId,
         date: new Date(booking.date),
         status: booking.status || "pending",
@@ -205,11 +174,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Documents
-  async getDocuments(trainerId: number, clientId?: number): Promise<Document[]> {
+  async getDocuments(clientId?: number): Promise<Document[]> {
     let query = db
       .select()
-      .from(documents)
-      .where(eq(documents.trainerId, trainerId));
+      .from(documents);
 
     if (clientId) {
       query = query.where(eq(documents.clientId, clientId));
@@ -219,7 +187,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDocument(document: InsertDocument): Promise<Document> {
-    if (!document.content || !document.title || !document.trainerId) {
+    if (!document.content || !document.title) {
       throw new Error("Missing required document fields");
     }
 
@@ -234,19 +202,14 @@ export class DatabaseStorage implements IStorage {
     return newDoc;
   }
 
-  async updateDocument(id: number, trainerId: number, document: Partial<InsertDocument>): Promise<Document> {
+  async updateDocument(id: number, document: Partial<InsertDocument>): Promise<Document> {
     const [existingDoc] = await db
       .select()
       .from(documents)
-      .where(
-        and(
-          eq(documents.id, id),
-          eq(documents.trainerId, trainerId)
-        )
-      );
+      .where(eq(documents.id, id));
 
     if (!existingDoc) {
-      throw new Error("Document not found or access denied");
+      throw new Error("Document not found");
     }
 
     const [updatedDoc] = await db
