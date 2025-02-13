@@ -113,11 +113,17 @@ Document Context: ${context || "No context provided"}`
     if (!req.user) return res.sendStatus(401);
 
     try {
-      const { classType, equipment, duration = 45 } = req.body;
+      const {
+        sessionType,
+        planType,
+        classType,
+        fitnessLevel,
+        clientDetails,
+        programDetails,
+      } = req.body;
 
-      const response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        system: `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
+      // Create base system prompt
+      const baseSystemPrompt = `You are Coach Pete Ryan's AI Assistant, specialized in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
 
 Rules to follow:
 1. Always use the exact sections and format from the blueprint
@@ -128,6 +134,13 @@ Rules to follow:
 6. Duration must be exactly 45 minutes
 7. Location is always PureGym West Byfleet
 8. Always respond in valid JSON format
+9. Consider client's fitness level: ${fitnessLevel}
+${clientDetails ? `10. Adapt to client profile:
+    - Age: ${clientDetails.age}
+    - Gender: ${clientDetails.gender}
+    - Goals: ${clientDetails.goals}
+    - Limitations: ${clientDetails.limitations || 'None'}` : ''}
+${planType === 'program' ? `11. Include periodization principles for ${programDetails.sessionsPerWeek} sessions per week over 12 weeks` : ''}
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
@@ -141,18 +154,26 @@ Available Equipment:
 - Battle Ropes (2 available)
 - Bodybar with plates
 - Step up Box
-- Yoga Matt`,
+- Yoga Matt`;
+
+      const generatePrompt = planType === 'oneoff'
+        ? `Generate a complete workout plan for a ${sessionType === 'group' ? classType + ' class' : 'personal training session'} that's 45 minutes long using only the available equipment.`
+        : `Generate Week 1 of a 12-week progressive program with ${programDetails.sessionsPerWeek} sessions per week. Focus on proper periodization and progressive overload.`;
+
+      const response = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        system: baseSystemPrompt,
         messages: [
           {
             role: "user",
-            content: `Generate a complete workout plan for a ${classType} class that's ${duration} minutes long using only the available equipment. Structure the response as a JSON object with the following format:
+            content: `${generatePrompt} Structure the response as a JSON object with the following format:
 
 {
   "classDetails": {
-    "className": "${classType}",
+    "className": "${sessionType === 'group' ? classType : 'Personal Training'}",
     "coach": "Coach Pete Ryan",
     "date": "current date",
-    "duration": ${duration},
+    "duration": 45,
     "location": "PureGym West Byfleet"
   },
   "equipmentNeeded": ["list of equipment"],
@@ -187,7 +208,12 @@ Available Equipment:
       "notes": "optional notes"
     }
   ],
-  "closingMessage": "Overview highlighting key elements and recovery principles"
+  "closingMessage": "Overview highlighting key elements and recovery principles"${planType === 'program' ? `,
+  "progression": {
+    "weeklyFocus": "Focus for each week",
+    "progressionStrategy": "How to progress over the 12 weeks",
+    "loadingPatterns": "Description of loading patterns"
+  }` : ''}
 }`
           }
         ],
