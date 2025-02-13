@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -112,16 +112,29 @@ export default function WorkoutGenerator() {
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
       sessionType: "group",
-      planType: "oneoff",
+      planType: "oneoff", // Always oneoff for group sessions
       fitnessLevel: "intermediate",
       focusAreas: [],
     },
   });
 
+  // Update form values when session type changes
+  useEffect(() => {
+    if (sessionType === "group") {
+      form.setValue("planType", "oneoff");
+    }
+  }, [sessionType, form]);
+
   const generateMutation = useMutation({
     mutationFn: async (values: WorkoutFormValues) => {
-      const res = await apiRequest("POST", "/api/generate-workout", {
+      // For group sessions, force oneoff plan type
+      const finalValues = {
         ...values,
+        planType: values.sessionType === "group" ? "oneoff" : values.planType,
+      };
+
+      const res = await apiRequest("POST", "/api/generate-workout", {
+        ...finalValues,
         duration: 45,
       });
       const data = await res.json();
@@ -241,42 +254,45 @@ ${generateMutation.data.closingMessage}`;
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="planType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan Type</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setPlanType(value as "oneoff" | "program");
-                        }}
-                        defaultValue={field.value}
-                        className="flex gap-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="oneoff" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Single Session
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="program" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            12-Week Program
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {/* Only show plan type for personal training */}
+              {sessionType === "personal" && (
+                <FormField
+                  control={form.control}
+                  name="planType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Plan Type</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setPlanType(value as "oneoff" | "program");
+                          }}
+                          defaultValue={field.value}
+                          className="flex gap-4"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="oneoff" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Single Session
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="program" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              12-Week Program
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {sessionType === "group" && (
                 <FormField
