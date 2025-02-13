@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { useEditor, EditorContent, BubbleMenu, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
@@ -33,10 +33,6 @@ import {
   Undo,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
-import { InsertDocument } from "@shared/schema";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import {
   Command,
   CommandList,
@@ -49,8 +45,23 @@ import {
 import { useState, useCallback } from "react";
 import { Extension } from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
+import type { Range } from '@tiptap/core'
+import { InsertDocument } from "@shared/schema";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 const lowlight = createLowlight(common)
+
+interface CommandProps {
+  editor: Editor;
+  range: Range;
+}
+
+interface SuggestionItem {
+  title: string;
+  command: (props: CommandProps) => void;
+}
 
 // Define the SlashCommand extension before using it
 const SlashCommand = Extension.create({
@@ -59,7 +70,7 @@ const SlashCommand = Extension.create({
     return {
       suggestion: {
         char: '/',
-        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
+        command: ({ editor, range, props }: { editor: Editor; range: Range; props: any }) => {
           props.command({ editor, range })
         },
       }
@@ -172,7 +183,7 @@ export default function DocumentEditor({
     setCommandMenuPosition(null);
   }, [aiAssistMutation]);
 
-  const insertBlock = useCallback((editor: any, type: string) => {
+  const insertBlock = useCallback((editor: Editor, type: string) => {
     if (!editor) return;
 
     switch (type) {
@@ -227,68 +238,70 @@ export default function DocumentEditor({
       }),
       SlashCommand.configure({
         suggestion: {
-          char: '/',
-          command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
-            props.command({ editor, range });
+          items: ({ query }: { query: string }) => {
+            const items: SuggestionItem[] = [
+              {
+                title: 'Heading 1',
+                command: ({ editor }) => insertBlock(editor, 'heading-1'),
+              },
+              {
+                title: 'Heading 2',
+                command: ({ editor }) => insertBlock(editor, 'heading-2'),
+              },
+              {
+                title: 'Task List',
+                command: ({ editor }) => insertBlock(editor, 'task-list'),
+              },
+              {
+                title: 'Table',
+                command: ({ editor }) => insertBlock(editor, 'table'),
+              },
+              {
+                title: 'Code Block',
+                command: ({ editor }) => insertBlock(editor, 'code-block'),
+              },
+              {
+                title: 'Ask Coach Pete',
+                command: () => handleAiCommand('help'),
+              },
+              {
+                title: 'Explain Exercise',
+                command: () => handleAiCommand('explain-exercise'),
+              },
+              {
+                title: 'Suggest Workout',
+                command: () => handleAiCommand('suggest-workout'),
+              },
+              {
+                title: 'Optimize Nutrition',
+                command: () => handleAiCommand('optimize-nutrition'),
+              },
+              {
+                title: 'Form Check',
+                command: () => handleAiCommand('form-check'),
+              },
+              {
+                title: 'Simplify',
+                command: () => handleAiCommand('simplify'),
+              },
+            ];
+
+            return items.filter(item =>
+              item.title.toLowerCase().includes(query.toLowerCase())
+            );
           },
-          items: ({ editor }: { editor: any }) => [
-            { 
-              title: 'Heading 1',
-              command: () => insertBlock(editor, 'heading-1')
-            },
-            {
-              title: 'Heading 2',
-              command: () => insertBlock(editor, 'heading-2')
-            },
-            {
-              title: 'Task List',
-              command: () => insertBlock(editor, 'task-list')
-            },
-            {
-              title: 'Table',
-              command: () => insertBlock(editor, 'table')
-            },
-            {
-              title: 'Code Block',
-              command: () => insertBlock(editor, 'code-block')
-            },
-            {
-              title: 'Ask Coach Pete',
-              command: () => handleAiCommand('help')
-            },
-            {
-              title: 'Explain Exercise',
-              command: () => handleAiCommand('explain-exercise')
-            },
-            {
-              title: 'Suggest Workout',
-              command: () => handleAiCommand('suggest-workout')
-            },
-            {
-              title: 'Optimize Nutrition',
-              command: () => handleAiCommand('optimize-nutrition')
-            },
-            {
-              title: 'Form Check',
-              command: () => handleAiCommand('form-check')
-            },
-            {
-              title: 'Simplify',
-              command: () => handleAiCommand('simplify')
-            },
-          ],
-          render: ({ editor, range, decorationNode }) => {
-            const domNode = decorationNode.type.spec.inline
+          render: ({ editor, decorationNode }) => {
+            const dom = decorationNode.type.spec.inline
               ? decorationNode
               : decorationNode.firstChild;
 
-            if (!domNode) {
+            if (!dom) {
               setShowCommandMenu(false);
               setCommandMenuPosition(null);
               return null;
             }
 
-            const rect = domNode.getBoundingClientRect();
+            const rect = dom.getBoundingClientRect();
             setCommandMenuPosition({
               left: rect.left,
               top: rect.bottom + window.scrollY,
