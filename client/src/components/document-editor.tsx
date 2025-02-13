@@ -27,6 +27,8 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Brain,
+  Sparkles,
   Undo,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
@@ -42,6 +44,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 
 const lowlight = createLowlight(common)
@@ -84,7 +87,7 @@ export default function DocumentEditor({
         lowlight,
       }),
       Placeholder.configure({
-        placeholder: 'Press "/" for commands...',
+        placeholder: 'Type "/" for commands or "@coach" for AI assistance...',
       }),
     ],
     content: initialContent,
@@ -138,6 +141,33 @@ export default function DocumentEditor({
     },
   });
 
+  const aiAssistMutation = useMutation({
+    mutationFn: async (prompt: string) => {
+      const res = await apiRequest("POST", "/api/ai-coach", {
+        prompt,
+        context: editor?.getHTML() || "",
+      });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (editor) {
+        // Insert AI response at current cursor position
+        editor.chain().focus().insertContent(data.response).run();
+      }
+      toast({
+        title: "Coach Pete",
+        description: "Response added to document",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Premium service required.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (!editor) {
     return null;
   }
@@ -169,9 +199,23 @@ export default function DocumentEditor({
     }
   };
 
+  const handleAiCommand = (command: string) => {
+    const aiCommands = {
+      "explain-exercise": "Explain how to properly perform the exercise mentioned in the current section.",
+      "suggest-workout": "Suggest a workout plan based on the goals mentioned in this document.",
+      "optimize-nutrition": "Analyze and suggest improvements for the nutrition plan in this document.",
+      "form-check": "Review the exercise form described and provide corrections and tips.",
+      "simplify": "Explain this fitness concept in simpler terms.",
+      "help": "How can I help you with your fitness journey today?",
+    };
+
+    aiAssistMutation.mutate(aiCommands[command] || command);
+  };
+
   return (
     <div className="space-y-4">
       <div className="border-b pb-4 flex flex-wrap gap-2">
+        {/* Existing toolbar buttons */}
         <div className="flex items-center gap-1">
           <Toggle
             size="sm"
@@ -312,6 +356,35 @@ export default function DocumentEditor({
             <CommandItem onSelect={() => insertBlock("code-block")}>
               <Code className="mr-2 h-4 w-4" />
               Code Block
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="AI Coach Pete">
+            <CommandItem onSelect={() => handleAiCommand("explain-exercise")}>
+              <Brain className="mr-2 h-4 w-4" />
+              Explain Exercise
+            </CommandItem>
+            <CommandItem onSelect={() => handleAiCommand("suggest-workout")}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Suggest Workout Plan
+            </CommandItem>
+            <CommandItem onSelect={() => handleAiCommand("optimize-nutrition")}>
+              <Brain className="mr-2 h-4 w-4" />
+              Optimize Nutrition
+            </CommandItem>
+            <CommandItem onSelect={() => handleAiCommand("form-check")}>
+              <Brain className="mr-2 h-4 w-4" />
+              Form Check
+            </CommandItem>
+            <CommandItem onSelect={() => handleAiCommand("simplify")}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Simplify This
+            </CommandItem>
+            <CommandItem onSelect={() => handleAiCommand("help")}>
+              <Brain className="mr-2 h-4 w-4" />
+              Ask Coach Pete
             </CommandItem>
           </CommandGroup>
         </CommandList>

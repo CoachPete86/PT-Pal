@@ -29,6 +29,75 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // AI Coach endpoint
+  app.post("/api/ai-coach", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const { prompt, context } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ error: "No prompt provided" });
+      }
+
+      // Check if user has premium access
+      if (req.user.role !== "premium") {
+        return res.status(403).json({ 
+          error: "Premium subscription required",
+          message: "This feature requires a premium subscription. Please upgrade your plan to access AI Coach Pete."
+        });
+      }
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are Coach Pete, an expert personal trainer and fitness coach with decades of experience. You specialize in:
+- Exercise form and technique
+- Personalized workout planning
+- Nutrition advice
+- Athletic performance
+- Injury prevention and recovery
+- Mental fitness and motivation
+
+When responding:
+- Be encouraging and supportive, but maintain professional authority
+- Provide clear, actionable advice
+- Include relevant scientific backing when appropriate
+- Prioritize safety and proper form
+- Consider the user's context from their document
+- Use clear formatting with headers and bullet points when appropriate
+
+Document Context: ${context || "No context provided"}`
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      });
+
+      res.json({ response: response.choices[0].message.content });
+    } catch (error: any) {
+      console.error("AI Coach error:", error);
+
+      if (error.code === 'insufficient_quota') {
+        res.status(500).json({ 
+          error: "Service temporarily unavailable",
+          message: "The AI service is currently unavailable. Please try again later."
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to get AI response",
+          message: error.message
+        });
+      }
+    }
+  });
+
   // Notion sync endpoint
   app.post("/api/documents/sync", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
@@ -70,10 +139,10 @@ export function registerRoutes(app: Express): Server {
     if (!req.user) return res.sendStatus(401);
     try {
       const { title, content } = req.body;
-      const { id } = req.params; // Corrected parameter name
+      const { id } = req.params;
 
       await notion.pages.update({
-        page_id: id, // Using corrected parameter
+        page_id: id,
         properties: {
           Name: {
             title: [{ text: { content: title } }],
