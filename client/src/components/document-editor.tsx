@@ -51,6 +51,29 @@ import Suggestion from '@tiptap/suggestion'
 
 const lowlight = createLowlight(common)
 
+// Define the SlashCommand extension before using it
+const SlashCommand = Extension.create({
+  name: 'slashCommand',
+  addOptions() {
+    return {
+      suggestion: {
+        char: '/',
+        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
+          props.command({ editor, range })
+        },
+      }
+    }
+  },
+  addProseMirrorPlugins() {
+    return [
+      Suggestion({
+        editor: this.editor,
+        ...this.options.suggestion,
+      }),
+    ]
+  },
+})
+
 interface DocumentEditorProps {
   initialContent?: string;
   documentId?: number;
