@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
@@ -91,48 +92,6 @@ export default function DocumentEditor({
   const [showCommandMenu, setShowCommandMenu] = useState(false);
   const [commandMenuPosition, setCommandMenuPosition] = useState<{ left: number; top: number } | null>(null);
 
-  const handleAiCommand = useCallback((command: string) => {
-    const aiCommands = {
-      "explain-exercise": "Explain how to properly perform the exercise mentioned in the current section.",
-      "suggest-workout": "Suggest a workout plan based on the goals mentioned in this document.",
-      "optimize-nutrition": "Analyze and suggest improvements for the nutrition plan in this document.",
-      "form-check": "Review the exercise form described and provide corrections and tips.",
-      "simplify": "Explain this fitness concept in simpler terms.",
-      "help": "How can I help you with your fitness journey today?",
-    };
-
-    aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
-    setShowCommandMenu(false);
-    setCommandMenuPosition(null);
-  }, []);
-
-  const insertBlock = useCallback((type: string) => {
-    if (!editor) return;
-
-    switch (type) {
-      case "table":
-        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-        break;
-      case "task-list":
-        editor.chain().focus().toggleTaskList().run();
-        break;
-      case "code-block":
-        editor.chain().focus().toggleCodeBlock().run();
-        break;
-      case "heading-1":
-        editor.chain().focus().toggleHeading({ level: 1 }).run();
-        break;
-      case "heading-2":
-        editor.chain().focus().toggleHeading({ level: 2 }).run();
-        break;
-      case "heading-3":
-        editor.chain().focus().toggleHeading({ level: 3 }).run();
-        break;
-    }
-    setShowCommandMenu(false);
-    setCommandMenuPosition(null);
-  }, []);
-
   const saveMutation = useMutation({
     mutationFn: async (data: InsertDocument & { notionSync?: boolean }) => {
       const endpoint = documentId ? `/api/documents/${documentId}` : "/api/documents";
@@ -198,6 +157,48 @@ export default function DocumentEditor({
     },
   });
 
+  const handleAiCommand = useCallback((command: string) => {
+    const aiCommands = {
+      "explain-exercise": "Explain how to properly perform the exercise mentioned in the current section.",
+      "suggest-workout": "Suggest a workout plan based on the goals mentioned in this document.",
+      "optimize-nutrition": "Analyze and suggest improvements for the nutrition plan in this document.",
+      "form-check": "Review the exercise form described and provide corrections and tips.",
+      "simplify": "Explain this fitness concept in simpler terms.",
+      "help": "How can I help you with your fitness journey today?",
+    };
+
+    aiAssistMutation.mutate(aiCommands[command as keyof typeof aiCommands] || command);
+    setShowCommandMenu(false);
+    setCommandMenuPosition(null);
+  }, [aiAssistMutation]);
+
+  const insertBlock = useCallback((editor: any, type: string) => {
+    if (!editor) return;
+
+    switch (type) {
+      case "table":
+        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+        break;
+      case "task-list":
+        editor.chain().focus().toggleTaskList().run();
+        break;
+      case "code-block":
+        editor.chain().focus().toggleCodeBlock().run();
+        break;
+      case "heading-1":
+        editor.chain().focus().toggleHeading({ level: 1 }).run();
+        break;
+      case "heading-2":
+        editor.chain().focus().toggleHeading({ level: 2 }).run();
+        break;
+      case "heading-3":
+        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        break;
+    }
+    setShowCommandMenu(false);
+    setCommandMenuPosition(null);
+  }, []);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -230,18 +231,51 @@ export default function DocumentEditor({
           command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
             props.command({ editor, range });
           },
-          items: () => [
-            { title: 'Heading 1', command: () => insertBlock('heading-1') },
-            { title: 'Heading 2', command: () => insertBlock('heading-2') },
-            { title: 'Task List', command: () => insertBlock('task-list') },
-            { title: 'Table', command: () => insertBlock('table') },
-            { title: 'Code Block', command: () => insertBlock('code-block') },
-            { title: 'Ask Coach Pete', command: () => handleAiCommand('help') },
-            { title: 'Explain Exercise', command: () => handleAiCommand('explain-exercise') },
-            { title: 'Suggest Workout', command: () => handleAiCommand('suggest-workout') },
-            { title: 'Optimize Nutrition', command: () => handleAiCommand('optimize-nutrition') },
-            { title: 'Form Check', command: () => handleAiCommand('form-check') },
-            { title: 'Simplify', command: () => handleAiCommand('simplify') },
+          items: ({ editor }: { editor: any }) => [
+            { 
+              title: 'Heading 1',
+              command: () => insertBlock(editor, 'heading-1')
+            },
+            {
+              title: 'Heading 2',
+              command: () => insertBlock(editor, 'heading-2')
+            },
+            {
+              title: 'Task List',
+              command: () => insertBlock(editor, 'task-list')
+            },
+            {
+              title: 'Table',
+              command: () => insertBlock(editor, 'table')
+            },
+            {
+              title: 'Code Block',
+              command: () => insertBlock(editor, 'code-block')
+            },
+            {
+              title: 'Ask Coach Pete',
+              command: () => handleAiCommand('help')
+            },
+            {
+              title: 'Explain Exercise',
+              command: () => handleAiCommand('explain-exercise')
+            },
+            {
+              title: 'Suggest Workout',
+              command: () => handleAiCommand('suggest-workout')
+            },
+            {
+              title: 'Optimize Nutrition',
+              command: () => handleAiCommand('optimize-nutrition')
+            },
+            {
+              title: 'Form Check',
+              command: () => handleAiCommand('form-check')
+            },
+            {
+              title: 'Simplify',
+              command: () => handleAiCommand('simplify')
+            },
           ],
           render: ({ editor, range, decorationNode }) => {
             const domNode = decorationNode.type.spec.inline
@@ -292,21 +326,21 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 1 })}
-            onPressedChange={() => insertBlock("heading-1")}
+            onPressedChange={() => insertBlock(editor, "heading-1")}
           >
             <Heading1 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 2 })}
-            onPressedChange={() => insertBlock("heading-2")}
+            onPressedChange={() => insertBlock(editor, "heading-2")}
           >
             <Heading2 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 3 })}
-            onPressedChange={() => insertBlock("heading-3")}
+            onPressedChange={() => insertBlock(editor, "heading-3")}
           >
             <Heading3 className="h-4 w-4" />
           </Toggle>
@@ -354,7 +388,7 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("taskList")}
-            onPressedChange={() => insertBlock("task-list")}
+            onPressedChange={() => insertBlock(editor, "task-list")}
           >
             <CheckSquare className="h-4 w-4" />
           </Toggle>
@@ -371,14 +405,14 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("codeBlock")}
-            onPressedChange={() => insertBlock("code-block")}
+            onPressedChange={() => insertBlock(editor, "code-block")}
           >
             <Code className="h-4 w-4" />
           </Toggle>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => insertBlock("table")}
+            onClick={() => insertBlock(editor, "table")}
           >
             <TableIcon className="h-4 w-4" />
           </Button>
@@ -417,23 +451,23 @@ export default function DocumentEditor({
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Blocks">
-                <CommandItem onSelect={() => insertBlock("heading-1")}>
+                <CommandItem onSelect={() => insertBlock(editor, "heading-1")}>
                   <Heading1 className="mr-2 h-4 w-4" />
                   Heading 1
                 </CommandItem>
-                <CommandItem onSelect={() => insertBlock("heading-2")}>
+                <CommandItem onSelect={() => insertBlock(editor, "heading-2")}>
                   <Heading2 className="mr-2 h-4 w-4" />
                   Heading 2
                 </CommandItem>
-                <CommandItem onSelect={() => insertBlock("task-list")}>
+                <CommandItem onSelect={() => insertBlock(editor, "task-list")}>
                   <CheckSquare className="mr-2 h-4 w-4" />
                   Task List
                 </CommandItem>
-                <CommandItem onSelect={() => insertBlock("table")}>
+                <CommandItem onSelect={() => insertBlock(editor, "table")}>
                   <TableIcon className="mr-2 h-4 w-4" />
                   Table
                 </CommandItem>
-                <CommandItem onSelect={() => insertBlock("code-block")}>
+                <CommandItem onSelect={() => insertBlock(editor, "code-block")}>
                   <Code className="mr-2 h-4 w-4" />
                   Code Block
                 </CommandItem>
