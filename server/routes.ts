@@ -142,7 +142,15 @@ ${clientDetails ? `11. Adapt to client profile:
     - Gender: ${clientDetails.gender}
     - Goals: ${clientDetails.goals}
     - Limitations: ${clientDetails.limitations || 'None'}` : ''}
-${planType === 'program' ? `12. Include periodisation principles for ${programDetails?.sessionsPerWeek} sessions per week over 12 weeks` : ''}
+${sessionType === 'group' ? `12. Group Session Specifics:
+    - Participants: ${req.body.participantInfo?.count || 'Variable'}
+    - Format: ${req.body.participantInfo?.format || 'Individual'} workout
+    ${req.body.participantInfo?.format === 'groups' ? `- Group Size: ${req.body.participantInfo.groupSize} participants per group` : ''}
+    - Circuit Types: ${req.body.circuitPreferences?.types.join(', ')}
+    - Station Rotation: ${req.body.circuitPreferences?.stationRotation ? 'Yes' : 'No'}
+    - Rest Between Stations: ${req.body.circuitPreferences?.restBetweenStations ? 'Yes' : 'No'}
+    - Mixed Equipment: ${req.body.circuitPreferences?.mixedEquipmentStations ? 'Allow' : 'Keep Simple'}` : ''}
+${planType === 'program' ? `13. Include periodisation principles for ${programDetails?.sessionsPerWeek} sessions per week over 12 weeks` : ''}
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5

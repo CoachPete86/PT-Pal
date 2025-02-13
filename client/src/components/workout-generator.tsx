@@ -47,6 +47,17 @@ const workoutFormSchema = z.object({
   planType: z.enum(["oneoff", "program"]),
   classType: z.string().optional(),
   fitnessLevel: z.enum(["beginner", "intermediate", "advanced"]),
+  participantInfo: z.object({
+    count: z.number().min(1).max(30).optional(),
+    format: z.enum(["individual", "partner", "groups"]).optional(),
+    groupSize: z.number().min(2).max(6).optional(),
+  }).optional(),
+  circuitPreferences: z.object({
+    types: z.array(z.string()),
+    stationRotation: z.boolean(),
+    restBetweenStations: z.boolean(),
+    mixedEquipmentStations: z.boolean(),
+  }),
   groupFormat: z.object({
     type: z.enum(["amrap", "emom", "tabata", "custom"]),
     workInterval: z.number().optional(),
@@ -82,6 +93,17 @@ const availableEquipment = [
   { id: "bodybar", label: "Bodybar with plates" },
   { id: "stepbox", label: "Step up Box" },
   { id: "yogamat", label: "Yoga Matt" },
+];
+
+const circuitTypes = [
+  { id: "strength", label: "Strength Focused" },
+  { id: "cardio", label: "Cardio/Endurance" },
+  { id: "hiit", label: "HIIT" },
+  { id: "technical", label: "Technical/Skill Work" },
+  { id: "mobility", label: "Mobility/Flexibility" },
+  { id: "power", label: "Power/Explosive" },
+  { id: "bodyweight", label: "Bodyweight Only" },
+  { id: "mixed", label: "Mixed Equipment" },
 ];
 
 interface WorkoutPlan {
@@ -130,6 +152,12 @@ export default function WorkoutGenerator() {
       planType: "oneoff",
       fitnessLevel: "intermediate",
       equipment: [],
+      circuitPreferences: {
+        types: [],
+        stationRotation: true,
+        restBetweenStations: true,
+        mixedEquipmentStations: true,
+      },
       groupFormat: {
         type: "amrap",
         workInterval: 40,
@@ -373,6 +401,192 @@ ${generateMutation.data.closingMessage}`;
                       />
                     </div>
                   )}
+
+                  {/* New Participant Information Section */}
+                  <div className="space-y-4">
+                    <FormLabel>Participant Information</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="participantInfo.count"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Expected Number of Participants</FormLabel>
+                          <FormControl>
+                            <Input type="number" min="1" max="30" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            This helps optimize station rotations and equipment allocation
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="participantInfo.format"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Workout Format</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select workout format" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="individual">Individual Stations</SelectItem>
+                              <SelectItem value="partner">Partner Workout</SelectItem>
+                              <SelectItem value="groups">Small Groups</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch("participantInfo.format") === "groups" && (
+                      <FormField
+                        control={form.control}
+                        name="participantInfo.groupSize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Participants per Group</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="2" max="6" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  {/* Circuit Preferences Section */}
+                  <div className="space-y-4">
+                    <FormLabel>Circuit Preferences</FormLabel>
+
+                    <FormField
+                      control={form.control}
+                      name="circuitPreferences.types"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel>Circuit Types</FormLabel>
+                            <FormDescription>
+                              Select the types of circuits you want to include
+                            </FormDescription>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            {circuitTypes.map((type) => (
+                              <FormField
+                                key={type.id}
+                                control={form.control}
+                                name="circuitPreferences.types"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={type.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(type.id)}
+                                          onCheckedChange={(checked) => {
+                                            return checked
+                                              ? field.onChange([...field.value, type.id])
+                                              : field.onChange(
+                                                  field.value?.filter(
+                                                    (value) => value !== type.id
+                                                  )
+                                                )
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal">
+                                        {type.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  )
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="circuitPreferences.stationRotation"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>
+                                Station Rotation
+                              </FormLabel>
+                              <FormDescription>
+                                Participants move between stations
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="circuitPreferences.restBetweenStations"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>
+                                Rest Between Stations
+                              </FormLabel>
+                              <FormDescription>
+                                Include rest periods during rotations
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="circuitPreferences.mixedEquipmentStations"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>
+                                Mixed Equipment Stations
+                              </FormLabel>
+                              <FormDescription>
+                                Allow multiple equipment types per station
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
                   <FormField
                     control={form.control}
