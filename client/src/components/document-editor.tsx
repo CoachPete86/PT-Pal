@@ -123,7 +123,7 @@ export default function DocumentEditor({
 
   const aiAssistMutation = useMutation({
     mutationFn: async (prompt: string) => {
-      const res = await apiRequest("POST", "/api/ai-coach", {
+      const res = await apiRequest("POST", "/api/coach-assist", {
         prompt,
         context: editor?.getHTML() || "",
       });
@@ -141,7 +141,7 @@ export default function DocumentEditor({
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to get AI response. Premium service required.",
+        description: "Failed to get assistant response. Premium service required.",
         variant: "destructive",
       });
     },

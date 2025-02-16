@@ -124,7 +124,7 @@ Document Context: ${context || "No context provided"}`
       } = req.body;
 
       // Create base system prompt
-      const baseSystemPrompt = `You are Coach Pete Ryan's AI Assistant, specialised in creating professional workout plans following his exact blueprint structure. You have extensive knowledge of exercise science and Coach Pete's training methodology.
+      const baseSystemPrompt = `Following Coach Pete Ryan's exact blueprint structure for creating professional workout plans, with extensive knowledge of exercise science and his training methodology.
 
 Rules to follow:
 1. Always use the exact sections and format from the blueprint
