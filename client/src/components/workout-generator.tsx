@@ -318,9 +318,9 @@ ${generateMutation.data.closingMessage}`;
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>AI Workout Generator</CardTitle>
+          <CardTitle>Workout Plan Generator</CardTitle>
           <CardDescription>
-            Generate professional workout plans powered by Coach Pete's methodology. Plans are automatically saved to Notion.
+            Create workout plans following Coach Pete's proven blueprint and session design templates - refined over years of professional experience. Plans are automatically saved to Notion.
           </CardDescription>
         </CardHeader>
         <CardContent>
