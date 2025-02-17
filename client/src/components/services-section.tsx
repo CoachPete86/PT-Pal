@@ -5,51 +5,51 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Dumbbell, Users, Globe, Sun, Brain, ChartBar, Sparkles } from "lucide-react";
+import { Brain, ChartBar, Users, MessageSquare, Calendar, FileText, Sparkles, Zap } from "lucide-react";
 
-const services = [
+const features = [
   {
-    title: "Smart Workout Plans",
+    title: "AI Workout Generator",
     description:
-      "Access our cutting-edge workout generator that creates professional, structured workout plans following Coach Pete's proven methodology. Perfect for trainers and dedicated athletes.",
+      "Create professional workout plans in minutes with our AI-powered generator. Customize templates and scale your programming efficiently.",
     icon: Sparkles,
     image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2",
     premium: true,
   },
   {
-    title: "1:1 Personal Training",
+    title: "Client Management",
     description:
-      "Expert training at PureGym West Byfleet, focusing on strength, endurance, and mobility. Movement analysis and biomechanics-based approach.",
-    icon: Dumbbell,
-    image: "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3",
-  },
-  {
-    title: "Online Coaching",
-    description:
-      "Virtual coaching with customised workout plans and regular check-ins. Flexible session durations to fit your schedule.",
-    icon: Globe,
-    image: "https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d",
-  },
-  {
-    title: "Outdoor Training",
-    description:
-      "Dynamic outdoor sessions that challenge your body and mind in natural environments. Perfect for those who prefer training outside.",
-    icon: Sun,
-    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5",
-  },
-  {
-    title: "Group Fitness",
-    description:
-      "High-energy classes including HIIT, Strength, Core, Burn, and Spin. Suitable for all fitness levels.",
+      "Manage your client base effectively with profiles, progress tracking, and automated check-ins. Keep all client information organized in one place.",
     icon: Users,
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+    image: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c",
   },
   {
-    title: "Movement Analysis",
+    title: "Business Analytics",
     description:
-      "Detailed assessment of your movement patterns and biomechanics. Identify limitations and develop corrective strategies.",
-    icon: Brain,
-    image: "https://images.unsplash.com/photo-1576678927484-cc907957088c",
+      "Track your business growth with detailed analytics. Monitor client retention, revenue, and program effectiveness.",
+    icon: ChartBar,
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+  },
+  {
+    title: "Messaging System",
+    description:
+      "Stay connected with your clients through our integrated messaging system. Send updates, check progress, and provide motivation.",
+    icon: MessageSquare,
+    image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f",
+  },
+  {
+    title: "Scheduling Tools",
+    description:
+      "Streamline your booking process with our integrated calendar. Manage sessions, classes, and availability in one place.",
+    icon: Calendar,
+    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173",
+  },
+  {
+    title: "Document Management",
+    description:
+      "Create and manage workout plans, nutrition guides, and waivers. Use templates to save time and maintain consistency.",
+    icon: FileText,
+    image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85",
   },
 ];
 
@@ -58,25 +58,25 @@ export default function ServicesSection() {
     <section id="services" className="py-20 bg-zinc-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Training Solutions</h2>
+          <h2 className="text-4xl font-bold mb-4">Platform Features</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Professional training services engineered to help you reach your full potential,
-            whether you're just starting or looking to break through plateaus.
+            Everything you need to manage and grow your fitness business, all in one
+            powerful platform.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service) => (
+          {features.map((feature) => (
             <Card
-              key={service.title}
+              key={feature.title}
               className="overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
               <div
                 className="h-48 bg-cover bg-center relative"
-                style={{ backgroundImage: `url(${service.image})` }}
+                style={{ backgroundImage: `url(${feature.image})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                {service.premium && (
+                {feature.premium && (
                   <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
                     Premium
                   </div>
@@ -84,13 +84,13 @@ export default function ServicesSection() {
               </div>
               <CardHeader className="relative">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <service.icon className="h-5 w-5" />
-                  {service.title}
+                  <feature.icon className="h-5 w-5" />
+                  {feature.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-sm">
-                  {service.description}
+                  {feature.description}
                 </CardDescription>
               </CardContent>
             </Card>

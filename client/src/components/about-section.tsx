@@ -6,36 +6,36 @@ export default function AboutSection() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold">About Coach Pete Ryan</h2>
+            <h2 className="text-3xl font-bold">Why Choose Our Platform?</h2>
             <p className="text-muted-foreground">
-              As a former British Kickboxing Champion and Extreme Endurance Athlete, 
-              I bring over 20 years of elite sports experience to my coaching practice. 
-              Since 2008, I've helped hundreds of clients achieve remarkable transformations 
-              through my unique approach to training and movement.
+              Built by fitness professionals for fitness professionals, our platform 
+              combines cutting-edge technology with deep industry knowledge. We understand 
+              the unique challenges of running a fitness business and have created tools 
+              that make a real difference.
             </p>
             <p className="text-muted-foreground">
-              My expertise in biomechanics and movement analysis allows me to create 
-              highly effective, personalised programmes that not only achieve results 
-              but also improve how you move and feel in daily life.
+              From automated workout generation to comprehensive client management, 
+              we provide everything you need to scale your business while maintaining 
+              the personal touch your clients value.
             </p>
 
             <div className="grid grid-cols-3 gap-4">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">20+</div>
-                  <div className="text-sm">Years Experience</div>
+                  <div className="text-3xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-sm">Active Trainers</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">15+</div>
-                  <div className="text-sm">Year Client Retention</div>
+                  <div className="text-3xl font-bold text-primary mb-2">10k+</div>
+                  <div className="text-sm">Clients Managed</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">#1</div>
-                  <div className="text-sm">Kickboxing Champion</div>
+                  <div className="text-3xl font-bold text-primary mb-2">98%</div>
+                  <div className="text-sm">Satisfaction Rate</div>
                 </CardContent>
               </Card>
             </div>
@@ -45,7 +45,7 @@ export default function AboutSection() {
             className="aspect-square rounded-lg bg-cover bg-center shadow-2xl"
             style={{
               backgroundImage:
-                'url("/assets/coach-pete.jpeg")',
+                'url("https://images.unsplash.com/photo-1609899464726-905eb9e5effe")',
             }}
           />
         </div>

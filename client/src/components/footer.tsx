@@ -1,23 +1,25 @@
 import { Link } from "wouter";
-import { Instagram, Facebook, Twitter } from "lucide-react";
+import { Instagram, Facebook, Twitter, BarChart } from "lucide-react";
 
 export default function Footer() {
   return (
     <footer className="bg-muted">
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8 text-center">
-          <img 
-            src="/assets/Twitter_Header_Photo.png" 
-            alt="Coach Pete Ryan Logo" 
-            className="h-16 mx-auto mb-4"
-          />
+          <div className="flex items-center justify-center gap-2 text-2xl font-bold">
+            <BarChart className="h-8 w-8 text-primary" />
+            <span>FitnessPro Platform</span>
+          </div>
+          <p className="text-muted-foreground mt-2">
+            Empowering fitness professionals worldwide
+          </p>
         </div>
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">Coach Pete Ryan</h3>
+            <h3 className="font-bold text-lg mb-4">About Platform</h3>
             <p className="text-muted-foreground">
-              Professional personal trainer dedicated to helping you achieve your
-              fitness goals through expert movement and strength training.
+              The complete business management solution for fitness professionals.
+              Scale your business, engage clients, and deliver exceptional results.
             </p>
           </div>
 
@@ -27,7 +29,7 @@ export default function Footer() {
               <li>
                 <Link href="/#services">
                   <a className="text-muted-foreground hover:text-primary">
-                    Services
+                    Features
                   </a>
                 </Link>
               </li>
@@ -39,9 +41,16 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/pricing">
+                  <a className="text-muted-foreground hover:text-primary">
+                    Pricing
+                  </a>
+                </Link>
+              </li>
+              <li>
                 <Link href="/auth">
                   <a className="text-muted-foreground hover:text-primary">
-                    Member Login
+                    Sign Up
                   </a>
                 </Link>
               </li>
@@ -49,38 +58,40 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
+            <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-muted-foreground">
-              <li>Email: pete@coachpeteryan.com</li>
-              <li>Phone: 07308 518428</li>
-              <li>Training Location:</li>
-              <li className="pl-4">PureGym West Byfleet</li>
-              <li className="pl-4">Unit 2 Wey Retail Park</li>
-              <li className="pl-4">Royston Road</li>
-              <li className="pl-4">West Byfleet</li>
-              <li className="pl-4">KT14 7NP</li>
+              <li>Email: support@fitnesspro.io</li>
+              <li>Help Center</li>
+              <li>Documentation</li>
+              <li>API Reference</li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Follow Us</h4>
+            <h4 className="font-semibold mb-4">Connect With Us</h4>
             <div className="flex gap-4">
               <a
-                href="#"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
                 aria-label="Instagram"
               >
                 <Instagram className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
                 aria-label="Facebook"
               >
                 <Facebook className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
                 aria-label="Twitter"
               >
@@ -91,7 +102,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Coach Pete Ryan. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} FitnessPro Platform. All rights reserved.</p>
         </div>
       </div>
     </footer>
