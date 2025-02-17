@@ -8,7 +8,7 @@ export default function HeroSection() {
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")',
+            'url("https://images.unsplash.com/photo-1534367507873-d2d7e24c797f")', // Modern gym environment with equipment
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />

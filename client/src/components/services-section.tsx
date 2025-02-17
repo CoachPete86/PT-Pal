@@ -13,7 +13,7 @@ const features = [
     description:
       "Create professional workout plans in minutes with our advanced programme generator. Customise templates and scale your training programmes efficiently.",
     icon: Zap,
-    image: "https://images.unsplash.com/photo-1594882645126-14020914d58d",
+    image: "https://images.unsplash.com/photo-1594381898411-846e7d193883", // PT explaining workout plan
     premium: true,
   },
   {
@@ -21,35 +21,35 @@ const features = [
     description:
       "Manage your client base effectively with profiles, progress tracking, and automated check-ins. Keep all client information organised in one place.",
     icon: Users,
-    image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b", // PT with client checking progress
   },
   {
     title: "Business Analytics",
     description:
       "Track your business growth with detailed analytics. Monitor client retention, revenue, and programme effectiveness.",
     icon: ChartBar,
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
+    image: "https://images.unsplash.com/photo-1593079831268-3381b0db4a77", // PT at desk reviewing progress
   },
   {
     title: "Messaging System",
     description:
       "Stay connected with your clients through our integrated messaging system. Send updates, check progress, and provide motivation.",
     icon: MessageSquare,
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b", // PT communicating with client
   },
   {
     title: "Scheduling Tools",
     description:
       "Streamline your booking process with our integrated calendar. Manage sessions, classes, and availability in one place.",
     icon: Calendar,
-    image: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc",
+    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155", // PT training session
   },
   {
     title: "Document Management",
     description:
       "Create and manage workout plans, nutrition guides, and waivers. Use templates to save time and maintain consistency.",
     icon: FileText,
-    image: "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d",
+    image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd", // PT reviewing documents with client
   },
 ];
 

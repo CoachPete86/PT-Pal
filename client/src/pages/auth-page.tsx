@@ -167,7 +167,7 @@ export default function AuthPage() {
         className="hidden md:block bg-cover bg-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1618590145013-680c8816047c")',
+            'url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e")',
         }}
       >
         <div className="h-full w-full bg-black/50 p-12 flex items-center">
