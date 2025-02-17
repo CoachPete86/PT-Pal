@@ -45,9 +45,9 @@ export default function AuthPage() {
       <div className="flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Welcome to Coach Pete Ryan</CardTitle>
+            <CardTitle>Welcome to PTpal</CardTitle>
             <CardDescription>
-              Sign in to access your personalized training dashboard
+              Sign in to access your coaching dashboard and manage your clients
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -56,7 +56,7 @@ export default function AuthPage() {
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <Form {...loginForm}>
                   <form
@@ -172,10 +172,10 @@ export default function AuthPage() {
       >
         <div className="h-full w-full bg-black/50 p-12 flex items-center">
           <div className="text-white">
-            <h2 className="text-3xl font-bold mb-4">Transform Your Life</h2>
+            <h2 className="text-3xl font-bold mb-4">Grow Your PT Business</h2>
             <p className="text-lg">
-              Join our community and get access to personalized training programs,
-              expert guidance, and support on your fitness journey.
+              Join hundreds of successful personal trainers using PTpal to manage
+              their clients, create workout plans, and scale their coaching business.
             </p>
           </div>
         </div>

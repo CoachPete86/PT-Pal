@@ -59,7 +59,7 @@ export default function Navbar() {
               <a className="flex items-center space-x-2">
                 <BarChart className="h-6 w-6 text-primary" />
                 <span className="text-xl font-bold">
-                  {user?.businessName || "Fitness Pro"}
+                  {user?.businessName || "PTpal"}
                 </span>
               </a>
             </Link>

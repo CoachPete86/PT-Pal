@@ -17,23 +17,23 @@ export default function HeroSection() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-2xl text-white">
           <span className="text-primary/90 font-semibold mb-2 block">
-            The Ultimate Platform for Fitness Professionals
+            The Only App Personal Trainers Will Ever Need
           </span>
           <h1 className="text-6xl font-bold mb-6 tracking-tight">
-            Streamline Your{" "}
+            Your Coaching Business{" "}
             <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
-              Fitness Business
+              Made Simple
             </span>
           </h1>
           <p className="text-xl mb-8 text-gray-200">
-            Empower your fitness business with our all-in-one platform. Create personalized
-            workout plans, manage clients, and grow your business with our intelligent tools
-            and analytics.
+            Manage your clients, create workout plans, track progress, and grow your PT 
+            business - all in one place. PTpal is your ultimate coaching companion designed 
+            specifically for personal trainers and gym instructors.
           </p>
           <div className="flex gap-4">
             <Link href="/auth">
               <Button size="lg" className="text-lg bg-primary hover:bg-primary/90 transition-all duration-300">
-                Get Started Free
+                Start Free Trial
               </Button>
             </Link>
             <Link href="/#services">
@@ -42,7 +42,7 @@ export default function HeroSection() {
                 variant="outline"
                 className="text-lg border-2 hover:bg-white/10 transition-all duration-300"
               >
-                View Features
+                Explore Features
               </Button>
             </Link>
           </div>

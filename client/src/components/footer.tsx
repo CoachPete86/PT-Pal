@@ -8,18 +8,18 @@ export default function Footer() {
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 text-2xl font-bold">
             <BarChart className="h-8 w-8 text-primary" />
-            <span>FitnessPro Platform</span>
+            <span>PTpal</span>
           </div>
           <p className="text-muted-foreground mt-2">
-            Empowering fitness professionals worldwide
+            The Ultimate Personal Training Management Platform
           </p>
         </div>
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">About Platform</h3>
+            <h3 className="font-bold text-lg mb-4">About PTpal</h3>
             <p className="text-muted-foreground">
-              The complete business management solution for fitness professionals.
-              Scale your business, engage clients, and deliver exceptional results.
+              Your all-in-one solution for managing personal training clients,
+              creating workout plans, and growing your coaching business.
             </p>
           </div>
 
@@ -60,10 +60,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-muted-foreground">
-              <li>Email: support@fitnesspro.io</li>
+              <li>Email: support@ptpal.io</li>
               <li>Help Center</li>
               <li>Documentation</li>
-              <li>API Reference</li>
+              <li>PT Resources</li>
             </ul>
           </div>
 
@@ -102,7 +102,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} FitnessPro Platform. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} PTpal. All rights reserved.</p>
         </div>
       </div>
     </footer>
