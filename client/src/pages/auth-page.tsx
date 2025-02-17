@@ -37,7 +37,15 @@ export default function AuthPage() {
 
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
-    defaultValues: { username: "", password: "", fullName: "" },
+    defaultValues: { 
+      username: "", 
+      password: "", 
+      fullName: "",
+      email: "", 
+      role: "trainer",
+      subscriptionTier: "free",
+      subscriptionStatus: "trial"
+    },
   });
 
   return (
@@ -118,6 +126,19 @@ export default function AuthPage() {
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
                             <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
