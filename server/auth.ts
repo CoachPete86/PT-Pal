@@ -107,8 +107,9 @@ export function setupAuth(app: Express) {
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 

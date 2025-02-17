@@ -5,10 +5,10 @@ import { z } from "zod";
 // Core tables
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name"),
-  email: text("email").notNull(),
   role: text("role", { enum: ["admin", "trainer", "client"] }).default("client").notNull(),
   subscriptionTier: text("subscription_tier", { 
     enum: ["free", "premium", "enterprise"] 
@@ -18,14 +18,25 @@ export const users = pgTable("users", {
   }).default("trial").notNull(),
   trialEndsAt: timestamp("trial_ends_at"),
   trainerId: integer("trainer_id").references(() => users.id, { onDelete: "set null" }),
-  bio: text("bio"),
-  profileImage: text("profile_image"),
-  businessName: text("business_name"),
-  businessLogo: text("business_logo"),
-  notionDatabaseId: text("notion_database_id"),
-  settings: jsonb("settings").default({}).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Schemas for validation
+export const insertUserSchema = createInsertSchema(users)
+  .omit({
+    id: true,
+    createdAt: true,
+    trialEndsAt: true,
+  })
+  .extend({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    email: z.string().email("Invalid email address"),
+  });
+
+// Types
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+
 
 export const workspaces = pgTable("workspaces", {
   id: serial("id").primaryKey(),
@@ -144,20 +155,6 @@ export const fitnessJourney = pgTable("fitness_journey", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Schemas for validation
-export const insertUserSchema = createInsertSchema(users)
-  .omit({
-    id: true,
-    createdAt: true,
-    trialEndsAt: true,
-    notionDatabaseId: true,
-    settings: true,
-  })
-  .extend({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    email: z.string().email("Invalid email address"),
-  });
-
 export const insertWorkspaceSchema = createInsertSchema(workspaces)
   .omit({
     id: true,
@@ -197,9 +194,6 @@ export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
     date: z.date(),
   });
 
-// Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
 export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
 export type Message = typeof messages.$inferSelect;
