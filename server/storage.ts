@@ -1,15 +1,15 @@
-import { users, messages, bookings, fitnessJourney, documents, workoutPlans } from "@shared/schema";
-import type { 
-  User, InsertUser, Message, Booking, FitnessJourney, 
-  InsertFitnessJourney, Document, InsertDocument,
-  WorkoutPlan, InsertWorkoutPlan 
+import { 
+  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans,
+  type User, type InsertUser, type Workspace, type InsertWorkspace,
+  type Message, type Booking, type FitnessJourney, type InsertFitnessJourney,
+  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, or, and, desc } from "drizzle-orm";
+import { eq, and, or, desc, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-import { notion } from "./notion"; // Assuming notion client is imported here
+import { notion } from "./notion";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -18,31 +18,41 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  getClients(): Promise<User[]>;
+  getClients(trainerId: number): Promise<User[]>;
+  updateUser(id: number, data: Partial<User>): Promise<User>;
+
+  // Workspace management
+  getWorkspace(id: number): Promise<Workspace | undefined>;
+  getWorkspaceByTrainer(trainerId: number): Promise<Workspace | undefined>;
+  createWorkspace(workspace: InsertWorkspace): Promise<Workspace>;
+  updateWorkspace(id: number, data: Partial<Workspace>): Promise<Workspace>;
 
   // Workout Plans
-  getWorkoutPlans(clientId: number): Promise<WorkoutPlan[]>;
+  getWorkoutPlans(workspaceId: number, clientId?: number): Promise<WorkoutPlan[]>;
   createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan>;
+  updateWorkoutPlan(id: number, data: Partial<WorkoutPlan>): Promise<WorkoutPlan>;
 
   // Messages
-  getMessages(userId: number): Promise<Message[]>;
+  getMessages(workspaceId: number, userId: number): Promise<Message[]>;
   createMessage(message: Partial<Message>): Promise<Message>;
 
   // Bookings
-  getBookings(clientId: number): Promise<Booking[]>;
+  getBookings(workspaceId: number, clientId?: number): Promise<Booking[]>;
   createBooking(booking: Partial<Booking>): Promise<Booking>;
+  updateBooking(id: number, data: Partial<Booking>): Promise<Booking>;
 
   // Fitness Journey
-  getFitnessJourney(clientId: number): Promise<FitnessJourney[]>;
+  getFitnessJourney(workspaceId: number, clientId: number): Promise<FitnessJourney[]>;
   createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney>;
 
   // Documents
-  getDocuments(clientId?: number): Promise<Document[]>;
+  getDocuments(workspaceId: number, clientId?: number): Promise<Document[]>;
   createDocument(document: InsertDocument): Promise<Document>;
-  updateDocument(id: number, document: Partial<InsertDocument>): Promise<Document>;
+  updateDocument(id: number, data: Partial<Document>): Promise<Document>;
+  getDocumentTemplates(workspaceId: number): Promise<Document[]>;
 
   sessionStore: session.Store;
-  setupNotionForUser(userId: number): Promise<void>;
+  setupNotionForWorkspace(workspaceId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -72,21 +82,72 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getClients(): Promise<User[]> {
+  async updateUser(id: number, data: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async getClients(trainerId: number): Promise<User[]> {
     return db
       .select()
       .from(users)
-      .where(eq(users.role, "client"))
+      .where(and(
+        eq(users.role, "client"),
+        eq(users.trainerId, trainerId)
+      ))
       .orderBy(desc(users.id));
   }
 
+  // Workspace Management
+  async getWorkspace(id: number): Promise<Workspace | undefined> {
+    const [workspace] = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.id, id));
+    return workspace;
+  }
+
+  async getWorkspaceByTrainer(trainerId: number): Promise<Workspace | undefined> {
+    const [workspace] = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.trainerId, trainerId));
+    return workspace;
+  }
+
+  async createWorkspace(workspace: InsertWorkspace): Promise<Workspace> {
+    const [newWorkspace] = await db
+      .insert(workspaces)
+      .values(workspace)
+      .returning();
+    return newWorkspace;
+  }
+
+  async updateWorkspace(id: number, data: Partial<Workspace>): Promise<Workspace> {
+    const [workspace] = await db
+      .update(workspaces)
+      .set(data)
+      .where(eq(workspaces.id, id))
+      .returning();
+    return workspace;
+  }
+
   // Workout Plans
-  async getWorkoutPlans(clientId: number): Promise<WorkoutPlan[]> {
-    return db
+  async getWorkoutPlans(workspaceId: number, clientId?: number): Promise<WorkoutPlan[]> {
+    let query = db
       .select()
       .from(workoutPlans)
-      .where(eq(workoutPlans.clientId, clientId))
-      .orderBy(desc(workoutPlans.startDate));
+      .where(eq(workoutPlans.workspaceId, workspaceId));
+
+    if (clientId) {
+      query = query.where(eq(workoutPlans.clientId, clientId));
+    }
+
+    return query.orderBy(desc(workoutPlans.startDate));
   }
 
   async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> {
@@ -97,22 +158,34 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async updateWorkoutPlan(id: number, data: Partial<WorkoutPlan>): Promise<WorkoutPlan> {
+    const [plan] = await db
+      .update(workoutPlans)
+      .set(data)
+      .where(eq(workoutPlans.id, id))
+      .returning();
+    return plan;
+  }
+
   // Messages
-  async getMessages(userId: number): Promise<Message[]> {
+  async getMessages(workspaceId: number, userId: number): Promise<Message[]> {
     return db
       .select()
       .from(messages)
       .where(
-        or(
-          eq(messages.senderId, userId),
-          eq(messages.recipientId, userId)
+        and(
+          eq(messages.workspaceId, workspaceId),
+          or(
+            eq(messages.senderId, userId),
+            eq(messages.recipientId, userId)
+          )
         )
       )
       .orderBy(desc(messages.timestamp));
   }
 
   async createMessage(message: Partial<Message>): Promise<Message> {
-    if (!message.content || !message.senderId || !message.recipientId) {
+    if (!message.content || !message.senderId || !message.recipientId || !message.workspaceId) {
       throw new Error("Missing required message fields");
     }
 
@@ -122,6 +195,7 @@ export class DatabaseStorage implements IStorage {
         content: message.content,
         senderId: message.senderId,
         recipientId: message.recipientId,
+        workspaceId: message.workspaceId,
         timestamp: new Date(),
         isRead: false
       })
@@ -130,24 +204,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Bookings
-  async getBookings(clientId: number): Promise<Booking[]> {
-    return db
+  async getBookings(workspaceId: number, clientId?: number): Promise<Booking[]> {
+    let query = db
       .select()
       .from(bookings)
-      .where(eq(bookings.clientId, clientId))
-      .orderBy(desc(bookings.date));
+      .where(eq(bookings.workspaceId, workspaceId));
+
+    if (clientId) {
+      query = query.where(eq(bookings.clientId, clientId));
+    }
+
+    return query.orderBy(desc(bookings.date));
   }
 
   async createBooking(booking: Partial<Booking>): Promise<Booking> {
-    if (!booking.clientId || !booking.date) {
+    if (!booking.workspaceId || !booking.trainerId || !booking.clientId || !booking.date) {
       throw new Error("Missing required booking fields");
     }
 
     const [newBooking] = await db
       .insert(bookings)
       .values({
+        workspaceId: booking.workspaceId,
+        trainerId: booking.trainerId,
         clientId: booking.clientId,
         date: new Date(booking.date),
+        duration: booking.duration || 60,
+        type: booking.type || "individual",
         status: booking.status || "pending",
         notes: booking.notes || null
       })
@@ -155,12 +238,26 @@ export class DatabaseStorage implements IStorage {
     return newBooking;
   }
 
+  async updateBooking(id: number, data: Partial<Booking>): Promise<Booking> {
+    const [booking] = await db
+      .update(bookings)
+      .set(data)
+      .where(eq(bookings.id, id))
+      .returning();
+    return booking;
+  }
+
   // Fitness Journey
-  async getFitnessJourney(clientId: number): Promise<FitnessJourney[]> {
+  async getFitnessJourney(workspaceId: number, clientId: number): Promise<FitnessJourney[]> {
     return db
       .select()
       .from(fitnessJourney)
-      .where(eq(fitnessJourney.clientId, clientId))
+      .where(
+        and(
+          eq(fitnessJourney.workspaceId, workspaceId),
+          eq(fitnessJourney.clientId, clientId)
+        )
+      )
       .orderBy(desc(fitnessJourney.date));
   }
 
@@ -176,10 +273,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Documents
-  async getDocuments(clientId?: number): Promise<Document[]> {
+  async getDocuments(workspaceId: number, clientId?: number): Promise<Document[]> {
     let query = db
       .select()
-      .from(documents);
+      .from(documents)
+      .where(eq(documents.workspaceId, workspaceId));
 
     if (clientId) {
       query = query.where(eq(documents.clientId, clientId));
@@ -188,8 +286,21 @@ export class DatabaseStorage implements IStorage {
     return query.orderBy(desc(documents.updatedAt));
   }
 
+  async getDocumentTemplates(workspaceId: number): Promise<Document[]> {
+    return db
+      .select()
+      .from(documents)
+      .where(
+        and(
+          eq(documents.workspaceId, workspaceId),
+          eq(documents.isTemplate, true)
+        )
+      )
+      .orderBy(desc(documents.updatedAt));
+  }
+
   async createDocument(document: InsertDocument): Promise<Document> {
-    if (!document.content || !document.title) {
+    if (!document.content || !document.title || !document.workspaceId) {
       throw new Error("Missing required document fields");
     }
 
@@ -204,20 +315,11 @@ export class DatabaseStorage implements IStorage {
     return newDoc;
   }
 
-  async updateDocument(id: number, document: Partial<InsertDocument>): Promise<Document> {
-    const [existingDoc] = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.id, id));
-
-    if (!existingDoc) {
-      throw new Error("Document not found");
-    }
-
+  async updateDocument(id: number, data: Partial<Document>): Promise<Document> {
     const [updatedDoc] = await db
       .update(documents)
       .set({
-        ...document,
+        ...data,
         updatedAt: new Date(),
       })
       .where(eq(documents.id, id))
@@ -225,30 +327,44 @@ export class DatabaseStorage implements IStorage {
     return updatedDoc;
   }
 
-  async setupNotionForUser(userId: number): Promise<void> {
+  async setupNotionForWorkspace(workspaceId: number): Promise<void> {
     try {
-      const user = await this.getUser(userId);
-      if (!user) {
-        throw new Error("User not found");
+      const [workspace] = await db
+        .select()
+        .from(workspaces)
+        .where(eq(workspaces.id, workspaceId));
+
+      if (!workspace) {
+        throw new Error("Workspace not found");
+      }
+
+      const [trainer] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, workspace.trainerId));
+
+      if (!trainer) {
+        throw new Error("Trainer not found");
       }
 
       const database = await notion.databases.retrieve({
         database_id: process.env.NOTION_DATABASE_ID!
       });
 
-      if (!database.properties['UserId']) {
+      // Add workspace-specific properties
+      if (!database.properties['WorkspaceId']) {
         await notion.databases.update({
           database_id: process.env.NOTION_DATABASE_ID!,
           properties: {
             ...database.properties,
-            UserId: {
-              rich_text: {}
+            WorkspaceId: {
+              number: {}
             }
           }
         });
       }
     } catch (error) {
-      console.error("Failed to setup Notion for user:", error);
+      console.error("Failed to setup Notion for workspace:", error);
       throw error;
     }
   }

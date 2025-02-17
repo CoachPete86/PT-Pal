@@ -14,6 +14,7 @@ import {
   Home,
   LogOut,
   Menu,
+  Settings,
   User,
   X,
 } from "lucide-react";
@@ -57,7 +58,9 @@ export default function Navbar() {
             <Link href="/">
               <a className="flex items-center space-x-2">
                 <BarChart className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Coach Pete Ryan</span>
+                <span className="text-xl font-bold">
+                  {user?.businessName || "Fitness Pro"}
+                </span>
               </a>
             </Link>
           </div>
@@ -103,6 +106,14 @@ export default function Navbar() {
                           <a className="flex items-center">
                             <User className="mr-2 h-4 w-4" />
                             Profile
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/settings">
+                          <a className="flex items-center">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Settings
                           </a>
                         </Link>
                       </DropdownMenuItem>
@@ -154,6 +165,14 @@ export default function Navbar() {
                           onClick={() => setIsOpen(false)}
                         >
                           Dashboard
+                        </a>
+                      </Link>
+                      <Link href="/settings">
+                        <a
+                          className="flex items-center py-2 text-sm font-medium"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          Settings
                         </a>
                       </Link>
                       <button
