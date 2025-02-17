@@ -25,9 +25,8 @@ import {
   RadioGroup,
   RadioGroupItem,
 } from "@/components/ui/radio-group";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { useState } from "react";
-import { PaymentFormWrapper } from "@/components/payment-form";
 
 const subscriptionPlans = [
   {
@@ -68,8 +67,6 @@ const subscriptionPlans = [
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [registrationData, setRegistrationData] = useState<any>(null);
 
   if (user) {
     setLocation("/dashboard");
@@ -77,7 +74,10 @@ export default function AuthPage() {
   }
 
   const loginForm = useForm({
-    defaultValues: { email: "", password: "" },
+    defaultValues: { 
+      email: "", 
+      password: "" 
+    },
   });
 
   const registerForm = useForm({
@@ -87,43 +87,25 @@ export default function AuthPage() {
       password: "",
       fullName: "",
       email: "",
-      role: "trainer",
-      subscriptionTier: "free",
-      subscriptionStatus: "trial",
+      role: "trainer" as const,
+      subscriptionTier: "free" as const,
+      subscriptionStatus: "trial" as const,
     },
   });
 
-  const handleRegistration = async (data: any) => {
+  const handleLogin = async (data: any) => {
     try {
-      setRegistrationData(data);
-      const response = await fetch("/api/create-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          subscriptionTier: data.subscriptionTier,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to create subscription");
-
-      const { clientSecret } = await response.json();
-      setClientSecret(clientSecret);
+      await loginMutation.mutateAsync(data);
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Login error:", error);
     }
   };
 
-  const handlePaymentSuccess = async (subscriptionId: string) => {
-    if (!registrationData) return;
-
+  const handleRegistration = async (data: any) => {
     try {
-      await registerMutation.mutateAsync({
-        ...registrationData,
-        subscriptionId,
-      });
+      await registerMutation.mutateAsync(data);
     } catch (error) {
-      console.error("Account creation error:", error);
+      console.error("Registration error:", error);
     }
   };
 
@@ -147,9 +129,7 @@ export default function AuthPage() {
               <TabsContent value="login">
                 <Form {...loginForm}>
                   <form
-                    onSubmit={loginForm.handleSubmit((data) =>
-                      loginMutation.mutate(data)
-                    )}
+                    onSubmit={loginForm.handleSubmit(handleLogin)}
                     className="space-y-4"
                   >
                     <FormField
@@ -183,145 +163,79 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={loginMutation.isPending}
                     >
-                      Login
+                      {loginMutation.isPending ? "Logging in..." : "Login"}
                     </Button>
                   </form>
                 </Form>
               </TabsContent>
 
               <TabsContent value="register">
-                {clientSecret ? (
-                  <PaymentFormWrapper
-                    clientSecret={clientSecret}
-                    onSuccess={handlePaymentSuccess}
-                  />
-                ) : (
-                  <Form {...registerForm}>
-                    <form
-                      onSubmit={registerForm.handleSubmit(handleRegistration)}
-                      className="space-y-6"
+                <Form {...registerForm}>
+                  <form
+                    onSubmit={registerForm.handleSubmit(handleRegistration)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={registerForm.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={registerMutation.isPending}
                     >
-                      <div className="space-y-4">
-                        <FormField
-                          control={registerForm.control}
-                          name="fullName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Full Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input type="email" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="username"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Username</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={registerForm.control}
-                          name="password"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Password</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="space-y-4">
-                        <h3 className="font-semibold">Choose Your Plan</h3>
-                        <FormField
-                          control={registerForm.control}
-                          name="subscriptionTier"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                  className="grid grid-cols-1 gap-4"
-                                >
-                                  {subscriptionPlans.map((plan) => (
-                                    <FormItem key={plan.id}>
-                                      <FormControl>
-                                        <RadioGroupItem
-                                          value={plan.tier}
-                                          id={plan.id}
-                                          className="peer sr-only"
-                                        />
-                                      </FormControl>
-                                      <label
-                                        htmlFor={plan.id}
-                                        className="flex flex-col p-4 border rounded-lg cursor-pointer peer-aria-checked:border-primary peer-aria-checked:ring-2 peer-aria-checked:ring-primary"
-                                      >
-                                        <div className="flex justify-between">
-                                          <span className="font-semibold">
-                                            {plan.name}
-                                          </span>
-                                          <span className="font-bold">
-                                            {plan.price}
-                                          </span>
-                                        </div>
-                                        <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                                          {plan.features.map((feature) => (
-                                            <li
-                                              key={feature}
-                                              className="flex items-center"
-                                            >
-                                              <Check className="w-4 h-4 mr-2 text-green-500" />
-                                              {feature}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      </label>
-                                    </FormItem>
-                                  ))}
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={registerMutation.isPending}
-                      >
-                        {clientSecret ? "Pay Now" : "Continue to Payment"}
-                      </Button>
-                    </form>
-                  </Form>
-                )}
+                      {registerMutation.isPending ? "Creating Account..." : "Create Account"}
+                    </Button>
+                  </form>
+                </Form>
               </TabsContent>
             </Tabs>
           </CardContent>

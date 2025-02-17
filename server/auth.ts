@@ -97,6 +97,8 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
+        subscriptionTier: "free",
+        subscriptionStatus: "trial",
       });
 
       req.login(user, (err) => {
