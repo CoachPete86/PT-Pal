@@ -143,8 +143,8 @@ export class DatabaseStorage implements IStorage {
       .from(workoutPlans)
       .where(eq(workoutPlans.workspaceId, workspaceId));
 
-    if (clientId) {
-      query = query.where(eq(workoutPlans.clientId, clientId));
+    if (clientId !== undefined) {
+      query = query.$dynamic().where(eq(workoutPlans.clientId, clientId));
     }
 
     return query.orderBy(desc(workoutPlans.startDate));
@@ -210,8 +210,8 @@ export class DatabaseStorage implements IStorage {
       .from(bookings)
       .where(eq(bookings.workspaceId, workspaceId));
 
-    if (clientId) {
-      query = query.where(eq(bookings.clientId, clientId));
+    if (clientId !== undefined) {
+      query = query.$dynamic().where(eq(bookings.clientId, clientId));
     }
 
     return query.orderBy(desc(bookings.date));
@@ -279,8 +279,8 @@ export class DatabaseStorage implements IStorage {
       .from(documents)
       .where(eq(documents.workspaceId, workspaceId));
 
-    if (clientId) {
-      query = query.where(eq(documents.clientId, clientId));
+    if (clientId !== undefined) {
+      query = query.$dynamic().where(eq(documents.clientId, clientId));
     }
 
     return query.orderBy(desc(documents.updatedAt));
@@ -367,6 +367,38 @@ export class DatabaseStorage implements IStorage {
       console.error("Failed to setup Notion for workspace:", error);
       throw error;
     }
+  }
+  // Add the upsertDocument method
+  async upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document> {
+    const existing = document.notionId 
+      ? await db
+          .select()
+          .from(documents)
+          .where(eq(documents.notionId, document.notionId))
+          .limit(1)
+      : null;
+
+    if (existing && existing.length > 0) {
+      const [doc] = await db
+        .update(documents)
+        .set({
+          ...document,
+          updatedAt: new Date(),
+        })
+        .where(eq(documents.notionId, document.notionId!))
+        .returning();
+      return doc;
+    }
+
+    const [doc] = await db
+      .insert(documents)
+      .values({
+        ...document,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return doc;
   }
 }
 

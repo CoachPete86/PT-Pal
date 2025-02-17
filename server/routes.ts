@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import { createSubscription, SUBSCRIPTION_PRICES } from "./stripe";
 import OpenAI from "openai";
 import { insertDocumentSchema } from "../shared/schema";
 import { Client } from "@notionhq/client";
@@ -40,6 +41,36 @@ const anthropic = new Anthropic({
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // Subscription creation endpoint
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      const { email, subscriptionTier } = req.body;
+
+      if (!email || !subscriptionTier) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const priceId = SUBSCRIPTION_PRICES[subscriptionTier];
+      if (!priceId) {
+        return res.status(400).json({ error: "Invalid subscription tier" });
+      }
+
+      const { subscriptionId, clientSecret } = await createSubscription(
+        email,
+        req.body.paymentMethodId,
+        priceId
+      );
+
+      res.json({ subscriptionId, clientSecret });
+    } catch (error: any) {
+      console.error("Subscription creation error:", error);
+      res.status(500).json({ 
+        error: "Failed to create subscription",
+        message: error.message 
+      });
+    }
+  });
 
   // Expert Coach endpoint
   app.post("/api/expert-coach", async (req, res) => {
