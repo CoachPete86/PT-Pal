@@ -10,8 +10,12 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
-        <ServicesSection />
-        <AboutSection />
+        <div id="services">
+          <ServicesSection />
+        </div>
+        <div id="about">
+          <AboutSection />
+        </div>
       </main>
       <Footer />
     </div>

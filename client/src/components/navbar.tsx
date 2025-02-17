@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +45,22 @@ const mainNavItems = [
 export default function Navbar() {
   const { user, logoutMutation } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [, setLocation] = useLocation();
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#')) {
+      e.preventDefault();
+      const id = href.substring(2);
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      // Set the URL without triggering navigation
+      window.history.pushState(null, '', href);
+    } else {
+      setLocation(href);
+    }
+  };
 
   return (
     <motion.nav
@@ -69,11 +85,13 @@ export default function Navbar() {
             <NavigationMenuList className="gap-6">
               {mainNavItems.map((item) => (
                 <NavigationMenuItem key={item.href}>
-                  <Link href={item.href}>
-                    <a className="text-sm font-medium transition-colors hover:text-primary">
-                      {item.label}
-                    </a>
-                  </Link>
+                  <a 
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className="text-sm font-medium transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </a>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -150,14 +168,17 @@ export default function Navbar() {
                     </SheetHeader>
                     <div className="mt-6 space-y-4">
                       {mainNavItems.map((item) => (
-                        <Link key={item.href} href={item.href}>
-                          <a
-                            className="flex items-center py-2 text-sm font-medium"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {item.label}
-                          </a>
-                        </Link>
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          className="flex items-center py-2 text-sm font-medium"
+                          onClick={(e) => {
+                            handleNavClick(e, item.href);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {item.label}
+                        </a>
                       ))}
                       <Link href="/dashboard">
                         <a
