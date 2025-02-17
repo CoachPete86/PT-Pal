@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { LoadingState } from "@/components/ui/loading-states";
 import {
   Card,
   CardContent,
@@ -94,7 +95,7 @@ export default function WorkspaceSettings() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-48">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <LoadingState variant="plate" size="lg" />
       </div>
     );
   }
@@ -213,9 +214,9 @@ export default function WorkspaceSettings() {
                 disabled={updateMutation.isPending}
                 className="w-full"
               >
-                {updateMutation.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {updateMutation.isPending ? (
+                  <LoadingState variant="dumbbell" size="sm" className="mr-2" />
+                ) : null}
                 Save Changes
               </Button>
             </form>
@@ -252,6 +253,9 @@ export default function WorkspaceSettings() {
                   onClick={() => setIsUpgrading(true)}
                   className="bg-gradient-to-r from-primary to-primary/80"
                 >
+                  {isUpgrading ? (
+                    <LoadingState variant="pulse" size="sm" className="mr-2" />
+                  ) : null}
                   Upgrade to Premium
                 </Button>
               )}
