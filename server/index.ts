@@ -37,30 +37,82 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = registerRoutes(app);
+const startServer = async () => {
+  try {
+    // Register routes and get HTTP server
+    const server = registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // Set up error handling middleware
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      console.error('Error:', err);
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      res.status(status).json({ error: message });
+    });
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    // Set up Vite or static serving based on environment
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    // Function to try binding to a port
+    const tryPort = async (port: number): Promise<number> => {
+      return new Promise((resolve, reject) => {
+        server.once('error', (err: NodeJS.ErrnoException) => {
+          if (err.code === 'EADDRINUSE') {
+            log(`Port ${port} is in use, trying next port...`);
+            if (port >= 5010) {
+              reject(new Error('No available ports found between 5000 and 5010'));
+            } else {
+              resolve(tryPort(port + 1));
+            }
+          } else {
+            reject(err);
+          }
+        });
+
+        server.listen(port, "0.0.0.0", () => {
+          log(`Server started successfully on port ${port}`);
+          resolve(port);
+        });
+      });
+    };
+
+    // Start server with port finding logic
+    try {
+      const port = await tryPort(5000);
+      log(`Server is running at http://0.0.0.0:${port}`);
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error('Server initialization failed:', error);
+    process.exit(1);
   }
+};
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
-  });
-})();
+// Start the server
+startServer();
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  log('SIGTERM signal received: closing HTTP server');
+  let server; //This line is added to fix the undefined server issue.
+  try{
+    server = registerRoutes(app);
+  } catch(error){
+    console.error("Error getting server instance during shutdown:", error);
+    process.exit(1);
+  }
+  if (server) {
+    server.close(() => {
+      log('HTTP server closed');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+});

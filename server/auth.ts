@@ -30,7 +30,7 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   // Generate a random session secret if one doesn't exist
-  const sessionSecret = randomBytes(32).toString('hex');
+  const sessionSecret = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
@@ -61,7 +61,11 @@ export function setupAuth(app: Express) {
       async (email, password, done) => {
         try {
           const user = await storage.getUserByEmail(email);
-          if (!user || !(await comparePasswords(password, user.password))) {
+          if (!user) {
+            return done(null, false, { message: "Invalid email or password" });
+          }
+          const isValid = await comparePasswords(password, user.password);
+          if (!isValid) {
             return done(null, false, { message: "Invalid email or password" });
           }
           return done(null, user);
@@ -86,7 +90,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/register", async (req, res) => {
     try {
       const existingUser = await storage.getUserByEmail(req.body.email);
       if (existingUser) {
@@ -97,14 +101,15 @@ export function setupAuth(app: Express) {
       const user = await storage.createUser({
         ...req.body,
         password: hashedPassword,
-        subscriptionTier: "free",
-        subscriptionStatus: "trial",
       });
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        // Remove password from response
-        const { password, ...userWithoutPassword } = user;
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+
+      req.login(userWithoutPassword, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Login failed after registration" });
+        }
         res.status(201).json(userWithoutPassword);
       });
     } catch (error: any) {
@@ -114,13 +119,19 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
-      if (err) return next(err);
+    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
+      if (err) {
+        console.error("Login error:", err);
+        return res.status(500).json({ error: "Internal server error" });
+      }
       if (!user) {
-        return res.status(401).json({ error: info?.message || "Authentication failed" });
+        return res.status(401).json({ error: info?.message || "Invalid credentials" });
       }
       req.login(user, (err) => {
-        if (err) return next(err);
+        if (err) {
+          console.error("Session error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
         // Remove password from response
         const { password, ...userWithoutPassword } = user;
         res.status(200).json(userWithoutPassword);

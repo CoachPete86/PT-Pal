@@ -1,10 +1,10 @@
-import { pgTable, text, serial, timestamp, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Core tables
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
@@ -37,9 +37,8 @@ export const insertUserSchema = createInsertSchema(users)
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-
 export const workspaces = pgTable("workspaces", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   trainerId: integer("trainer_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
@@ -51,14 +50,14 @@ export const workspaces = pgTable("workspaces", {
 });
 
 export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id, { onDelete: "cascade" })
     .notNull(),
-  senderId: serial("sender_id")
+  senderId: integer("sender_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
-  recipientId: serial("recipient_id")
+  recipientId: integer("recipient_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
   content: text("content").notNull(),
@@ -67,7 +66,7 @@ export const messages = pgTable("messages", {
 });
 
 export const workoutPlans = pgTable("workout_plans", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id, { onDelete: "cascade" })
     .notNull(),
@@ -89,7 +88,7 @@ export const workoutPlans = pgTable("workout_plans", {
 });
 
 export const bookings = pgTable("bookings", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id, { onDelete: "cascade" })
     .notNull(),
@@ -110,7 +109,7 @@ export const bookings = pgTable("bookings", {
 });
 
 export const documents = pgTable("documents", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id, { onDelete: "cascade" })
     .notNull(),
@@ -131,7 +130,7 @@ export const documents = pgTable("documents", {
 });
 
 export const fitnessJourney = pgTable("fitness_journey", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
     .references(() => workspaces.id, { onDelete: "cascade" })
     .notNull(),
