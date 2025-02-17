@@ -7,6 +7,7 @@ import { insertDocumentSchema } from "../shared/schema";
 import { Client } from "@notionhq/client";
 import Anthropic from '@anthropic-ai/sdk';
 import { format } from "date-fns";
+import { generateSocialContent } from "./openai";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -542,6 +543,30 @@ The response must be a valid JSON object with this exact structure:
       ...req.body,
     });
     res.json(booking);
+  });
+
+  // Social Media Content Generation endpoint
+  app.post("/api/social/generate", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const content = await generateSocialContent(req.body);
+      res.json({ content });
+    } catch (error: any) {
+      console.error("Social content generation error:", error);
+
+      if (error.code === 'insufficient_quota') {
+        res.status(500).json({ 
+          error: "Service temporarily unavailable",
+          message: "The service is currently unavailable. Please try again later."
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to generate content",
+          message: error.message
+        });
+      }
+    }
   });
 
   const httpServer = createServer(app);
