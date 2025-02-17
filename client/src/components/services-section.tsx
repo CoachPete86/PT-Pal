@@ -13,7 +13,7 @@ const features = [
     description:
       "Create professional workout plans in minutes with our advanced programme generator. Customise templates and scale your training programmes efficiently.",
     icon: Zap,
-    image: "https://images.unsplash.com/photo-1594381898411-846e7d193883", // PT explaining workout plan
+    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155", // Atmospheric B&W image of weights
     premium: true,
   },
   {
@@ -21,35 +21,35 @@ const features = [
     description:
       "Manage your client base effectively with profiles, progress tracking, and automated check-ins. Keep all client information organised in one place.",
     icon: Users,
-    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b", // PT with client checking progress
+    image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1", // Silhouette of trainer and client
   },
   {
     title: "Business Analytics",
     description:
       "Track your business growth with detailed analytics. Monitor client retention, revenue, and programme effectiveness.",
     icon: ChartBar,
-    image: "https://images.unsplash.com/photo-1593079831268-3381b0db4a77", // PT at desk reviewing progress
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f", // Dramatic B&W gym environment
   },
   {
     title: "Messaging System",
     description:
       "Stay connected with your clients through our integrated messaging system. Send updates, check progress, and provide motivation.",
     icon: MessageSquare,
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b", // PT communicating with client
+    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5", // Abstract B&W movement shot
   },
   {
     title: "Scheduling Tools",
     description:
       "Streamline your booking process with our integrated calendar. Manage sessions, classes, and availability in one place.",
     icon: Calendar,
-    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155", // PT training session
+    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155", // Keeping the original atmospheric image
   },
   {
     title: "Document Management",
     description:
       "Create and manage workout plans, nutrition guides, and waivers. Use templates to save time and maintain consistency.",
     icon: FileText,
-    image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd", // PT reviewing documents with client
+    image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc", // Dramatic B&W gym equipment
   },
 ];
 
@@ -72,7 +72,7 @@ export default function ServicesSection() {
               className="overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg border-zinc-200"
             >
               <div
-                className="h-48 bg-cover bg-center relative"
+                className="h-48 bg-cover bg-center relative grayscale hover:grayscale-0 transition-all duration-500"
                 style={{ backgroundImage: `url(${feature.image})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

@@ -5,10 +5,10 @@ export default function HeroSection() {
   return (
     <div className="relative min-h-[600px] flex items-center">
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center"
+        className="absolute inset-0 z-0 bg-cover bg-center grayscale"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1534367507873-d2d7e24c797f")', // Modern gym environment with equipment
+            'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")', // Dramatic B&W gym environment with deep shadows
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
