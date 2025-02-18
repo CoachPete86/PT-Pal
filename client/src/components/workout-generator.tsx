@@ -986,7 +986,7 @@ ${generateMutation.data.closingMessage}`;
                       </h3>
                       <div className="space-y-3">
                         {generateMutation.data.warmup.map((exercise, index) => (
-                          <<div
+                          <div
                             key={index}
                             className="flex items-start gap-4 p-4 rounded-lg bg-orange-500/5 border border-orange-500/10"
                           >

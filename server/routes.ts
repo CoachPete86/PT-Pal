@@ -209,6 +209,12 @@ The response must be a valid JSON object with this exact structure:
     "fitnessLevel": string,
     "focusArea": string
   },
+  "introduction": {
+    "overview": string, // Brief overview of the session
+    "intensity": string, // Expected intensity level
+    "objectives": string[], // Key objectives for the session
+    "preparation": string // Pre-workout preparation advice
+  },
   "equipmentNeeded": string[],
   "description": string,
   "warmup": Array<{
@@ -219,20 +225,30 @@ The response must be a valid JSON object with this exact structure:
   "mainWorkout": Array<{
     "circuitNumber": number,
     "explanation": string,
+    "objective": string,
+    "setupInstructions": string,
     "exercises": Array<{
       "exercise": string,
       "reps": string,
       "sets": string,
       "men": string,
       "woman": string,
+      "technique": string,
       "notes"?: string
     }>
   }>,
   "cooldown": Array<{
     "exercise": string,
     "duration": string,
+    "technique": string,
     "notes"?: string
   }>,
+  "recovery": {
+    "immediateSteps": string[],
+    "nutritionTips": string[],
+    "restRecommendations": string,
+    "nextDayGuidance": string
+  },
   "closingMessage": string
 }`;
 
