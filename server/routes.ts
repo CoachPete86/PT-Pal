@@ -691,6 +691,237 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
+  //NEW ROUTES FROM EDITED SNIPPET
+  app.get("/api/onboarding-forms", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspaceId = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspaceId) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      const forms = await storage.getOnboardingForms(workspaceId);
+      res.json(forms);
+    } catch (error: any) {
+      console.error("Error fetching onboarding forms:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch onboarding forms",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/onboarding-forms", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const form = await storage.createOnboardingForm({
+        ...req.body,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(form);
+    } catch (error: any) {
+      console.error("Error creating onboarding form:", error);
+      res.status(500).json({ 
+        error: "Failed to create onboarding form",
+        message: error.message 
+      });
+    }
+  });
+
+  app.patch("/api/onboarding-forms/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const form = await storage.updateOnboardingForm(
+        parseInt(req.params.id),
+        req.body
+      );
+      res.json(form);
+    } catch (error: any) {
+      console.error("Error updating onboarding form:", error);
+      res.status(500).json({ 
+        error: "Failed to update onboarding form",
+        message: error.message 
+      });
+    }
+  });
+
+  app.delete("/api/onboarding-forms/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      await storage.deleteOnboardingForm(parseInt(req.params.id));
+      res.sendStatus(200);
+    } catch (error: any) {
+      console.error("Error deleting onboarding form:", error);
+      res.status(500).json({ 
+        error: "Failed to delete onboarding form",
+        message: error.message 
+      });
+    }
+  });
+
+  // Form Responses
+  app.get("/api/form-responses/:formId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const responses = await storage.getFormResponses(parseInt(req.params.formId));
+      res.json(responses);
+    } catch (error: any) {
+      console.error("Error fetching form responses:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch form responses",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/form-responses", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const response = await storage.createFormResponse({
+        ...req.body,
+        clientId: req.user.id,
+      });
+      res.json(response);
+    } catch (error: any) {
+      console.error("Error creating form response:", error);
+      res.status(500).json({ 
+        error: "Failed to create form response",
+        message: error.message 
+      });
+    }
+  });
+
+  // Client Goals
+  app.get("/api/client-goals/:clientId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const goals = await storage.getClientGoals(parseInt(req.params.clientId));
+      res.json(goals);
+    } catch (error: any) {
+      console.error("Error fetching client goals:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch client goals",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/client-goals", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const goal = await storage.createClientGoal({
+        ...req.body,
+        clientId: req.body.clientId || req.user.id,
+      });
+      res.json(goal);
+    } catch (error: any) {
+      console.error("Error creating client goal:", error);
+      res.status(500).json({ 
+        error: "Failed to create client goal",
+        message: error.message 
+      });
+    }
+  });
+
+  app.patch("/api/client-goals/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const goal = await storage.updateClientGoal(
+        parseInt(req.params.id),
+        req.body
+      );
+      res.json(goal);
+    } catch (error: any) {
+      console.error("Error updating client goal:", error);
+      res.status(500).json({ 
+        error: "Failed to update client goal",
+        message: error.message 
+      });
+    }
+  });
+
+  // Document Templates
+  app.get("/api/document-templates", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspaceId = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspaceId) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      const templates = await storage.getDocumentTemplates(workspaceId);
+      res.json(templates);
+    } catch (error: any) {
+      console.error("Error fetching document templates:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch document templates",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/document-templates", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const template = await storage.createDocumentTemplate({
+        ...req.body,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(template);
+    } catch (error: any) {
+      console.error("Error creating document template:", error);
+      res.status(500).json({ 
+        error: "Failed to create document template",
+        message: error.message 
+      });
+    }
+  });
+
+  // Generated Documents
+  app.get("/api/generated-documents/:clientId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const documents = await storage.getGeneratedDocuments(parseInt(req.params.clientId));
+      res.json(documents);
+    } catch (error: any) {
+      console.error("Error fetching generated documents:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch generated documents",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/generated-documents", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {const document = await storage.createGeneratedDocument(req.body);
+      res.json(document);
+    } catch (error: any) {
+      console.error("Error creating generated document:", error);
+      res.status(500).json({ 
+        error: "Failed to create generated document",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/generated-documents/:id/sign", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { signature, role } = req.body;
+      const document = await storage.signDocument(
+        parseInt(req.params.id),
+        signature,
+        role
+      );
+      res.json(document);
+    } catch (error: any) {
+      console.error("Error signing document:", error);
+      res.status(500).json({ 
+        error: "Failed to sign document",
+        message: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
