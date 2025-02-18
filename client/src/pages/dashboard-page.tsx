@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/navbar";
 import SessionTracker from "@/components/session-tracker";
 import MessagePanel from "@/components/message-panel";
@@ -7,10 +8,11 @@ import FitnessTimeline from "@/components/fitness-timeline";
 import DocumentEditor from "@/components/document-editor";
 import DocumentList from "@/components/document-list";
 import WorkoutGenerator from "@/components/workout-generator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import type { Document } from "@shared/schema";
+import type { Document, User } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
@@ -23,6 +25,8 @@ import {
   Heart,
   Trophy,
   FileText,
+  UserPlus,
+  Loader2,
 } from "lucide-react";
 
 const fadeIn = {
@@ -45,6 +49,32 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
+  // Fetch real client data
+  const { data: clients, isLoading: isLoadingClients } = useQuery<User[]>({
+    queryKey: ['/api/clients'],
+    enabled: user?.role === 'trainer',
+  });
+
+  // Fetch session packages for today's sessions count
+  const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
+    queryKey: ['/api/session-packages'],
+    enabled: user?.role === 'trainer',
+  });
+
+  // Get today's sessions
+  const todaySessions = sessionPackages?.filter(pkg => {
+    const today = new Date().toISOString().split('T')[0];
+    return pkg.sessions?.some(session => session.date.startsWith(today));
+  });
+
+  // Calculate active programs
+  const { data: workoutPlans, isLoading: isLoadingPlans } = useQuery({
+    queryKey: ['/api/workout-plans'],
+    enabled: user?.role === 'trainer',
+  });
+
+  const activePrograms = workoutPlans?.filter(plan => plan.status === 'active');
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -64,59 +94,79 @@ export default function DashboardPage() {
                   Welcome, {user?.fullName || user?.username}
                 </h1>
                 <p className="text-muted-foreground">
-                  Manage your clients and training business
+                  {user?.role === 'trainer' 
+                    ? 'Manage your clients and training business'
+                    : 'Track your fitness journey and connect with your trainer'}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-end">
-                  <span className="text-sm font-medium">Active Clients</span>
-                  <span className="text-2xl font-bold">12</span>
-                </div>
-              </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <Card>
-                <CardContent className="flex items-center gap-4 p-6">
-                  <Activity className="h-8 w-8 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">Today's Sessions</p>
-                    <h3 className="text-2xl font-bold">5</h3>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="flex items-center gap-4 p-6">
-                  <Users className="h-8 w-8 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">Total Clients</p>
-                    <h3 className="text-2xl font-bold">24</h3>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="flex items-center gap-4 p-6">
-                  <ClipboardList className="h-8 w-8 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">Active Programs</p>
-                    <h3 className="text-2xl font-bold">8</h3>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="flex items-center gap-4 p-6">
-                  <Heart className="h-8 w-8 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">Client Progress</p>
-                    <h3 className="text-2xl font-bold">92%</h3>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Quick Stats - Only show for trainers */}
+            {user?.role === 'trainer' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <Card>
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Activity className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Today's Sessions</p>
+                      {isLoadingPackages ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">{todaySessions?.length || 0}</h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Users className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Active Clients</p>
+                      {isLoadingClients ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">{clients?.length || 0}</h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <ClipboardList className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Active Programs</p>
+                      {isLoadingPlans ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">{activePrograms?.length || 0}</h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Heart className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Session Completion</p>
+                      {isLoadingPackages ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">
+                          {sessionPackages?.length ? 
+                            `${Math.round((sessionPackages.reduce((acc, pkg) => 
+                              acc + (pkg.totalSessions - pkg.remainingSessions), 0) / 
+                              sessionPackages.reduce((acc, pkg) => acc + pkg.totalSessions, 0)) * 100)}%`
+                            : '0%'}
+                        </h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </motion.div>
 
-          <Tabs defaultValue="sessions" className="space-y-8">
+          <Tabs defaultValue="clients" className="space-y-8">
             <TabsList className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-16 z-10 w-full justify-start rounded-none border-b px-0 h-auto flex-wrap">
               <AnimatePresence>
                 {tabItems.map((tab) => (
@@ -142,12 +192,44 @@ export default function DashboardPage() {
             <TabsContent value="clients">
               <div className="grid gap-6">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Client Overview</CardTitle>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle>Client Management</CardTitle>
+                      <CardDescription>
+                        Manage your client relationships and track their progress
+                      </CardDescription>
+                    </div>
+                    <Button className="flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" />
+                      Add New Client
+                    </Button>
                   </CardHeader>
                   <CardContent>
-                    {/* Add client list component here */}
-                    <p>Client management interface coming soon</p>
+                    {isLoadingClients ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : clients?.length ? (
+                      <div className="space-y-4">
+                        {clients.map((client) => (
+                          <Card key={client.id}>
+                            <CardContent className="flex items-center justify-between p-4">
+                              <div className="flex items-center gap-4">
+                                <div className="space-y-1">
+                                  <p className="font-medium">{client.fullName || client.username}</p>
+                                  <p className="text-sm text-muted-foreground">{client.email}</p>
+                                </div>
+                              </div>
+                              <Button variant="outline">View Profile</Button>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No clients found. Add your first client to get started.
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>

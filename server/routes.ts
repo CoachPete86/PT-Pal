@@ -474,6 +474,36 @@ The response must be a valid JSON object with this exact structure:
     res.json(entry);
   });
 
+  // Client management endpoints
+  app.get("/api/clients", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const clients = await storage.getClients(req.user.id);
+      res.json(clients);
+    } catch (error: any) {
+      console.error("Error fetching clients:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch clients",
+        message: error.message 
+      });
+    }
+  });
+
+  app.get("/api/workout-plans", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const plans = await storage.getWorkoutPlans(req.user.id);
+      res.json(plans);
+    } catch (error: any) {
+      console.error("Error fetching workout plans:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch workout plans",
+        message: error.message 
+      });
+    }
+  });
+
+
   // Session package endpoints
   app.get("/api/session-packages", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
