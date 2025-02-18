@@ -474,6 +474,46 @@ The response must be a valid JSON object with this exact structure:
     res.json(entry);
   });
 
+  // Session package endpoints
+  app.get("/api/session-packages", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const packages = await storage.getSessionPackages(req.user.id);
+    res.json(packages);
+  });
+
+  app.post("/api/session-packages", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const sessionPackage = await storage.createSessionPackage({
+      trainerId: req.user.id,
+      ...req.body,
+    });
+    res.json(sessionPackage);
+  });
+
+  app.post("/api/complete-session", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const { packageId, notes, trainerSignature, clientSignature } = req.body;
+
+    // Create PDF with signatures
+    const pdf = await storage.generateSessionPdf({
+      packageId,
+      notes,
+      trainerSignature,
+      clientSignature,
+      date: new Date(),
+    });
+
+    const session = await storage.completeSession({
+      packageId,
+      notes,
+      trainerSignature,
+      clientSignature,
+      pdfUrl: pdf.url,
+    });
+
+    res.json(session);
+  });
+
   // Food Analysis endpoint
   // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
   app.post("/api/analyze-food", async (req, res) => {

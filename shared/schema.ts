@@ -201,5 +201,38 @@ export type WorkoutPlan = typeof workoutPlans.$inferSelect;
 export type InsertWorkoutPlan = z.infer<typeof insertWorkoutPlanSchema>;
 export type FitnessJourney = typeof fitnessJourney.$inferSelect;
 export type InsertFitnessJourney = z.infer<typeof insertFitnessJourneySchema>;
+export const sessionPackages = pgTable("session_packages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  trainerId: integer("trainer_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  totalSessions: integer("total_sessions").notNull(),
+  remainingSessions: integer("remaining_sessions").notNull(),
+  purchaseDate: timestamp("purchase_date").defaultNow().notNull(),
+  expiryDate: timestamp("expiry_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const completedSessions = pgTable("completed_sessions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  packageId: integer("package_id")
+    .references(() => sessionPackages.id, { onDelete: "cascade" })
+    .notNull(),
+  date: timestamp("date").notNull(),
+  notes: text("notes"),
+  trainerSignature: text("trainer_signature").notNull(),
+  clientSignature: text("client_signature").notNull(),
+  pdfUrl: text("pdf_url"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+export type SessionPackage = typeof sessionPackages.$inferSelect;
+export type CompletedSession = typeof completedSessions.$inferSelect;
