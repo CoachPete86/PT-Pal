@@ -9,7 +9,6 @@ import { eq, and, or, desc, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-import { notion } from "./notion";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -51,9 +50,9 @@ export interface IStorage {
   createDocument(document: InsertDocument): Promise<Document>;
   updateDocument(id: number, data: Partial<Document>): Promise<Document>;
   getDocumentTemplates(workspaceId: number): Promise<Document[]>;
-
   sessionStore: session.Store;
   setupNotionForWorkspace(workspaceId: number): Promise<void>;
+  upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -62,8 +61,8 @@ export class DatabaseStorage implements IStorage {
   constructor() {
     this.sessionStore = new PostgresSessionStore({
       pool,
-      createTableIfMissing: true,
-      tableName: 'session'
+      tableName: 'session',
+      createTableIfMissing: true
     });
   }
 
@@ -377,7 +376,7 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
-  // Add the upsertDocument method
+    // Add the upsertDocument method
   async upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document> {
     const existing = document.notionId 
       ? await db
