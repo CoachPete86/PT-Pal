@@ -10,8 +10,8 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   fullName: text("full_name"),
   role: text("role", { enum: ["admin", "trainer", "client"] }).default("client").notNull(),
-  subscriptionTier: text("subscription_tier", { 
-    enum: ["free", "premium", "enterprise"] 
+  subscriptionTier: text("subscription_tier", {
+    enum: ["free", "premium", "enterprise"]
   }).default("free").notNull(),
   subscriptionStatus: text("subscription_status", {
     enum: ["active", "inactive", "trial"]
@@ -120,8 +120,8 @@ export const documents = pgTable("documents", {
     .references(() => users.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  type: text("type", { 
-    enum: ["workout_plan", "nutrition_plan", "progress_report", "template", "general"] 
+  type: text("type", {
+    enum: ["workout_plan", "nutrition_plan", "progress_report", "template", "general"]
   }).default("general").notNull(),
   isTemplate: boolean("is_template").default(false).notNull(),
   notionId: text("notion_id"),
@@ -232,7 +232,24 @@ export const completedSessions = pgTable("completed_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const insertSessionPackageSchema = createInsertSchema(sessionPackages)
+  .omit({
+    id: true,
+    createdAt: true,
+    purchaseDate: true,
+  });
+
+export const insertCompletedSessionSchema = createInsertSchema(completedSessions)
+  .omit({
+    id: true,
+    createdAt: true,
+    pdfUrl: true,
+  });
+
+export type SessionPackage = typeof sessionPackages.$inferSelect;
+export type InsertSessionPackage = z.infer<typeof insertSessionPackageSchema>;
+export type CompletedSession = typeof completedSessions.$inferSelect;
+export type InsertCompletedSession = z.infer<typeof insertCompletedSessionSchema>;
+
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
-export type SessionPackage = typeof sessionPackages.$inferSelect;
-export type CompletedSession = typeof completedSessions.$inferSelect;

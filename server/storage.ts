@@ -1,8 +1,9 @@
 import { 
-  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans,
+  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans, sessionPackages, completedSessions,
   type User, type InsertUser, type Workspace, type InsertWorkspace,
   type Message, type Booking, type FitnessJourney, type InsertFitnessJourney,
-  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan
+  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan,
+  type SessionPackage, type CompletedSession
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";
@@ -20,6 +21,25 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getClients(trainerId: number): Promise<User[]>;
   updateUser(id: number, data: Partial<User>): Promise<User>;
+
+  // Session Package Management
+  getSessionPackages(trainerId: number): Promise<SessionPackage[]>;
+  createSessionPackage(data: {
+    workspaceId: number;
+    trainerId: number;
+    clientId: number;
+    totalSessions: number;
+    remainingSessions: number;
+    expiryDate?: Date;
+  }): Promise<SessionPackage>;
+  updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage>;
+  completeSession(data: {
+    packageId: number;
+    date: Date;
+    notes?: string;
+    trainerSignature: string;
+    clientSignature: string;
+  }): Promise<CompletedSession>;
 
   // Workspace management
   getWorkspace(id: number): Promise<Workspace | undefined>;
@@ -376,7 +396,6 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
-    // Add the upsertDocument method
   async upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document> {
     const existing = document.notionId 
       ? await db
@@ -407,6 +426,83 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return doc;
+  }
+
+  // Session Package Management Implementation
+  async getSessionPackages(trainerId: number): Promise<SessionPackage[]> {
+    return db
+      .select()
+      .from(sessionPackages)
+      .where(eq(sessionPackages.trainerId, trainerId))
+      .orderBy(desc(sessionPackages.createdAt));
+  }
+
+  async createSessionPackage(data: {
+    workspaceId: number;
+    trainerId: number;
+    clientId: number;
+    totalSessions: number;
+    remainingSessions: number;
+    expiryDate?: Date;
+  }): Promise<SessionPackage> {
+    const [pkg] = await db
+      .insert(sessionPackages)
+      .values({
+        workspaceId: data.workspaceId,
+        trainerId: data.trainerId,
+        clientId: data.clientId,
+        totalSessions: data.totalSessions,
+        remainingSessions: data.remainingSessions,
+        purchaseDate: new Date(),
+        expiryDate: data.expiryDate,
+      })
+      .returning();
+    return pkg;
+  }
+
+  async updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage> {
+    const [pkg] = await db
+      .update(sessionPackages)
+      .set(data)
+      .where(eq(sessionPackages.id, id))
+      .returning();
+    return pkg;
+  }
+
+  async completeSession(data: {
+    packageId: number;
+    date: Date;
+    notes?: string;
+    trainerSignature: string;
+    clientSignature: string;
+  }): Promise<CompletedSession> {
+    // First, update the session package to decrease remaining sessions
+    const [pkg] = await db
+      .select()
+      .from(sessionPackages)
+      .where(eq(sessionPackages.id, data.packageId));
+
+    if (!pkg || pkg.remainingSessions <= 0) {
+      throw new Error('No remaining sessions available');
+    }
+
+    await this.updateSessionPackage(data.packageId, {
+      remainingSessions: pkg.remainingSessions - 1,
+    });
+
+    // Then create the completed session record
+    const [session] = await db
+      .insert(completedSessions)
+      .values({
+        packageId: data.packageId,
+        date: data.date,
+        notes: data.notes,
+        trainerSignature: data.trainerSignature,
+        clientSignature: data.clientSignature,
+      })
+      .returning();
+
+    return session;
   }
 }
 
