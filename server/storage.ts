@@ -1,13 +1,8 @@
 import { 
-  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans, sessionPackages, completedSessions,
-  onboardingForms, formResponses, clientGoals, documentTemplates, generatedDocuments,
+  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans,
   type User, type InsertUser, type Workspace, type InsertWorkspace,
   type Message, type Booking, type FitnessJourney, type InsertFitnessJourney,
-  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan,
-  type SessionPackage, type CompletedSession, type OnboardingForm, type InsertOnboardingForm,
-  type FormResponse, type InsertFormResponse, type ClientGoal, type InsertClientGoal,
-  type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
-  branding, type Branding, type InsertBranding,
+  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";
@@ -25,25 +20,6 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getClients(trainerId: number): Promise<User[]>;
   updateUser(id: number, data: Partial<User>): Promise<User>;
-
-  // Session Package Management
-  getSessionPackages(trainerId: number): Promise<SessionPackage[]>;
-  createSessionPackage(data: {
-    workspaceId: number;
-    trainerId: number;
-    clientId: number;
-    totalSessions: number;
-    remainingSessions: number;
-    expiryDate?: Date;
-  }): Promise<SessionPackage>;
-  updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage>;
-  completeSession(data: {
-    packageId: number;
-    date: Date;
-    notes?: string;
-    trainerSignature: string;
-    clientSignature: string;
-  }): Promise<CompletedSession>;
 
   // Workspace management
   getWorkspace(id: number): Promise<Workspace | undefined>;
@@ -77,39 +53,6 @@ export interface IStorage {
   sessionStore: session.Store;
   setupNotionForWorkspace(workspaceId: number): Promise<void>;
   upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document>;
-
-  // Onboarding Form Management
-  getOnboardingForms(workspaceId: number): Promise<OnboardingForm[]>;
-  createOnboardingForm(form: InsertOnboardingForm): Promise<OnboardingForm>;
-  updateOnboardingForm(id: number, data: Partial<OnboardingForm>): Promise<OnboardingForm>;
-  deleteOnboardingForm(id: number): Promise<void>;
-
-  // Form Responses
-  getFormResponses(formId: number): Promise<FormResponse[]>;
-  getClientFormResponses(clientId: number): Promise<FormResponse[]>;
-  createFormResponse(response: InsertFormResponse): Promise<FormResponse>;
-  updateFormResponse(id: number, data: Partial<FormResponse>): Promise<FormResponse>;
-
-  // Client Goals
-  getClientGoals(clientId: number): Promise<ClientGoal[]>;
-  createClientGoal(goal: InsertClientGoal): Promise<ClientGoal>;
-  updateClientGoal(id: number, data: Partial<ClientGoal>): Promise<ClientGoal>;
-
-  // Document Templates
-  getDocumentTemplates(workspaceId: number): Promise<DocumentTemplate[]>;
-  createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate>;
-  updateDocumentTemplate(id: number, data: Partial<DocumentTemplate>): Promise<DocumentTemplate>;
-
-  // Generated Documents
-  getGeneratedDocuments(clientId: number): Promise<GeneratedDocument[]>;
-  createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument>;
-  updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument>;
-  signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument>;
-
-  // Branding Management
-  getBranding(workspaceId: number): Promise<Branding | undefined>;
-  createBranding(branding: InsertBranding): Promise<Branding>;
-  updateBranding(id: number, data: Partial<Branding>): Promise<Branding>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -433,6 +376,7 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+    // Add the upsertDocument method
   async upsertDocument(document: InsertDocument & { notionId?: string | null }): Promise<Document> {
     const existing = document.notionId 
       ? await db
@@ -463,289 +407,6 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return doc;
-  }
-
-  // Session Package Management Implementation
-  async getSessionPackages(trainerId: number): Promise<SessionPackage[]> {
-    return db
-      .select()
-      .from(sessionPackages)
-      .where(eq(sessionPackages.trainerId, trainerId))
-      .orderBy(desc(sessionPackages.createdAt));
-  }
-
-  async createSessionPackage(data: {
-    workspaceId: number;
-    trainerId: number;
-    clientId: number;
-    totalSessions: number;
-    remainingSessions: number;
-    expiryDate?: Date;
-  }): Promise<SessionPackage> {
-    const [pkg] = await db
-      .insert(sessionPackages)
-      .values({
-        workspaceId: data.workspaceId,
-        trainerId: data.trainerId,
-        clientId: data.clientId,
-        totalSessions: data.totalSessions,
-        remainingSessions: data.remainingSessions,
-        purchaseDate: new Date(),
-        expiryDate: data.expiryDate,
-      })
-      .returning();
-    return pkg;
-  }
-
-  async updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage> {
-    const [pkg] = await db
-      .update(sessionPackages)
-      .set(data)
-      .where(eq(sessionPackages.id, id))
-      .returning();
-    return pkg;
-  }
-
-  async completeSession(data: {
-    packageId: number;
-    date: Date;
-    notes?: string;
-    trainerSignature: string;
-    clientSignature: string;
-  }): Promise<CompletedSession> {
-    // First, update the session package to decrease remaining sessions
-    const [pkg] = await db
-      .select()
-      .from(sessionPackages)
-      .where(eq(sessionPackages.id, data.packageId));
-
-    if (!pkg || pkg.remainingSessions <= 0) {
-      throw new Error('No remaining sessions available');
-    }
-
-    await this.updateSessionPackage(data.packageId, {
-      remainingSessions: pkg.remainingSessions - 1,
-    });
-
-    // Then create the completed session record
-    const [session] = await db
-      .insert(completedSessions)
-      .values({
-        packageId: data.packageId,
-        date: data.date,
-        notes: data.notes,
-        trainerSignature: data.trainerSignature,
-        clientSignature: data.clientSignature,
-      })
-      .returning();
-
-    return session;
-  }
-
-  //Onboarding Forms
-  async getOnboardingForms(workspaceId: number): Promise<OnboardingForm[]> {
-    return db
-      .select()
-      .from(onboardingForms)
-      .where(eq(onboardingForms.workspaceId, workspaceId))
-      .orderBy(onboardingForms.order);
-  }
-
-  async createOnboardingForm(form: InsertOnboardingForm): Promise<OnboardingForm> {
-    const [newForm] = await db
-      .insert(onboardingForms)
-      .values(form)
-      .returning();
-    return newForm;
-  }
-
-  async updateOnboardingForm(id: number, data: Partial<OnboardingForm>): Promise<OnboardingForm> {
-    const [form] = await db
-      .update(onboardingForms)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(onboardingForms.id, id))
-      .returning();
-    return form;
-  }
-
-  async deleteOnboardingForm(id: number): Promise<void> {
-    await db
-      .delete(onboardingForms)
-      .where(eq(onboardingForms.id, id));
-  }
-
-  //Form Responses
-  async getFormResponses(formId: number): Promise<FormResponse[]> {
-    return db
-      .select()
-      .from(formResponses)
-      .where(eq(formResponses.formId, formId))
-      .orderBy(desc(formResponses.submittedAt));
-  }
-
-  async getClientFormResponses(clientId: number): Promise<FormResponse[]> {
-    return db
-      .select()
-      .from(formResponses)
-      .where(eq(formResponses.clientId, clientId))
-      .orderBy(desc(formResponses.submittedAt));
-  }
-
-  async createFormResponse(response: InsertFormResponse): Promise<FormResponse> {
-    const [newResponse] = await db
-      .insert(formResponses)
-      .values(response)
-      .returning();
-    return newResponse;
-  }
-
-  async updateFormResponse(id: number, data: Partial<FormResponse>): Promise<FormResponse> {
-    const [response] = await db
-      .update(formResponses)
-      .set(data)
-      .where(eq(formResponses.id, id))
-      .returning();
-    return response;
-  }
-
-  //Client Goals
-  async getClientGoals(clientId: number): Promise<ClientGoal[]> {
-    return db
-      .select()
-      .from(clientGoals)
-      .where(eq(clientGoals.clientId, clientId))
-      .orderBy(desc(clientGoals.createdAt));
-  }
-
-  async createClientGoal(goal: InsertClientGoal): Promise<ClientGoal> {
-    const [newGoal] = await db
-      .insert(clientGoals)
-      .values({
-        ...goal,
-        targetDate: new Date(goal.targetDate)
-      })
-      .returning();
-    return newGoal;
-  }
-
-  async updateClientGoal(id: number, data: Partial<ClientGoal>): Promise<ClientGoal> {
-    const [goal] = await db
-      .update(clientGoals)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-        targetDate: data.targetDate ? new Date(data.targetDate) : undefined
-      })
-      .where(eq(clientGoals.id, id))
-      .returning();
-    return goal;
-  }
-
-  //Document Templates
-  async getDocumentTemplates(workspaceId: number): Promise<DocumentTemplate[]> {
-    return db
-      .select()
-      .from(documentTemplates)
-      .where(eq(documentTemplates.workspaceId, workspaceId))
-      .orderBy(desc(documentTemplates.updatedAt));
-  }
-
-  async createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate> {
-    const [newTemplate] = await db
-      .insert(documentTemplates)
-      .values(template)
-      .returning();
-    return newTemplate;
-  }
-
-  async updateDocumentTemplate(id: number, data: Partial<DocumentTemplate>): Promise<DocumentTemplate> {
-    const [template] = await db
-      .update(documentTemplates)
-      .set({
-        ...data,
-        updatedAt: new Date()
-      })
-      .where(eq(documentTemplates.id, id))
-      .returning();
-    return template;
-  }
-
-  //Generated Documents
-  async getGeneratedDocuments(clientId: number): Promise<GeneratedDocument[]> {
-    return db
-      .select()
-      .from(generatedDocuments)
-      .where(eq(generatedDocuments.clientId, clientId))
-      .orderBy(desc(generatedDocuments.createdAt));
-  }
-
-  async createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument> {
-    const [newDocument] = await db
-      .insert(generatedDocuments)
-      .values(document)
-      .returning();
-    return newDocument;
-  }
-
-  async updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument> {
-    const [document] = await db
-      .update(generatedDocuments)
-      .set(data)
-      .where(eq(generatedDocuments.id, id))
-      .returning();
-    return document;
-  }
-
-  async signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument> {
-    const now = new Date();
-    const [document] = await db
-      .update(generatedDocuments)
-      .set({
-        ...(role === 'client' ? {
-          signedByClient: true,
-          clientSignature: signature,
-        } : {
-          signedByTrainer: true,
-          trainerSignature: signature,
-        }),
-        signedAt: now,
-      })
-      .where(eq(generatedDocuments.id, id))
-      .returning();
-    return document;
-  }
-
-  // Branding Management Implementation
-  async getBranding(workspaceId: number): Promise<Branding | undefined> {
-    const [result] = await db
-      .select()
-      .from(branding)
-      .where(eq(branding.workspaceId, workspaceId));
-    return result;
-  }
-
-  async createBranding(brandingData: InsertBranding): Promise<Branding> {
-    const [result] = await db
-      .insert(branding)
-      .values({
-        ...brandingData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
-    return result;
-  }
-
-  async updateBranding(id: number, data: Partial<Branding>): Promise<Branding> {
-    const [result] = await db
-      .update(branding)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
-      .where(eq(branding.id, id))
-      .returning();
-    return result;
   }
 }
 
