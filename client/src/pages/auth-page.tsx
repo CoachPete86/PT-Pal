@@ -21,58 +21,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/radio-group";
-import { Check } from "lucide-react";
 import { useState } from "react";
-
-const subscriptionPlans = [
-  {
-    id: "free",
-    name: "Free Trial",
-    price: "$0/month",
-    features: ["Basic workout tracking", "Up to 3 clients", "Basic analytics"],
-    tier: "free" as const,
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: "$29/month",
-    features: [
-      "Unlimited clients",
-      "Advanced analytics",
-      "Custom branding",
-      "Priority support",
-      "Content generation",
-    ],
-    tier: "premium" as const,
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    price: "$99/month",
-    features: [
-      "All Premium features",
-      "White-label solution",
-      "API access",
-      "Dedicated support",
-      "Custom integrations",
-    ],
-    tier: "enterprise" as const,
-  },
-];
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
 
-  if (user) {
-    setLocation("/dashboard");
-    return null;
-  }
-
+  // Initialize all form hooks before any conditional returns
   const loginForm = useForm({
     defaultValues: { 
       email: "", 
@@ -93,6 +48,7 @@ export default function AuthPage() {
     },
   });
 
+  // Handle mutations
   const handleLogin = async (data: any) => {
     try {
       await loginMutation.mutateAsync(data);
@@ -108,6 +64,12 @@ export default function AuthPage() {
       console.error("Registration error:", error);
     }
   };
+
+  // Check authentication status after all hooks are initialized
+  if (user) {
+    setLocation("/dashboard");
+    return null;
+  }
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
