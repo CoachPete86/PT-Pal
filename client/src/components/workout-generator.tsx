@@ -267,7 +267,7 @@ export default function WorkoutGenerator() {
     if (!generateMutation.data) return;
 
     const content = `# ${generateMutation.data.classDetails.className} Workout Plan
-    
+
 ## Class Details
 - Coach: ${generateMutation.data.classDetails.coach}
 - Date: ${generateMutation.data.classDetails.date}
@@ -320,7 +320,10 @@ ${generateMutation.data.closingMessage}`;
         <CardHeader>
           <CardTitle>Workout Plan Generator</CardTitle>
           <CardDescription>
-            Create workout plans following Coach Pete's proven blueprint and session design templates - refined over years of professional experience. Plans are automatically saved to Notion.
+            {sessionType === "group" 
+              ? "Create group class plans following Coach Pete's proven blueprint for effective group training sessions."
+              : "Design personalized training sessions tailored to individual client needs and goals."}
+            All plans follow a structured format with proper warm-up, progressive loading, and cool-down phases.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -983,7 +986,7 @@ ${generateMutation.data.closingMessage}`;
                       </h3>
                       <div className="space-y-3">
                         {generateMutation.data.warmup.map((exercise, index) => (
-                          <div
+                          <<div
                             key={index}
                             className="flex items-start gap-4 p-4 rounded-lg bg-orange-500/5 border border-orange-500/10"
                           >

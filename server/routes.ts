@@ -200,11 +200,14 @@ Available Equipment:
 
 The response must be a valid JSON object with this exact structure:
 {
-  "classDetails": {
-    "className": string,
+  "sessionDetails": {
+    "type": string, // "Group Class" or "Personal Training"
+    "name": string, // Class name for group, "Personal Training Session" for PT
     "coach": "Coach Pete Ryan",
     "duration": 45,
-    "location": "PureGym West Byfleet"
+    "location": "PureGym West Byfleet",
+    "fitnessLevel": string,
+    "focusArea": string
   },
   "equipmentNeeded": string[],
   "description": string,
