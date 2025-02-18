@@ -6,7 +6,8 @@ import {
   type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan,
   type SessionPackage, type CompletedSession, type OnboardingForm, type InsertOnboardingForm,
   type FormResponse, type InsertFormResponse, type ClientGoal, type InsertClientGoal,
-  type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument
+  type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
+  branding, type Branding, type InsertBranding,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";
@@ -104,6 +105,11 @@ export interface IStorage {
   createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument>;
   updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument>;
   signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument>;
+
+  // Branding Management
+  getBranding(workspaceId: number): Promise<Branding | undefined>;
+  createBranding(branding: InsertBranding): Promise<Branding>;
+  updateBranding(id: number, data: Partial<Branding>): Promise<Branding>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -707,6 +713,39 @@ export class DatabaseStorage implements IStorage {
       .where(eq(generatedDocuments.id, id))
       .returning();
     return document;
+  }
+
+  // Branding Management Implementation
+  async getBranding(workspaceId: number): Promise<Branding | undefined> {
+    const [result] = await db
+      .select()
+      .from(branding)
+      .where(eq(branding.workspaceId, workspaceId));
+    return result;
+  }
+
+  async createBranding(brandingData: InsertBranding): Promise<Branding> {
+    const [result] = await db
+      .insert(branding)
+      .values({
+        ...brandingData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    return result;
+  }
+
+  async updateBranding(id: number, data: Partial<Branding>): Promise<Branding> {
+    const [result] = await db
+      .update(branding)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(branding.id, id))
+      .returning();
+    return result;
   }
 }
 

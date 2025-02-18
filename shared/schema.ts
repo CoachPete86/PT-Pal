@@ -145,6 +145,60 @@ export const insertGeneratedDocumentSchema = createInsertSchema(generatedDocumen
   signedAt: true,
 });
 
+// Add branding table
+export const branding = pgTable("branding", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  logoUrl: text("logo_url"),
+  faviconUrl: text("favicon_url"),
+  primaryColor: text("primary_color").default("#000000"),
+  secondaryColor: text("secondary_color").default("#ffffff"),
+  accentColor: text("accent_color").default("#3b82f6"),
+  fontPrimary: text("font_primary").default("Inter"),
+  fontSecondary: text("font_secondary").default("Inter"),
+  customCss: text("custom_css"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Update workspace table to include theme and branding settings
+export const workspaces = pgTable("workspaces", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  trainerId: integer("trainer_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  name: text("name").notNull(),
+  logo: text("logo"),
+  theme: jsonb("theme").default({
+    primary: "#000000",
+    variant: "professional",
+    appearance: "system",
+    radius: 0.5
+  }).notNull(),
+  settings: jsonb("settings").default({
+    allowClientRegistration: true,
+    requireOnboarding: true,
+    displayBranding: true
+  }).notNull(),
+  brandingId: integer("branding_id").references(() => branding.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Add branding schemas
+export const insertBrandingSchema = createInsertSchema(branding)
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+  });
+
+// Export types
+export type Branding = typeof branding.$inferSelect;
+export type InsertBranding = z.infer<typeof insertBrandingSchema>;
+
+
 // Export types
 export type OnboardingForm = typeof onboardingForms.$inferSelect;
 export type InsertOnboardingForm = z.infer<typeof insertOnboardingFormSchema>;
@@ -225,26 +279,15 @@ export const insertUserSchema = createInsertSchema(users)
     id: true,
     createdAt: true,
     trialEndsAt: true,
-    onboardingStatus:true,
-    lastActive:true,
-    preferences:true,
-    profilePicture:true,
+    onboardingStatus: true,
+    lastActive: true,
+    preferences: true,
+    profilePicture: true,
   })
   .extend({
     password: z.string().min(8, "Password must be at least 8 characters"),
     email: z.string().email("Invalid email address"),
   });
-export const workspaces = pgTable("workspaces", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  trainerId: integer("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  name: text("name").notNull(),
-  logo: text("logo"),
-  theme: jsonb("theme").default({}).notNull(),
-  settings: jsonb("settings").default({}).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
 export const messages = pgTable("messages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")

@@ -691,6 +691,85 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
+  // Branding endpoints
+  app.get("/api/branding", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      const branding = await storage.getBranding(workspace.id);
+      res.json(branding || {});
+    } catch (error: any) {
+      console.error("Error fetching branding:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch branding",
+        message: error.message 
+      });
+    }
+  });
+
+  app.patch("/api/branding", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+
+      let branding = await storage.getBranding(workspace.id);
+      if (!branding) {
+        branding = await storage.createBranding({
+          workspaceId: workspace.id,
+          ...req.body
+        });
+      } else {
+        branding = await storage.updateBranding(branding.id, req.body);
+      }
+
+      res.json(branding);
+    } catch (error: any) {
+      console.error("Error updating branding:", error);
+      res.status(500).json({ 
+        error: "Failed to update branding",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/branding/logo", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+
+      // Handle file upload logic here
+      // For now, we'll just update the URL
+      const { logoUrl } = req.body;
+      let branding = await storage.getBranding(workspace.id);
+
+      if (!branding) {
+        branding = await storage.createBranding({
+          workspaceId: workspace.id,
+          logoUrl
+        });
+      } else {
+        branding = await storage.updateBranding(branding.id, { logoUrl });
+      }
+
+      res.json(branding);
+    } catch (error: any) {
+      console.error("Error uploading logo:", error);
+      res.status(500).json({ 
+        error: "Failed to upload logo",
+        message: error.message 
+      });
+    }
+  });
+
   //NEW ROUTES FROM EDITED SNIPPET
   app.get("/api/onboarding-forms", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
@@ -808,7 +887,7 @@ The response must be a valid JSON object with this exact structure:
   app.post("/api/client-goals", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const goal = await storage.createClientGoal({
+      const goal = awaitstorage.createClientGoal({
         ...req.body,
         clientId: req.body.clientId || req.user.id,
       });
