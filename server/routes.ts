@@ -477,42 +477,63 @@ The response must be a valid JSON object with this exact structure:
   // Session package endpoints
   app.get("/api/session-packages", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    const packages = await storage.getSessionPackages(req.user.id);
-    res.json(packages);
+    try {
+      const packages = await storage.getSessionPackages(req.user.id);
+      res.json(packages);
+    } catch (error: any) {
+      console.error("Error fetching session packages:", error);
+      // Send a more graceful error response
+      if (error.code === '42P01') { // Table doesn't exist
+        res.status(500).json({ 
+          error: "Service temporarily unavailable",
+          message: "The session tracking service is currently being set up."
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to fetch session packages",
+          message: error.message 
+        });
+      }
+    }
   });
 
   app.post("/api/session-packages", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    const sessionPackage = await storage.createSessionPackage({
-      trainerId: req.user.id,
-      ...req.body,
-    });
-    res.json(sessionPackage);
+    try {
+      const sessionPackage = await storage.createSessionPackage({
+        trainerId: req.user.id,
+        ...req.body,
+      });
+      res.json(sessionPackage);
+    } catch (error: any) {
+      console.error("Error creating session package:", error);
+      res.status(500).json({ 
+        error: "Failed to create session package",
+        message: error.message 
+      });
+    }
   });
 
   app.post("/api/complete-session", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    const { packageId, notes, trainerSignature, clientSignature } = req.body;
-
-    // Create PDF with signatures
-    const pdf = await storage.generateSessionPdf({
-      packageId,
-      notes,
-      trainerSignature,
-      clientSignature,
-      date: new Date(),
-    });
-
-    const session = await storage.completeSession({
-      packageId,
-      notes,
-      trainerSignature,
-      clientSignature,
-      pdfUrl: pdf.url,
-    });
-
-    res.json(session);
+    try {
+      const session = await storage.completeSession({
+        packageId: req.body.packageId,
+        notes: req.body.notes,
+        trainerSignature: req.body.trainerSignature,
+        clientSignature: req.body.clientSignature,
+        date: new Date(),
+      });
+      res.json(session);
+    } catch (error: any) {
+      console.error("Error completing session:", error);
+      res.status(500).json({ 
+        error: "Failed to complete session",
+        message: error.message 
+      });
+    }
   });
+
 
   // Food Analysis endpoint
   // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user

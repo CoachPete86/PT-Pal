@@ -12,19 +12,30 @@ import {
   CalendarCheck, 
   Download,
   RefreshCw,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
-import type { SessionPackage, CompletedSession } from '@shared/schema';
+import { useToast } from '@/hooks/use-toast';
+import type { SessionPackage } from '@shared/schema';
 
 export default function SessionTracker() {
+  const { toast } = useToast();
   const signaturePadRef = useRef<SignaturePad>(null);
   const [notes, setNotes] = useState('');
   const [clientName, setClientName] = useState('');
   const [sessionDate, setSessionDate] = useState(new Date().toISOString().split('T')[0]);
   const [duration, setDuration] = useState('60');
 
-  const { data: packages, isLoading } = useQuery<SessionPackage[]>({
+  const { data: packages, isLoading, error } = useQuery<SessionPackage[]>({
     queryKey: ['/api/session-packages'],
+    retry: false,
+    onError: (err) => {
+      toast({
+        title: 'Error loading session packages',
+        description: err.message,
+        variant: 'destructive',
+      });
+    }
   });
 
   const completeSessionMutation = useMutation({
@@ -44,7 +55,18 @@ export default function SessionTracker() {
       signaturePadRef.current?.clear();
       setNotes('');
       setClientName('');
+      toast({
+        title: 'Session completed',
+        description: 'The session has been successfully recorded.',
+      });
     },
+    onError: (err: Error) => {
+      toast({
+        title: 'Error completing session',
+        description: err.message,
+        variant: 'destructive',
+      });
+    }
   });
 
   const handleCompleteSession = async (packageId: number) => {
@@ -64,6 +86,46 @@ export default function SessionTracker() {
     signaturePadRef.current?.clear();
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !packages) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="h-5 w-5" />
+            Session Tracking
+          </CardTitle>
+          <CardDescription>
+            No active session packages found. Please create a session package first.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (packages.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarCheck className="h-5 w-5" />
+            Session Tracking
+          </CardTitle>
+          <CardDescription>
+            No active session packages available.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -77,7 +139,7 @@ export default function SessionTracker() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {packages?.map((pkg) => (
+          {packages.map((pkg) => (
             <div key={pkg.id} className="mb-6 p-4 border rounded-lg bg-card">
               <div className="flex justify-between mb-4">
                 <div>
@@ -171,16 +233,26 @@ export default function SessionTracker() {
                       }
                     }}
                     className="flex items-center gap-2"
+                    disabled={signaturePadRef.current?.isEmpty()}
                   >
                     <Download className="h-4 w-4" />
                     Save Signature
                   </Button>
                   <Button
                     onClick={() => handleCompleteSession(pkg.id)}
-                    disabled={pkg.remainingSessions === 0 || !clientName || signaturePadRef.current?.isEmpty()}
+                    disabled={
+                      pkg.remainingSessions === 0 || 
+                      !clientName || 
+                      signaturePadRef.current?.isEmpty() ||
+                      completeSessionMutation.isPending
+                    }
                     className="flex items-center gap-2"
                   >
-                    <CalendarCheck className="h-4 w-4" />
+                    {completeSessionMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CalendarCheck className="h-4 w-4" />
+                    )}
                     Complete Session
                   </Button>
                 </div>
