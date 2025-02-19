@@ -259,6 +259,9 @@ export default function DashboardPage() {
                 </Card>
               </motion.div>
             )}
+          </main>
+        </div>
+      </div>
 
           <Tabs defaultValue="clients" className="space-y-8">
             <TabsList className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-16 z-10 w-full justify-start rounded-none border-b px-0 h-auto flex-wrap">
