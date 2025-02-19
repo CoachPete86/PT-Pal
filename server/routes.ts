@@ -273,10 +273,14 @@ The response must be a valid JSON object with this exact structure:
       try {
         plan = JSON.parse(response.content[0].text);
 
-        // Validate required structure
-        if (!plan.classDetails || !plan.mainWorkout) {
+        // Validate required structure with more lenient checks
+        if (!plan || typeof plan !== 'object') {
           throw new Error("Invalid response structure from AI");
         }
+
+        // Initialize missing sections if needed
+        plan.sessionDetails = plan.sessionDetails || plan.classDetails || {};
+        plan.mainWorkout = plan.mainWorkout || [];
 
         // Add current date in UK format
         const currentDate = format(new Date(), 'dd/MM/yyyy');
