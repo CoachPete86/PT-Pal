@@ -1106,12 +1106,8 @@ The response must be a valid JSON object with this exact structure:
   app.get("/api/client-analytics/:clientId", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const workspaceId = req.user.workspaceId;
-      if (!workspaceId) {
-        return res.status(404).json({ error: "Workspace not found" });
-      }
       const analytics = await storage.getClientAnalytics(
-        workspaceId,
+        req.user.workspaceId,
         parseInt(req.params.clientId)
       );
       res.json(analytics);
@@ -1141,14 +1137,13 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
-  // Progress Metrics
+  // Progress Metrics endpoints
   app.get("/api/progress-metrics/:clientId", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const { category } = req.query;
       const metrics = await storage.getProgressMetrics(
         parseInt(req.params.clientId),
-        category as string | undefined
+        req.query.category as string | undefined
       );
       res.json(metrics);
     } catch (error: any) {
@@ -1165,7 +1160,7 @@ The response must be a valid JSON object with this exact structure:
     try {
       const metric = await storage.createProgressMetric({
         ...req.body,
-        workspaceId: req.user.workspaceId,
+        date: new Date(req.body.date || new Date()),
       });
       res.json(metric);
     } catch (error: any) {
@@ -1177,31 +1172,28 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
-  app.get("/api/client-progress/:clientId", async (req, res) => {
+  app.get("/api/progress-metrics/:clientId/trend", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const { startDate, endDate } = req.query;
-      if (!startDate || !endDate) {
-        return res.status(400).json({ 
-          error: "Missing required query parameters",
-          message: "Both startDate and endDate are required" 
-        });
-      }
+      const startDate = new Date(req.query.startDate as string || new Date());
+      const endDate = new Date(req.query.endDate as string || new Date());
 
       const progress = await storage.getClientProgress(
         parseInt(req.params.clientId),
-        new Date(startDate as string),
-        new Date(endDate as string)
+        startDate,
+        endDate
       );
       res.json(progress);
     } catch (error: any) {
-      console.error("Error fetching client progress:", error);
+      console.error("Error fetching progress trend:", error);
       res.status(500).json({ 
-        error: "Failed to fetch client progress",
+        error: "Failed to fetch progress trend",
         message: error.message 
       });
     }
   });
+
+  //NEW ROUTES FROM EDITED SNIPPET
 
   const httpServer = createServer(app);
   return httpServer;
