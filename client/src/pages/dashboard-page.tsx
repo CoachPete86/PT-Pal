@@ -26,6 +26,8 @@ import ClientManagement from "@/components/client-management";
 import {
   Activity,
   Users,
+  AlertCircle,
+  Clock,
   Calendar,
   MessageSquare,
   ClipboardList,
@@ -132,7 +134,56 @@ export default function DashboardPage() {
                     <Calendar className="h-8 w-8 text-primary" />
                     <div>
                       <p className="text-sm font-medium">Upcoming Sessions</p>
-                      <h3 className="text-2xl font-bold">{upcomingSessions?.length || 0}</h3>
+                      {isLoadingPackages ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">
+                          {sessionPackages?.filter(pkg => {
+                            const today = new Date().toISOString().split('T')[0];
+                            return pkg.sessions?.some(session => 
+                              session.date > today
+                            );
+                          })?.length || 0}
+                        </h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <AlertCircle className="h-8 w-8 text-red-500" />
+                    <div>
+                      <p className="text-sm font-medium">Payments Due</p>
+                      {isLoadingPackages ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">
+                          {sessionPackages?.filter(pkg => 
+                            pkg.paymentStatus === 'pending'
+                          )?.length || 0}
+                        </h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Clock className="h-8 w-8 text-yellow-500" />
+                    <div>
+                      <p className="text-sm font-medium">Expiring Packages</p>
+                      {isLoadingPackages ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">
+                          {sessionPackages?.filter(pkg => {
+                            const thirtyDaysFromNow = new Date();
+                            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                            return new Date(pkg.expiryDate) <= thirtyDaysFromNow;
+                          })?.length || 0}
+                        </h3>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
