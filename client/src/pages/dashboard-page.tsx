@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import type { Document, User } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
+import ClientManagement from "@/components/client-management";
 import {
   Activity,
   Users,
