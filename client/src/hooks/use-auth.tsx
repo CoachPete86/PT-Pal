@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { isLoading } = useQuery({
     queryKey: ['/api/user'],
     queryFn: async () => {
-      if (isDevelopment) {
+      if (isDevelopment && !user) {
         setUser(DEV_USER);
         return DEV_USER;
       }
