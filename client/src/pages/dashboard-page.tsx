@@ -112,8 +112,8 @@ export default function DashboardPage() {
 
             {/* Quick Stats - Only show for trainers */}
             {user?.role === 'trainer' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <Card>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
                   <CardContent className="flex items-center gap-4 p-6">
                     <Activity className="h-8 w-8 text-primary" />
                     <div>
@@ -126,6 +126,52 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
+                
+                <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Calendar className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Upcoming Sessions</p>
+                      <h3 className="text-2xl font-bold">{upcomingSessions?.length || 0}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <Users className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Active Clients</p>
+                      {isLoadingClients ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <h3 className="text-2xl font-bold">{clients?.length || 0}</h3>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <AlertCircle className="h-8 w-8 text-orange-500" />
+                    <div>
+                      <p className="text-sm font-medium">Payments Due</p>
+                      <h3 className="text-2xl font-bold">{paymentsOverdue?.length || 0}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <PackageOpen className="h-8 w-8 text-yellow-500" />
+                    <div>
+                      <p className="text-sm font-medium">Expiring Packages</p>
+                      <h3 className="text-2xl font-bold">{expiringPackages?.length || 0}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
                 <Card>
                   <CardContent className="flex items-center gap-4 p-6">
                     <Users className="h-8 w-8 text-primary" />

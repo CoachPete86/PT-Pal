@@ -101,6 +101,8 @@ export default function Navbar() {
             {user ? (
               <>
                 <div className="hidden md:flex items-center gap-4">
+                  <UniversalSearch />
+                  <NotificationCenter />
                   <Link href="/dashboard">
                     <Button variant="outline" size="sm">
                       Dashboard
