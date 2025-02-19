@@ -65,9 +65,9 @@ export function registerRoutes(app: Express): Server {
       res.json({ subscriptionId, clientSecret });
     } catch (error: any) {
       console.error("Subscription creation error:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create subscription",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -85,7 +85,7 @@ export function registerRoutes(app: Express): Server {
 
       // Check if user has premium access
       if (req.user.role !== "premium") {
-        return res.status(403).json({ 
+        return res.status(403).json({
           error: "Premium subscription required",
           message: "This feature requires a premium subscription. Please upgrade your plan to access Coach Pete's expert system."
         });
@@ -128,12 +128,12 @@ Document Context: ${context || "No context provided"}`
       console.error("Expert coach error:", error);
 
       if (error.code === 'insufficient_quota') {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Service temporarily unavailable",
           message: "The service is currently unavailable. Please try again later."
         });
       } else {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to get response",
           message: error.message
         });
@@ -296,7 +296,7 @@ The response must be a valid JSON object with this exact structure:
           date: currentDate,
           duration: '45 minutes',
           fitnessLevel,
-          exercises: plan.mainWorkout.map(circuit => 
+          exercises: plan.mainWorkout.map(circuit =>
             circuit.exercises.map(ex => ex.exercise).join(", ")
           ).join("; "),
           equipment: plan.equipmentNeeded.join(", ")
@@ -320,7 +320,7 @@ The response must be a valid JSON object with this exact structure:
                 }
               },
               Date: {
-                date: { 
+                date: {
                   start: new Date().toISOString()
                 }
               },
@@ -355,9 +355,9 @@ The response must be a valid JSON object with this exact structure:
       }
     } catch (error: any) {
       console.error("Workout generation error:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to generate workout plan",
-        details: error.message 
+        details: error.message
       });
     }
   };
@@ -404,9 +404,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(results);
     } catch (error: any) {
       console.error("Error syncing with Notion:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to sync with Notion",
-        details: error.message 
+        details: error.message
       });
     }
   });
@@ -433,9 +433,9 @@ The response must be a valid JSON object with this exact structure:
       res.json({ success: true });
     } catch (error: any) {
       console.error("Error updating Notion page:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to update Notion page",
-        details: error.message 
+        details: error.message
       });
     }
   });
@@ -505,33 +505,51 @@ The response must be a valid JSON object with this exact structure:
       res.json(clients);
     } catch (error: any) {
       console.error("Error fetching clients:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch clients",
-        message: error.message 
+        message: error.message
       });
     }
   });
 
   app.post("/api/clients", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
+    if (!req.user) {
+      console.log("No user in session for /api/clients POST");
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "You must be logged in to create clients"
+      });
+    }
+
     try {
       if (!req.body.fullName || !req.body.email) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: "Missing required fields",
-          message: "Full name and email are required" 
+          message: "Full name and email are required"
         });
       }
+
+      // Get workspace for the trainer
+      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({
+          error: "Workspace not found",
+          message: "Trainer workspace must be set up first"
+        });
+      }
+
       const client = await storage.createClient({
         ...req.body,
         trainerId: req.user.id,
-        workspaceId: req.user.workspaceId,
+        workspaceId: workspace.id
       });
+
       res.json(client);
     } catch (error: any) {
       console.error("Error creating client:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create client",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -543,9 +561,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(plans);
     } catch (error: any) {
       console.error("Error fetching workout plans:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch workout plans",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -561,14 +579,14 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error fetching session packages:", error);
       // Send a more graceful error response
       if (error.code === '42P01') { // Table doesn't exist
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Service temporarily unavailable",
           message: "The session tracking service is currently being set up."
         });
       } else {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to fetch session packages",
-          message: error.message 
+          message: error.message
         });
       }
     }
@@ -584,9 +602,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(sessionPackage);
     } catch (error: any) {
       console.error("Error creating session package:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create session package",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -604,9 +622,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(session);
     } catch (error: any) {
       console.error("Error completing session:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to complete session",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -659,12 +677,12 @@ The response must be a valid JSON object with this exact structure:
       console.error("Food analysis error:", error);
 
       if (error.code === 'invalid_api_key') {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "API configuration error",
           details: "There's an issue with the API configuration. Please try again later."
         });
       } else if (error.code === 'insufficient_quota') {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Service temporarily unavailable",
           details: "The service is currently unavailable. Please try again later."
         });
@@ -674,9 +692,9 @@ The response must be a valid JSON object with this exact structure:
           details: "The AI model is currently unavailable. Please try again later."
         });
       } else {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to analyze food image",
-          details: error.response?.data?.error?.message || error.message 
+          details: error.response?.data?.error?.message || error.message
         });
       }
     }
@@ -725,12 +743,12 @@ The response must be a valid JSON object with this exact structure:
       console.error("Social content generation error:", error);
 
       if (error.code === 'insufficient_quota') {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Service temporarily unavailable",
           message: "The service is currently unavailable. Please try again later."
         });
       } else {
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to generate content",
           message: error.message
         });
@@ -750,9 +768,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(branding || {});
     } catch (error: any) {
       console.error("Error fetching branding:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch branding",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -778,9 +796,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(branding);
     } catch (error: any) {
       console.error("Error updating branding:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to update branding",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -810,9 +828,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(branding);
     } catch (error: any) {
       console.error("Error uploading logo:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to upload logo",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -829,9 +847,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(forms);
     } catch (error: any) {
       console.error("Error fetching onboarding forms:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch onboarding forms",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -846,9 +864,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(form);
     } catch (error: any) {
       console.error("Error creating onboarding form:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create onboarding form",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -863,9 +881,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(form);
     } catch (error: any) {
       console.error("Error updating onboarding form:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to update onboarding form",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -877,9 +895,9 @@ The response must be a valid JSON object with this exact structure:
       res.sendStatus(200);
     } catch (error: any) {
       console.error("Error deleting onboarding form:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to delete onboarding form",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -892,9 +910,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(responses);
     } catch (error: any) {
       console.error("Error fetching formresponses:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch form responses",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -909,9 +927,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(response);
     } catch (error: any) {
       console.error("Error creating form response:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create form response",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -924,9 +942,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(goals);
     } catch (error: any) {
       console.error("Error fetching client goals:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch client goals",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -941,9 +959,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(goal);
     } catch (error: any) {
       console.error("Error creating client goal:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create client goal",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -958,9 +976,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(goal);
     } catch (error: any) {
       console.error("Error updating client goal:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to update client goal",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -977,9 +995,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(templates);
     } catch (error: any) {
       console.error("Error fetching document templates:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch document templates",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -994,9 +1012,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(template);
     } catch (error: any) {
       console.error("Error creating document template:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create document template",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1009,9 +1027,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(documents);
     } catch (error: any) {
       console.error("Error fetching generated documents:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch generated documents",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1023,9 +1041,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(document);
     } catch (error: any) {
       console.error("Error creating generated document:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create generated document",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1042,9 +1060,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(document);
     } catch (error: any) {
       console.error("Error signing document:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to sign document",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1061,9 +1079,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(reminders);
     } catch (error: any) {
       console.error("Error fetching payment reminders:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch payment reminders",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1078,9 +1096,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(reminder);
     } catch (error: any) {
       console.error("Error creating payment reminder:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create payment reminder",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1095,9 +1113,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(reminder);
     } catch (error: any) {
       console.error("Error updating payment reminder:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to update payment reminder",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1113,9 +1131,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(analytics);
     } catch (error: any) {
       console.error("Error fetching client analytics:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch client analytics",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1130,9 +1148,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(analytics);
     } catch (error: any) {
       console.error("Error creating client analytics:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create client analytics",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1148,9 +1166,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(metrics);
     } catch (error: any) {
       console.error("Error fetching progress metrics:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch progress metrics",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1165,9 +1183,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(metric);
     } catch (error: any) {
       console.error("Error creating progress metric:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to create progress metric",
-        message: error.message 
+        message: error.message
       });
     }
   });
@@ -1186,9 +1204,9 @@ The response must be a valid JSON object with this exact structure:
       res.json(progress);
     } catch (error: any) {
       console.error("Error fetching progress trend:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to fetch progress trend",
-        message: error.message 
+        message: error.message
       });
     }
   });
