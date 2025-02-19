@@ -2,6 +2,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export function ProtectedRoute({
   path,
   component: Component,
@@ -10,6 +12,11 @@ export function ProtectedRoute({
   component: () => React.JSX.Element;
 }) {
   const { user, isLoading } = useAuth();
+
+  if (isDevelopment) {
+    // In development, bypass auth check and render the component directly
+    return <Route path={path} component={Component} />;
+  }
 
   if (isLoading) {
     return (
@@ -29,5 +36,5 @@ export function ProtectedRoute({
     );
   }
 
-  return <Component />
+  return <Route path={path} component={Component} />;
 }
