@@ -73,8 +73,18 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/">
               <a className="flex items-center space-x-2">
-                <BarChart className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">
+                {user?.branding?.logoUrl ? (
+                  <img 
+                    src={user.branding.logoUrl} 
+                    alt="Logo" 
+                    className="h-8 w-auto"
+                  />
+                ) : (
+                  <BarChart className="h-6 w-6 text-primary" />
+                )}
+                <span className="text-xl font-bold" style={{
+                  color: user?.branding?.primaryColor || 'inherit'
+                }}>
                   {user?.businessName || "PTpal"}
                 </span>
               </a>

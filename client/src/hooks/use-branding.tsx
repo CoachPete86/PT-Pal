@@ -99,3 +99,38 @@ export function useBranding() {
   }
   return context;
 }
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useAuth } from "./use-auth";
+
+export interface BrandingSettings {
+  primaryColor: string;
+  secondaryColor: string;
+  logoUrl: string;
+  welcomeMessage: string;
+}
+
+export function useBranding() {
+  const { user } = useAuth();
+
+  const { data: branding } = useQuery({
+    queryKey: ['/api/branding'],
+    enabled: !!user,
+  });
+
+  const updateBranding = useMutation({
+    mutationFn: async (settings: Partial<BrandingSettings>) => {
+      const res = await fetch('/api/branding', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      if (!res.ok) throw new Error('Failed to update branding');
+      return res.json();
+    },
+  });
+
+  return {
+    branding,
+    updateBranding,
+  };
+}
