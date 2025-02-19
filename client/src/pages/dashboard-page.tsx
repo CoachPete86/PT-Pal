@@ -137,6 +137,7 @@ export default function DashboardPage() {
                 </Card>
               </motion.div>
             )}
+            </main>
                 
                 <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
                   <CardContent className="flex items-center gap-4 p-6">
