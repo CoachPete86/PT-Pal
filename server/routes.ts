@@ -512,6 +512,30 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
+  app.post("/api/clients", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      if (!req.body.fullName || !req.body.email) {
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          message: "Full name and email are required" 
+        });
+      }
+      const client = await storage.createClient({
+        ...req.body,
+        trainerId: req.user.id,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(client);
+    } catch (error: any) {
+      console.error("Error creating client:", error);
+      res.status(500).json({ 
+        error: "Failed to create client",
+        message: error.message 
+      });
+    }
+  });
+
   app.get("/api/workout-plans", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {

@@ -27,14 +27,24 @@ export default function ClientManagement() {
   const addClientMutation = useMutation({
     mutationFn: async (clientData: typeof newClient) => {
       const res = await apiRequest('POST', '/api/clients', clientData);
+      if (!res.ok) {
+        throw new Error('Failed to add client');
+      }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
       setNewClient({ fullName: '', email: '', phone: '', notes: '' });
       toast({
-        title: 'Client added',
+        title: 'Success',
         description: 'New client has been successfully added.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       });
     }
   });
