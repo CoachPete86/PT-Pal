@@ -60,28 +60,24 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
-  // Fetch real client data
   const { data: clients, isLoading: isLoadingClients } = useQuery<User[]>({
     queryKey: ['/api/clients'],
     enabled: user?.role === 'trainer',
   });
 
-  // Fetch session packages for today's sessions count
   const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
     queryKey: ['/api/session-packages'],
     enabled: user?.role === 'trainer',
   });
 
-  // Get today's sessions
-  const todaySessions = sessionPackages?.filter(pkg => {
-    const today = new Date().toISOString().split('T')[0];
-    return pkg.sessions?.some(session => session.date.startsWith(today));
-  });
-
-  // Calculate active programs
   const { data: workoutPlans, isLoading: isLoadingPlans } = useQuery({
     queryKey: ['/api/workout-plans'],
     enabled: user?.role === 'trainer',
+  });
+
+  const todaySessions = sessionPackages?.filter(pkg => {
+    const today = new Date().toISOString().split('T')[0];
+    return pkg.sessions?.some(session => session.date.startsWith(today));
   });
 
   const activePrograms = workoutPlans?.filter(plan => plan.status === 'active');
@@ -112,16 +108,8 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Quick Stats - Only show for trainers */}
             {user?.role === 'trainer' && (
-              <motion.div
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={fadeIn}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8"
-              >
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
                 <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
                   <CardContent className="flex items-center gap-4 p-6">
                     <Activity className="h-8 w-8 text-primary" />
@@ -135,10 +123,7 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
-            )}
-            </main>
-                
+
                 <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
                   <CardContent className="flex items-center gap-4 p-6">
                     <Calendar className="h-8 w-8 text-primary" />
@@ -211,58 +196,9 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-
-                </motion.div>
+              </div>
             )}
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <Users className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">Active Clients</p>
-                      {isLoadingClients ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <h3 className="text-2xl font-bold">{clients?.length || 0}</h3>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <ClipboardList className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">Active Programs</p>
-                      {isLoadingPlans ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <h3 className="text-2xl font-bold">{activePrograms?.length || 0}</h3>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <Heart className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">Session Completion</p>
-                      {isLoadingPackages ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <h3 className="text-2xl font-bold">
-                          {sessionPackages?.length ? 
-                            `${Math.round((sessionPackages.reduce((acc, pkg) => 
-                              acc + (pkg.totalSessions - pkg.remainingSessions), 0) / 
-                              sessionPackages.reduce((acc, pkg) => acc + pkg.totalSessions, 0)) * 100)}%`
-                            : '0%'}
-                        </h3>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </main>
-        </div>
-      </div>
+          </motion.div>
 
           <Tabs defaultValue="clients" className="space-y-8">
             <TabsList className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-16 z-10 w-full justify-start rounded-none border-b px-0 h-auto flex-wrap">
