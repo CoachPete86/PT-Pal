@@ -209,28 +209,8 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <AlertCircle className="h-8 w-8 text-orange-500" />
-                    <div>
-                      <p className="text-sm font-medium">Payments Due</p>
-                      <h3 className="text-2xl font-bold">{paymentsOverdue?.length || 0}</h3>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <PackageOpen className="h-8 w-8 text-yellow-500" />
-                    <div>
-                      <p className="text-sm font-medium">Expiring Packages</p>
-                      <h3 className="text-2xl font-bold">{expiringPackages?.length || 0}</h3>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                </motion.div>
             )}
-            <Card>
                   <CardContent className="flex items-center gap-4 p-6">
                     <Users className="h-8 w-8 text-primary" />
                     <div>

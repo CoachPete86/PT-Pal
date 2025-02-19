@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/sheet";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { NotificationCenter } from "./notification-center";
+import { UniversalSearch } from "./universal-search";
 
 const mainNavItems = [
   { href: "/#services", label: "Services" },
