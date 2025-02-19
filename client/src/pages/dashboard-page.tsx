@@ -11,6 +11,14 @@ import WorkoutGenerator from "@/components/workout-generator";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 import type { Document, User } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
@@ -199,10 +207,23 @@ export default function DashboardPage() {
                         Manage your client relationships and track their progress
                       </CardDescription>
                     </div>
-                    <Button className="flex items-center gap-2">
-                      <UserPlus className="h-4 w-4" />
-                      Add New Client
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="flex items-center gap-2">
+                          <UserPlus className="h-4 w-4" />
+                          Add New Client
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Add New Client</DialogTitle>
+                          <DialogDescription>
+                            Enter the client's details below
+                          </DialogDescription>
+                        </DialogHeader>
+                        <ClientManagement />
+                      </DialogContent>
+                    </Dialog>
                   </CardHeader>
                   <CardContent>
                     {isLoadingClients ? (
