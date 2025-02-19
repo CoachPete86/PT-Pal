@@ -86,16 +86,37 @@ export default function SessionTracker() {
         return;
       }
 
-      await completeSessionMutation.mutate({
-        packageId,
-        notes,
-        clientSignature,
-        trainerSignature,
-        clientName,
-        sessionDate,
-        duration,
-        verificationCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-      });
+      try {
+        await completeSessionMutation.mutate({
+          packageId,
+          notes,
+          clientSignature,
+          trainerSignature,
+          clientName,
+          sessionDate,
+          duration: parseInt(duration),
+          verificationCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        });
+        
+        toast({
+          title: "Session completed",
+          description: "Session has been logged successfully",
+        });
+        
+        // Reset form
+        setNotes('');
+        setClientName('');
+        setSessionDate(new Date().toISOString().split('T')[0]);
+        setDuration('60');
+        clearSignature();
+        
+      } catch (error: any) {
+        toast({
+          title: "Error completing session",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
