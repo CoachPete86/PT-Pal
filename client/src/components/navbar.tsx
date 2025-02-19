@@ -38,8 +38,8 @@ import { cn } from "@/lib/utils";
 const mainNavItems = [
   { href: "/#services", label: "Services" },
   { href: "/#about", label: "About" },
-  { href: "/blog", label: "Blog" },
-  { href: "/contact", label: "Contact" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/content-generator", label: "Content" },
 ];
 
 export default function Navbar() {

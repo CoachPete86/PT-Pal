@@ -17,6 +17,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
+      <ProtectedRoute path="/settings" component={SettingsPage} />
       <Route component={NotFound} />
     </Switch>
   );
