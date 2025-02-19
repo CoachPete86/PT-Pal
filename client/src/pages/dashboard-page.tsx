@@ -228,9 +228,9 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </motion.div>
             )}
-                <Card>
+            <Card>
                   <CardContent className="flex items-center gap-4 p-6">
                     <Users className="h-8 w-8 text-primary" />
                     <div>
