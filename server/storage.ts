@@ -9,8 +9,11 @@ import {
   type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
   branding, type Branding, type InsertBranding,
   type PaymentReminder, type InsertPaymentReminder,
+  paymentReminders,
   type ClientAnalytics, type InsertClientAnalytics,
+  clientAnalytics,
   type ProgressMetrics, type InsertProgressMetrics,
+  progressMetrics
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";

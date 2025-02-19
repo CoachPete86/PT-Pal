@@ -16,14 +16,6 @@ declare global {
 const scryptAsync = promisify(scrypt);
 const isDevelopment = process.env.NODE_ENV === "development";
 
-// Mock user for development
-const DEV_USER = {
-  id: 1,
-  email: "dev@example.com",
-  role: "trainer",
-  workspaceId: 1,
-};
-
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
@@ -93,9 +85,6 @@ export function setupAuth(app: Express) {
 
   passport.deserializeUser(async (id: number, done) => {
     try {
-      if (isDevelopment) {
-        return done(null, DEV_USER);
-      }
       const user = await storage.getUser(id);
       if (!user) {
         return done(null, false);
@@ -106,49 +95,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Development mode middleware
-  if (isDevelopment) {
-    app.use((req, res, next) => {
-      if (!req.user) {
-        req.user = DEV_USER as Express.User;
-      }
-      next();
-    });
-  }
-
-  app.post("/api/register", async (req, res) => {
-    try {
-      const existingUser = await storage.getUserByEmail(req.body.email);
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already exists" });
-      }
-
-      const hashedPassword = await hashPassword(req.body.password);
-      const user = await storage.createUser({
-        ...req.body,
-        password: hashedPassword,
-      });
-
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-
-      req.login(userWithoutPassword, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Login failed after registration" });
-        }
-        res.status(201).json(userWithoutPassword);
-      });
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   app.post("/api/login", (req, res, next) => {
-    if (isDevelopment) {
-      return res.status(200).json(DEV_USER);
-    }
-
     passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
       if (err) {
         console.error("Login error:", err);
@@ -177,10 +124,6 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (isDevelopment) {
-      return res.json(DEV_USER);
-    }
-
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }
