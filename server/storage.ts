@@ -8,6 +8,9 @@ import {
   type FormResponse, type InsertFormResponse, type ClientGoal, type InsertClientGoal,
   type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
   branding, type Branding, type InsertBranding,
+  type PaymentReminder, type InsertPaymentReminder,
+  type ClientAnalytics, type InsertClientAnalytics,
+  type ProgressMetrics, type InsertProgressMetrics,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";
@@ -110,6 +113,22 @@ export interface IStorage {
   getBranding(workspaceId: number): Promise<Branding | undefined>;
   createBranding(branding: InsertBranding): Promise<Branding>;
   updateBranding(id: number, data: Partial<Branding>): Promise<Branding>;
+
+  // Payment Reminders
+  getPaymentReminders(workspaceId: number): Promise<PaymentReminder[]>;
+  createPaymentReminder(reminder: InsertPaymentReminder): Promise<PaymentReminder>;
+  updatePaymentReminder(id: number, data: Partial<PaymentReminder>): Promise<PaymentReminder>;
+  getOverdueReminders(): Promise<PaymentReminder[]>;
+
+  // Client Analytics
+  getClientAnalytics(workspaceId: number, clientId: number): Promise<ClientAnalytics[]>;
+  createClientAnalytics(analytics: InsertClientAnalytics): Promise<ClientAnalytics>;
+  updateClientAnalytics(id: number, data: Partial<ClientAnalytics>): Promise<ClientAnalytics>;
+
+  // Progress Metrics
+  getProgressMetrics(clientId: number, category?: string): Promise<ProgressMetrics[]>;
+  createProgressMetric(metric: InsertProgressMetrics): Promise<ProgressMetrics>;
+  getClientProgress(clientId: number, startDate: Date, endDate: Date): Promise<ProgressMetrics[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -770,6 +789,118 @@ export class DatabaseStorage implements IStorage {
       .where(eq(branding.id, id))
       .returning();
     return result;
+  }
+
+  // Payment Reminders Implementation
+  async getPaymentReminders(workspaceId: number): Promise<PaymentReminder[]> {
+    return db
+      .select()
+      .from(paymentReminders)
+      .where(eq(paymentReminders.workspaceId, workspaceId))
+      .orderBy(desc(paymentReminders.dueDate));
+  }
+
+  async createPaymentReminder(reminder: InsertPaymentReminder): Promise<PaymentReminder> {
+    const [newReminder] = await db
+      .insert(paymentReminders)
+      .values(reminder)
+      .returning();
+    return newReminder;
+  }
+
+  async updatePaymentReminder(id: number, data: Partial<PaymentReminder>): Promise<PaymentReminder> {
+    const [reminder] = await db
+      .update(paymentReminders)
+      .set(data)
+      .where(eq(paymentReminders.id, id))
+      .returning();
+    return reminder;
+  }
+
+  async getOverdueReminders(): Promise<PaymentReminder[]> {
+    return db
+      .select()
+      .from(paymentReminders)
+      .where(
+        and(
+          eq(paymentReminders.status, "pending"),
+          sql`${paymentReminders.dueDate} < NOW()`
+        )
+      )
+      .orderBy(paymentReminders.dueDate);
+  }
+
+  // Client Analytics Implementation
+  async getClientAnalytics(workspaceId: number, clientId: number): Promise<ClientAnalytics[]> {
+    return db
+      .select()
+      .from(clientAnalytics)
+      .where(
+        and(
+          eq(clientAnalytics.workspaceId, workspaceId),
+          eq(clientAnalytics.clientId, clientId)
+        )
+      )
+      .orderBy(desc(clientAnalytics.endDate));
+  }
+
+  async createClientAnalytics(analytics: InsertClientAnalytics): Promise<ClientAnalytics> {
+    const [newAnalytics] = await db
+      .insert(clientAnalytics)
+      .values(analytics)
+      .returning();
+    return newAnalytics;
+  }
+
+  async updateClientAnalytics(id: number, data: Partial<ClientAnalytics>): Promise<ClientAnalytics> {
+    const [analytics] = await db
+      .update(clientAnalytics)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientAnalytics.id, id))
+      .returning();
+    return analytics;
+  }
+
+  // Progress Metrics Implementation
+  async getProgressMetrics(clientId: number, category?: string): Promise<ProgressMetrics[]> {
+    let query = db
+      .select()
+      .from(progressMetrics)
+      .where(eq(progressMetrics.clientId, clientId));
+
+    if (category) {
+      query = query.where(eq(progressMetrics.category, category));
+    }
+
+    return query.orderBy(desc(progressMetrics.date));
+  }
+
+  async createProgressMetric(metric: InsertProgressMetrics): Promise<ProgressMetrics> {
+    const [newMetric] = await db
+      .insert(progressMetrics)
+      .values(metric)
+      .returning();
+    return newMetric;
+  }
+
+  async getClientProgress(
+    clientId: number,
+    startDate: Date,
+    endDate: Date
+  ): Promise<ProgressMetrics[]> {
+    return db
+      .select()
+      .from(progressMetrics)
+      .where(
+        and(
+          eq(progressMetrics.clientId, clientId),
+          sql`${progressMetrics.date} BETWEEN ${startDate} AND ${endDate}`
+        )
+      )
+      .orderBy(progressMetrics.date);
   }
 }
 

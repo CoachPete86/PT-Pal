@@ -253,6 +253,60 @@ export const completedSessions = pgTable("completed_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Add payment reminder table
+export const paymentReminders = pgTable("payment_reminders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  packageId: integer("package_id")
+    .references(() => sessionPackages.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  remindersSent: integer("reminders_sent").default(0).notNull(),
+  lastReminderSent: timestamp("last_reminder_sent"),
+  status: text("status", { enum: ["pending", "sent", "overdue", "paid"] })
+    .default("pending")
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Add client analytics table
+export const clientAnalytics = pgTable("client_analytics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  metricsData: jsonb("metrics_data").default({}).notNull(), // Stores various metrics like attendance, progress, etc.
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Add progress tracking table
+export const progressMetrics = pgTable("progress_metrics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  category: text("category", {
+    enum: ["weight", "strength", "cardio", "flexibility", "measurements"]
+  }).notNull(),
+  value: text("value").notNull(),
+  unit: text("unit").notNull(),
+  date: timestamp("date").defaultNow().notNull(),
+  notes: text("notes"),
+});
+
 export const insertSessionPackageSchema = createInsertSchema(sessionPackages)
   .omit({
     id: true,
@@ -431,3 +485,31 @@ export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
   .extend({
     date: z.date(),
   });
+
+// Add schemas for validation
+export const insertPaymentReminderSchema = createInsertSchema(paymentReminders)
+  .omit({
+    id: true,
+    createdAt: true,
+    remindersSent: true,
+    lastReminderSent: true,
+  });
+
+export const insertClientAnalyticsSchema = createInsertSchema(clientAnalytics)
+  .omit({
+    id: true,
+    updatedAt: true,
+  });
+
+export const insertProgressMetricsSchema = createInsertSchema(progressMetrics)
+  .omit({
+    id: true,
+  });
+
+// Export types
+export type PaymentReminder = typeof paymentReminders.$inferSelect;
+export type InsertPaymentReminder = z.infer<typeof insertPaymentReminderSchema>;
+export type ClientAnalytics = typeof clientAnalytics.$inferSelect;
+export type InsertClientAnalytics = z.infer<typeof insertClientAnalyticsSchema>;
+export type ProgressMetrics = typeof progressMetrics.$inferSelect;
+export type InsertProgressMetrics = z.infer<typeof insertProgressMetricsSchema>;

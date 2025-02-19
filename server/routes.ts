@@ -891,7 +891,7 @@ The response must be a valid JSON object with this exact structure:
       const responses = await storage.getFormResponses(parseInt(req.params.formId));
       res.json(responses);
     } catch (error: any) {
-      console.error("Error fetching form responses:", error);
+      console.error("Error fetching formresponses:", error);
       res.status(500).json({ 
         error: "Failed to fetch form responses",
         message: error.message 
@@ -934,7 +934,7 @@ The response must be a valid JSON object with this exact structure:
   app.post("/api/client-goals", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const goal = awaitstorage.createClientGoal({
+      const goal = await storage.createClientGoal({
         ...req.body,
         clientId: req.body.clientId || req.user.id,
       });
@@ -1018,7 +1018,8 @@ The response must be a valid JSON object with this exact structure:
 
   app.post("/api/generated-documents", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    try {const document = await storage.createGeneratedDocument(req.body);
+    try {
+      const document = await storage.createGeneratedDocument(req.body);
       res.json(document);
     } catch (error: any) {
       console.error("Error creating generated document:", error);
@@ -1043,6 +1044,160 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error signing document:", error);
       res.status(500).json({ 
         error: "Failed to sign document",
+        message: error.message 
+      });
+    }
+  });
+
+  // Payment Reminders
+  app.get("/api/payment-reminders", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspaceId = req.user.workspaceId;
+      if (!workspaceId) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      const reminders = await storage.getPaymentReminders(workspaceId);
+      res.json(reminders);
+    } catch (error: any) {
+      console.error("Error fetching payment reminders:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch payment reminders",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/payment-reminders", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const reminder = await storage.createPaymentReminder({
+        ...req.body,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(reminder);
+    } catch (error: any) {
+      console.error("Error creating payment reminder:", error);
+      res.status(500).json({ 
+        error: "Failed to create payment reminder",
+        message: error.message 
+      });
+    }
+  });
+
+  app.patch("/api/payment-reminders/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const reminder = await storage.updatePaymentReminder(
+        parseInt(req.params.id),
+        req.body
+      );
+      res.json(reminder);
+    } catch (error: any) {
+      console.error("Error updating payment reminder:", error);
+      res.status(500).json({ 
+        error: "Failed to update payment reminder",
+        message: error.message 
+      });
+    }
+  });
+
+  // Client Analytics
+  app.get("/api/client-analytics/:clientId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspaceId = req.user.workspaceId;
+      if (!workspaceId) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      const analytics = await storage.getClientAnalytics(
+        workspaceId,
+        parseInt(req.params.clientId)
+      );
+      res.json(analytics);
+    } catch (error: any) {
+      console.error("Error fetching client analytics:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch client analytics",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/client-analytics", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const analytics = await storage.createClientAnalytics({
+        ...req.body,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(analytics);
+    } catch (error: any) {
+      console.error("Error creating client analytics:", error);
+      res.status(500).json({ 
+        error: "Failed to create client analytics",
+        message: error.message 
+      });
+    }
+  });
+
+  // Progress Metrics
+  app.get("/api/progress-metrics/:clientId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { category } = req.query;
+      const metrics = await storage.getProgressMetrics(
+        parseInt(req.params.clientId),
+        category as string | undefined
+      );
+      res.json(metrics);
+    } catch (error: any) {
+      console.error("Error fetching progress metrics:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch progress metrics",
+        message: error.message 
+      });
+    }
+  });
+
+  app.post("/api/progress-metrics", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const metric = await storage.createProgressMetric({
+        ...req.body,
+        workspaceId: req.user.workspaceId,
+      });
+      res.json(metric);
+    } catch (error: any) {
+      console.error("Error creating progress metric:", error);
+      res.status(500).json({ 
+        error: "Failed to create progress metric",
+        message: error.message 
+      });
+    }
+  });
+
+  app.get("/api/client-progress/:clientId", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const { startDate, endDate } = req.query;
+      if (!startDate || !endDate) {
+        return res.status(400).json({ 
+          error: "Missing required query parameters",
+          message: "Both startDate and endDate are required" 
+        });
+      }
+
+      const progress = await storage.getClientProgress(
+        parseInt(req.params.clientId),
+        new Date(startDate as string),
+        new Date(endDate as string)
+      );
+      res.json(progress);
+    } catch (error: any) {
+      console.error("Error fetching client progress:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch client progress",
         message: error.message 
       });
     }
