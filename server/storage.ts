@@ -167,6 +167,30 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(users.id));
   }
 
+  async createClient(data: { 
+    fullName: string; 
+    email: string; 
+    trainerId: number;
+    workspaceId: number;
+    phone?: string;
+    notes?: string;
+  }): Promise<User> {
+    const [client] = await db
+      .insert(users)
+      .values({
+        username: data.email.split('@')[0],
+        email: data.email,
+        fullName: data.fullName,
+        role: "client",
+        trainerId: data.trainerId,
+        workspaceId: data.workspaceId,
+        phone: data.phone,
+        notes: data.notes
+      })
+      .returning();
+    return client;
+  }
+
   // Workspace Management
   async getWorkspace(id: number): Promise<Workspace | undefined> {
     const [workspace] = await db
