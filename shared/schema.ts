@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // Core tables
 export const users = pgTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
@@ -25,6 +25,45 @@ export const users = pgTable("users", {
   lastActive: timestamp("last_active"),
   profilePicture: text("profile_picture"),
   preferences: jsonb("preferences").default({}).notNull(),
+});
+
+// Add branding table first since workspaces reference it
+export const branding = pgTable("branding", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+  workspaceId: integer("workspace_id").notNull(),
+  logoUrl: text("logo_url"),
+  faviconUrl: text("favicon_url"),
+  primaryColor: text("primary_color").default("#000000"),
+  secondaryColor: text("secondary_color").default("#ffffff"),
+  accentColor: text("accent_color").default("#3b82f6"),
+  fontPrimary: text("font_primary").default("Inter"),
+  fontSecondary: text("font_secondary").default("Inter"),
+  customCss: text("custom_css"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Update workspace table
+export const workspaces = pgTable("workspaces", {
+  id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+  trainerId: integer("trainer_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  name: text("name").notNull(),
+  logo: text("logo"),
+  theme: jsonb("theme").default({
+    primary: "#000000",
+    variant: "professional",
+    appearance: "system",
+    radius: 0.5
+  }).notNull(),
+  settings: jsonb("settings").default({
+    allowClientRegistration: true,
+    requireOnboarding: true,
+    displayBranding: true
+  }).notNull(),
+  brandingId: integer("branding_id").references(() => branding.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Onboarding Forms
@@ -145,83 +184,7 @@ export const insertGeneratedDocumentSchema = createInsertSchema(generatedDocumen
   signedAt: true,
 });
 
-// Add branding table
-export const branding = pgTable("branding", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  workspaceId: integer("workspace_id")
-    .references(() => workspaces.id, { onDelete: "cascade" })
-    .notNull(),
-  logoUrl: text("logo_url"),
-  faviconUrl: text("favicon_url"),
-  primaryColor: text("primary_color").default("#000000"),
-  secondaryColor: text("secondary_color").default("#ffffff"),
-  accentColor: text("accent_color").default("#3b82f6"),
-  fontPrimary: text("font_primary").default("Inter"),
-  fontSecondary: text("font_secondary").default("Inter"),
-  customCss: text("custom_css"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
 
-// Update workspace table to include theme and branding settings
-export const workspaces = pgTable("workspaces", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  trainerId: integer("trainer_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  name: text("name").notNull(),
-  logo: text("logo"),
-  theme: jsonb("theme").default({
-    primary: "#000000",
-    variant: "professional",
-    appearance: "system",
-    radius: 0.5
-  }).notNull(),
-  settings: jsonb("settings").default({
-    allowClientRegistration: true,
-    requireOnboarding: true,
-    displayBranding: true
-  }).notNull(),
-  brandingId: integer("branding_id").references(() => branding.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Add branding schemas
-export const insertBrandingSchema = createInsertSchema(branding)
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-  });
-
-// Export types
-export type Branding = typeof branding.$inferSelect;
-export type InsertBranding = z.infer<typeof insertBrandingSchema>;
-
-
-// Export types
-export type OnboardingForm = typeof onboardingForms.$inferSelect;
-export type InsertOnboardingForm = z.infer<typeof insertOnboardingFormSchema>;
-export type FormResponse = typeof formResponses.$inferSelect;
-export type InsertFormResponse = z.infer<typeof insertFormResponseSchema>;
-export type ClientGoal = typeof clientGoals.$inferSelect;
-export type InsertClientGoal = z.infer<typeof insertClientGoalSchema>;
-export type DocumentTemplate = typeof documentTemplates.$inferSelect;
-export type InsertDocumentTemplate = z.infer<typeof insertDocumentTemplateSchema>;
-export type GeneratedDocument = typeof generatedDocuments.$inferSelect;
-export type InsertGeneratedDocument = z.infer<typeof insertGeneratedDocumentSchema>;
-
-// Keep existing exports
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
-export type Workspace = typeof workspaces.$inferSelect;
-export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
-export type Message = typeof messages.$inferSelect;
-export type Booking = typeof bookings.$inferSelect;
-export type WorkoutPlan = typeof workoutPlans.$inferSelect;
-export type InsertWorkoutPlan = z.infer<typeof insertWorkoutPlanSchema>;
-export type FitnessJourney = typeof fitnessJourney.$inferSelect;
-export type InsertFitnessJourney = z.infer<typeof insertFitnessJourneySchema>;
 export const sessionPackages = pgTable("session_packages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
@@ -253,60 +216,6 @@ export const completedSessions = pgTable("completed_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Add payment reminder table
-export const paymentReminders = pgTable("payment_reminders", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  workspaceId: integer("workspace_id")
-    .references(() => workspaces.id, { onDelete: "cascade" })
-    .notNull(),
-  packageId: integer("package_id")
-    .references(() => sessionPackages.id, { onDelete: "cascade" })
-    .notNull(),
-  clientId: integer("client_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  dueDate: timestamp("due_date").notNull(),
-  remindersSent: integer("reminders_sent").default(0).notNull(),
-  lastReminderSent: timestamp("last_reminder_sent"),
-  status: text("status", { enum: ["pending", "sent", "overdue", "paid"] })
-    .default("pending")
-    .notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Add client analytics table
-export const clientAnalytics = pgTable("client_analytics", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  workspaceId: integer("workspace_id")
-    .references(() => workspaces.id, { onDelete: "cascade" })
-    .notNull(),
-  clientId: integer("client_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  metricsData: jsonb("metrics_data").default({}).notNull(), // Stores various metrics like attendance, progress, etc.
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// Add progress tracking table
-export const progressMetrics = pgTable("progress_metrics", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  workspaceId: integer("workspace_id")
-    .references(() => workspaces.id, { onDelete: "cascade" })
-    .notNull(),
-  clientId: integer("client_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
-  category: text("category", {
-    enum: ["weight", "strength", "cardio", "flexibility", "measurements"]
-  }).notNull(),
-  value: text("value").notNull(),
-  unit: text("unit").notNull(),
-  date: timestamp("date").defaultNow().notNull(),
-  notes: text("notes"),
-});
-
 export const insertSessionPackageSchema = createInsertSchema(sessionPackages)
   .omit({
     id: true,
@@ -326,22 +235,7 @@ export type InsertSessionPackage = z.infer<typeof insertSessionPackageSchema>;
 export type CompletedSession = typeof completedSessions.$inferSelect;
 export type InsertCompletedSession = z.infer<typeof insertCompletedSessionSchema>;
 
-export type Document = typeof documents.$inferSelect;
-export type InsertDocument = z.infer<typeof insertDocumentSchema>;
-export const insertUserSchema = createInsertSchema(users)
-  .omit({
-    id: true,
-    createdAt: true,
-    trialEndsAt: true,
-    onboardingStatus: true,
-    lastActive: true,
-    preferences: true,
-    profilePicture: true,
-  })
-  .extend({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    email: z.string().email("Invalid email address"),
-  });
+
 export const messages = pgTable("messages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")
@@ -487,6 +381,57 @@ export const insertFitnessJourneySchema = createInsertSchema(fitnessJourney)
   });
 
 // Add schemas for validation
+export const paymentReminders = pgTable("payment_reminders", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  packageId: integer("package_id")
+    .references(() => sessionPackages.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  remindersSent: integer("reminders_sent").default(0).notNull(),
+  lastReminderSent: timestamp("last_reminder_sent"),
+  status: text("status", { enum: ["pending", "sent", "overdue", "paid"] })
+    .default("pending")
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const clientAnalytics = pgTable("client_analytics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  metricsData: jsonb("metrics_data").default({}).notNull(), // Stores various metrics like attendance, progress, etc.
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const progressMetrics = pgTable("progress_metrics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .references(() => workspaces.id, { onDelete: "cascade" })
+    .notNull(),
+  clientId: integer("client_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  category: text("category", {
+    enum: ["weight", "strength", "cardio", "flexibility", "measurements"]
+  }).notNull(),
+  value: text("value").notNull(),
+  unit: text("unit").notNull(),
+  date: timestamp("date").defaultNow().notNull(),
+  notes: text("notes"),
+});
+
 export const insertPaymentReminderSchema = createInsertSchema(paymentReminders)
   .omit({
     id: true,
@@ -513,3 +458,51 @@ export type ClientAnalytics = typeof clientAnalytics.$inferSelect;
 export type InsertClientAnalytics = z.infer<typeof insertClientAnalyticsSchema>;
 export type ProgressMetrics = typeof progressMetrics.$inferSelect;
 export type InsertProgressMetrics = z.infer<typeof insertProgressMetricsSchema>;
+
+// Single declaration of insertUserSchema
+export const insertUserSchema = createInsertSchema(users)
+  .omit({
+    id: true,
+    createdAt: true,
+    trialEndsAt: true,
+    onboardingStatus: true,
+    lastActive: true,
+    preferences: true,
+    profilePicture: true,
+  })
+  .extend({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    email: z.string().email("Invalid email address"),
+  });
+
+export const insertBrandingSchema = createInsertSchema(branding)
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+  });
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Workspace = typeof workspaces.$inferSelect;
+export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
+export type Branding = typeof branding.$inferSelect;
+export type InsertBranding = z.infer<typeof insertBrandingSchema>;
+export type Message = typeof messages.$inferSelect;
+export type Booking = typeof bookings.$inferSelect;
+export type WorkoutPlan = typeof workoutPlans.$inferSelect;
+export type InsertWorkoutPlan = z.infer<typeof insertWorkoutPlanSchema>;
+export type FitnessJourney = typeof fitnessJourney.$inferSelect;
+export type InsertFitnessJourney = z.infer<typeof insertFitnessJourneySchema>;
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+export type OnboardingForm = typeof onboardingForms.$inferSelect;
+export type InsertOnboardingForm = z.infer<typeof insertOnboardingFormSchema>;
+export type FormResponse = typeof formResponses.$inferSelect;
+export type InsertFormResponse = z.infer<typeof insertFormResponseSchema>;
+export type ClientGoal = typeof clientGoals.$inferSelect;
+export type InsertClientGoal = z.infer<typeof insertClientGoalSchema>;
+export type DocumentTemplate = typeof documentTemplates.$inferSelect;
+export type InsertDocumentTemplate = z.infer<typeof insertDocumentTemplateSchema>;
+export type GeneratedDocument = typeof generatedDocuments.$inferSelect;
+export type InsertGeneratedDocument = z.infer<typeof insertGeneratedDocumentSchema>;

@@ -218,8 +218,9 @@ export class DatabaseStorage implements IStorage {
     const [workspace] = await db
       .select()
       .from(workspaces)
-      .where(eq(workspaces.id, id));
-    return workspace;
+      .where(eq(workspaces.id, id))
+      .leftJoin(branding, eq(workspaces.brandingId, branding.id));
+    return workspace?.workspaces;
   }
 
   async getWorkspaceByTrainer(trainerId: number): Promise<Workspace | undefined> {
@@ -233,7 +234,22 @@ export class DatabaseStorage implements IStorage {
   async createWorkspace(workspace: InsertWorkspace): Promise<Workspace> {
     const [newWorkspace] = await db
       .insert(workspaces)
-      .values(workspace)
+      .values({
+        trainerId: workspace.trainerId,
+        name: workspace.name,
+        logo: workspace.logo,
+        theme: workspace.theme || {
+          primary: "#000000",
+          variant: "professional",
+          appearance: "system",
+          radius: 0.5
+        },
+        settings: workspace.settings || {
+          allowClientRegistration: true,
+          requireOnboarding: true,
+          displayBranding: true
+        }
+      })
       .returning();
     return newWorkspace;
   }
