@@ -95,6 +95,54 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Registration endpoint
+  app.post("/api/register", async (req, res) => {
+    try {
+      const { email, password, fullName } = req.body;
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({
+          error: "Email already registered",
+          message: "This email is already registered. Please try logging in instead."
+        });
+      }
+
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        email,
+        username: email.split('@')[0],
+        password: hashedPassword,
+        full_name: fullName,
+        role: "trainer",
+        subscription_tier: "free",
+        subscription_status: "active",
+        created_at: new Date(),
+        last_active: new Date(),
+        preferences: {},
+        onboarding_status: "pending"
+      });
+
+      // Log the user in after registration
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Session error:", err);
+          return res.status(500).json({ error: "Failed to create session" });
+        }
+        // Remove password from response
+        const { password, ...userWithoutPassword } = user;
+        res.status(201).json(userWithoutPassword);
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(500).json({
+        error: "Failed to register user",
+        message: error.message
+      });
+    }
+  });
+
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
       if (err) {
@@ -117,9 +165,22 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/logout", (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Not logged in" });
+    }
     req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
+      if (err) {
+        console.error("Logout error:", err);
+        return next(err);
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destruction error:", err);
+          return next(err);
+        }
+        res.clearCookie('connect.sid');
+        res.sendStatus(200);
+      });
     });
   });
 
