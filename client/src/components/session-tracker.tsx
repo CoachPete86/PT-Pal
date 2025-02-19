@@ -71,13 +71,30 @@ export default function SessionTracker() {
 
   const handleCompleteSession = async (packageId: number) => {
     if (!signaturePadRef.current?.isEmpty() && clientName) {
+      // Get client signature
+      const clientSignature = signaturePadRef.current?.toDataURL();
+      
+      // Get trainer signature (you'll need to add another SignaturePad for trainer)
+      const trainerSignature = trainerSignaturePadRef.current?.toDataURL();
+      
+      if (!clientSignature || !trainerSignature) {
+        toast({
+          title: 'Missing signatures',
+          description: 'Both client and trainer signatures are required.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       await completeSessionMutation.mutate({
         packageId,
         notes,
-        signature: signaturePadRef.current?.toDataURL(),
+        clientSignature,
+        trainerSignature,
         clientName,
         sessionDate,
         duration,
+        verificationCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
       });
     }
   };
