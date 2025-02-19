@@ -114,7 +114,14 @@ export default function DashboardPage() {
 
             {/* Quick Stats - Only show for trainers */}
             {user?.role === 'trainer' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              <motion.div
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                variants={fadeIn}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8"
+              >
                 <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
                   <CardContent className="flex items-center gap-4 p-6">
                     <Activity className="h-8 w-8 text-primary" />
