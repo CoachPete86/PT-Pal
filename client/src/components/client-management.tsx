@@ -177,12 +177,12 @@ export default function ClientManagement() {
       </Card>
 
       {/* Add New Client Form */}
-      <Card id="addClientForm" className="max-h-[80vh] overflow-hidden">
+      <Card id="addClientForm" className="h-[600px] flex flex-col">
         <CardHeader>
           <CardTitle>Add New Client</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-4 pr-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Full Name</Label>
@@ -230,7 +230,7 @@ export default function ClientManagement() {
                   value={newClient.goals}
                   onChange={e => setNewClient(prev => ({ ...prev, goals: e.target.value }))}
                   placeholder="Client's fitness and health goals..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] resize-none"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -239,7 +239,7 @@ export default function ClientManagement() {
                   value={newClient.healthConditions}
                   onChange={e => setNewClient(prev => ({ ...prev, healthConditions: e.target.value }))}
                   placeholder="Any relevant health conditions or contraindications..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] resize-none"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -248,7 +248,7 @@ export default function ClientManagement() {
                   value={newClient.notes}
                   onChange={e => setNewClient(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="Any additional notes about the client..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] resize-none"
                 />
               </div>
             </div>
