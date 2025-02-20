@@ -96,7 +96,7 @@ export default function ClientManagement() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       {/* Search and Filter Section */}
       <div className="flex flex-col md:flex-row gap-4 items-end">
         <div className="flex-1">
@@ -130,7 +130,7 @@ export default function ClientManagement() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Clients</CardTitle>
-          <Button onClick={() => document.getElementById('addClientForm')?.scrollIntoView({ behavior: 'smooth' })}>
+          <Button onClick={() => document.getElementById('addClientForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
             <UserPlus className="h-4 w-4 mr-2" />
             Add New Client
           </Button>
@@ -177,12 +177,12 @@ export default function ClientManagement() {
       </Card>
 
       {/* Add New Client Form */}
-      <Card id="addClientForm" className="h-[600px] flex flex-col">
+      <Card id="addClientForm" className="relative">
         <CardHeader>
           <CardTitle>Add New Client</CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-4 pr-4">
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Full Name</Label>
@@ -230,7 +230,7 @@ export default function ClientManagement() {
                   value={newClient.goals}
                   onChange={e => setNewClient(prev => ({ ...prev, goals: e.target.value }))}
                   placeholder="Client's fitness and health goals..."
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[100px]"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -239,7 +239,7 @@ export default function ClientManagement() {
                   value={newClient.healthConditions}
                   onChange={e => setNewClient(prev => ({ ...prev, healthConditions: e.target.value }))}
                   placeholder="Any relevant health conditions or contraindications..."
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[100px]"
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
@@ -248,13 +248,13 @@ export default function ClientManagement() {
                   value={newClient.notes}
                   onChange={e => setNewClient(prev => ({ ...prev, notes: e.target.value }))}
                   placeholder="Any additional notes about the client..."
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[100px]"
                 />
               </div>
             </div>
             <Button 
               type="submit" 
-              className="w-full"
+              className="w-full mt-6"
               disabled={addClientMutation.isPending}
             >
               {addClientMutation.isPending ? (
