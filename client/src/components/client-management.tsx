@@ -96,9 +96,9 @@ export default function ClientManagement() {
   );
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="container mx-auto p-4 overflow-y-auto">
       {/* Search and Filter Section */}
-      <div className="flex flex-col md:flex-row gap-4 items-end">
+      <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
         <div className="flex-1">
           <Label>Search Clients</Label>
           <div className="relative">
@@ -127,7 +127,7 @@ export default function ClientManagement() {
       </div>
 
       {/* Client Table */}
-      <Card>
+      <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Clients</CardTitle>
           <Button onClick={() => document.getElementById('addClientForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
@@ -136,54 +136,56 @@ export default function ClientManagement() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Client Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Next Session</TableHead>
-                <TableHead>Sessions Left</TableHead>
-                <TableHead>Last Update</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredClients?.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{client.fullName}</div>
-                      <div className="text-sm text-muted-foreground">{client.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
-                      {client.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{client.nextSession || 'No session scheduled'}</TableCell>
-                  <TableCell>{client.sessionsRemaining || 0}</TableCell>
-                  <TableCell>{client.lastUpdate ? new Date(client.lastUpdate).toLocaleDateString() : 'No updates'}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm">
-                      View Profile
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Next Session</TableHead>
+                  <TableHead>Sessions Left</TableHead>
+                  <TableHead>Last Update</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredClients?.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{client.fullName}</div>
+                        <div className="text-sm text-muted-foreground">{client.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
+                        {client.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{client.nextSession || 'No session scheduled'}</TableCell>
+                    <TableCell>{client.sessionsRemaining || 0}</TableCell>
+                    <TableCell>{client.lastUpdate ? new Date(client.lastUpdate).toLocaleDateString() : 'No updates'}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">
+                        View Profile
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
       {/* Add New Client Form */}
-      <Card id="addClientForm" className="relative">
+      <Card id="addClientForm" className="mb-6">
         <CardHeader>
           <CardTitle>Add New Client</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>Full Name</Label>
                 <Input
@@ -254,7 +256,7 @@ export default function ClientManagement() {
             </div>
             <Button 
               type="submit" 
-              className="w-full mt-6"
+              className="w-full"
               disabled={addClientMutation.isPending}
             >
               {addClientMutation.isPending ? (
