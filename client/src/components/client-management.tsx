@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { Loader2, UserPlus, Search, Filter } from 'lucide-react';
+import { Loader2, UserPlus, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 
@@ -90,16 +90,16 @@ export default function ClientManagement() {
   });
 
   if (isLoading) return (
-    <div className="flex items-center justify-center min-h-[200px]">
+    <div className="flex items-center justify-center h-48">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
     </div>
   );
 
   return (
-    <div className="min-h-screen w-full overflow-y-auto pb-20">
-      <div className="container mx-auto p-4 space-y-6">
+    <div className="w-full h-full overflow-auto">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Search and Filter Section */}
-        <div className="flex flex-col md:flex-row gap-4 items-end mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
             <Label>Search Clients</Label>
             <div className="relative">
@@ -128,7 +128,7 @@ export default function ClientManagement() {
         </div>
 
         {/* Client Table */}
-        <Card className="mb-6">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Clients</CardTitle>
             <Button onClick={() => document.getElementById('addClientForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
@@ -184,8 +184,8 @@ export default function ClientManagement() {
           <CardHeader>
             <CardTitle>Add New Client</CardTitle>
           </CardHeader>
-          <CardContent className="pb-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-8 pb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Full Name</Label>
