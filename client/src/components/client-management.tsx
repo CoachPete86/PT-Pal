@@ -50,22 +50,6 @@ export default function ClientManagement() {
     retry: false
   });
 
-  const isLoading = isWorkspaceLoading || isClientsLoading;
-
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-48">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  );
-
-  if (!workspace) {
-    return (
-      <div className="flex items-center justify-center h-48 flex-col gap-4">
-        <p className="text-muted-foreground">Workspace not found. Please contact support.</p>
-      </div>
-    );
-  }
-
   const addClientMutation = useMutation({
     mutationFn: async (clientData) => {
       if (!workspace?.id) {
@@ -111,13 +95,30 @@ export default function ClientManagement() {
     addClientMutation.mutate(newClient);
   };
 
+  const isLoading = isWorkspaceLoading || isClientsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!workspace) {
+    return (
+      <div className="flex items-center justify-center h-48 flex-col gap-4">
+        <p className="text-muted-foreground">Workspace not found. Please contact support.</p>
+      </div>
+    );
+  }
+
   const filteredClients = clients?.filter(client => {
     const matchesSearch = client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         client.email.toLowerCase().includes(searchTerm.toLowerCase());
+                       client.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
     return matchesSearch && matchesStatus;
-  });
-
+  }) || [];
 
   return (
     <div className="h-screen w-full p-4 flex flex-col">
