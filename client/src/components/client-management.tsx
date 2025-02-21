@@ -40,6 +40,11 @@ export default function ClientManagement() {
     healthConditions: ''
   });
 
+  const { data: workspace } = useQuery({
+    queryKey: ['/api/workspace'],
+    retry: false
+  });
+
   const { data: clients, isLoading } = useQuery({
     queryKey: ['/api/clients'],
     retry: false
@@ -47,7 +52,13 @@ export default function ClientManagement() {
 
   const addClientMutation = useMutation({
     mutationFn: async (clientData) => {
-      const res = await apiRequest('POST', '/api/clients', clientData);
+      if (!workspace?.id) {
+        throw new Error('Workspace not found. Please contact support.');
+      }
+      const res = await apiRequest('POST', '/api/clients', {
+        ...clientData,
+        workspaceId: workspace.id
+      });
       if (!res.ok) {
         throw new Error('Failed to add client');
       }
