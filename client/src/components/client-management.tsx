@@ -40,15 +40,31 @@ export default function ClientManagement() {
     healthConditions: ''
   });
 
-  const { data: workspace } = useQuery({
+  const { data: workspace, isLoading: isWorkspaceLoading } = useQuery({
     queryKey: ['/api/workspace'],
     retry: false
   });
 
-  const { data: clients, isLoading } = useQuery({
+  const { data: clients, isLoading: isClientsLoading } = useQuery({
     queryKey: ['/api/clients'],
     retry: false
   });
+
+  const isLoading = isWorkspaceLoading || isClientsLoading;
+
+  if (isLoading) return (
+    <div className="flex items-center justify-center h-48">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+
+  if (!workspace) {
+    return (
+      <div className="flex items-center justify-center h-48 flex-col gap-4">
+        <p className="text-muted-foreground">Workspace not found. Please contact support.</p>
+      </div>
+    );
+  }
 
   const addClientMutation = useMutation({
     mutationFn: async (clientData) => {
@@ -102,11 +118,6 @@ export default function ClientManagement() {
     return matchesSearch && matchesStatus;
   });
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-48">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  );
 
   return (
     <div className="h-screen w-full p-4 flex flex-col">

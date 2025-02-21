@@ -1212,6 +1212,23 @@ The response must be a valid JSON object with this exact structure:
   });
 
   //NEW ROUTES FROM EDITED SNIPPET
+  // Workspace endpoint
+  app.get("/api/workspace", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      if (!workspace) {
+        return res.status(404).json({ error: "Workspace not found" });
+      }
+      res.json(workspace);
+    } catch (error: any) {
+      console.error("Error fetching workspace:", error);
+      res.status(500).json({
+        error: "Failed to fetch workspace",
+        message: error.message
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
