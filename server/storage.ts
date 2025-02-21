@@ -196,6 +196,9 @@ export class DatabaseStorage implements IStorage {
     workspaceId: number;
     phone?: string;
     notes?: string;
+    status?: string;
+    goals?: string;
+    healthConditions?: string;
   }): Promise<User> {
     const [client] = await db
       .insert(users)
@@ -203,11 +206,20 @@ export class DatabaseStorage implements IStorage {
         username: data.email.split('@')[0],
         email: data.email,
         fullName: data.fullName,
-        role: "client",
+        role: "client" as const,
         trainerId: data.trainerId,
         workspaceId: data.workspaceId,
         phone: data.phone,
-        notes: data.notes
+        notes: data.notes,
+        status: data.status as "active" | "inactive" | undefined,
+        // Generate a random password that will be changed on first login
+        password: Math.random().toString(36).slice(-8),
+        subscriptionTier: "free" as const,
+        subscriptionStatus: "trial" as const,
+        preferences: {
+          goals: data.goals,
+          healthConditions: data.healthConditions
+        }
       })
       .returning();
     return client;

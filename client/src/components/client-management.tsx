@@ -24,13 +24,24 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Loader2, UserPlus, Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
+import { User, Workspace } from '@shared/schema';
+
+interface NewClientData {
+  fullName: string;
+  email: string;
+  phone?: string;
+  notes?: string;
+  status: 'active' | 'inactive';
+  goals?: string;
+  healthConditions?: string;
+}
 
 export default function ClientManagement() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newClient, setNewClient] = useState({
+  const [newClient, setNewClient] = useState<NewClientData>({
     fullName: '',
     email: '',
     phone: '',
@@ -40,18 +51,18 @@ export default function ClientManagement() {
     healthConditions: ''
   });
 
-  const { data: workspace, isLoading: isWorkspaceLoading } = useQuery({
+  const { data: workspace, isLoading: isWorkspaceLoading } = useQuery<Workspace>({
     queryKey: ['/api/workspace'],
     retry: false
   });
 
-  const { data: clients, isLoading: isClientsLoading } = useQuery({
+  const { data: clients, isLoading: isClientsLoading } = useQuery<User[]>({
     queryKey: ['/api/clients'],
     retry: false
   });
 
   const addClientMutation = useMutation({
-    mutationFn: async (clientData) => {
+    mutationFn: async (clientData: NewClientData) => {
       if (!workspace?.id) {
         throw new Error('Workspace not found. Please contact support.');
       }
@@ -60,17 +71,18 @@ export default function ClientManagement() {
         workspaceId: workspace.id
       });
       if (!res.ok) {
-        throw new Error('Failed to add client');
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to add client');
       }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
-      setNewClient({ 
-        fullName: '', 
-        email: '', 
-        phone: '', 
-        notes: '', 
+      setNewClient({
+        fullName: '',
+        email: '',
+        phone: '',
+        notes: '',
         status: 'active',
         goals: '',
         healthConditions: ''
@@ -114,7 +126,7 @@ export default function ClientManagement() {
   }
 
   const filteredClients = clients?.filter(client => {
-    const matchesSearch = client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (client.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                        client.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -191,9 +203,9 @@ export default function ClientManagement() {
                               {client.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>{client.nextSession || 'No session scheduled'}</TableCell>
-                          <TableCell>{client.sessionsRemaining || 0}</TableCell>
-                          <TableCell>{client.lastUpdate ? new Date(client.lastUpdate).toLocaleDateString() : 'No updates'}</TableCell>
+                          <TableCell>No session scheduled</TableCell>
+                          <TableCell>0</TableCell>
+                          <TableCell>{client.lastActive ? new Date(client.lastActive).toLocaleDateString() : 'No updates'}</TableCell>
                           <TableCell>
                             <Button variant="ghost" size="sm">
                               View Profile
@@ -249,7 +261,7 @@ export default function ClientManagement() {
                   <Label>Status</Label>
                   <Select 
                     value={newClient.status}
-                    onValueChange={(value) => setNewClient(prev => ({ ...prev, status: value }))}
+                    onValueChange={(value: 'active' | 'inactive') => setNewClient(prev => ({ ...prev, status: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
