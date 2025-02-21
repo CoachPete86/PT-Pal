@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { Loader2, UserPlus, Search } from 'lucide-react';
+import { Loader2, UserPlus, Search, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 
@@ -29,6 +29,7 @@ export default function ClientManagement() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showAddForm, setShowAddForm] = useState(false);
   const [newClient, setNewClient] = useState({
     fullName: '',
     email: '',
@@ -63,6 +64,7 @@ export default function ClientManagement() {
         goals: '',
         healthConditions: ''
       });
+      setShowAddForm(false);
       toast({
         title: 'Success',
         description: 'New client has been successfully added.',
@@ -96,97 +98,105 @@ export default function ClientManagement() {
   );
 
   return (
-    <div className="w-full h-full overflow-auto">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Search and Filter Section */}
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <Label>Search Clients</Label>
-            <div className="relative">
-              <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
+    <div className="h-screen w-full p-4 flex flex-col">
+      {!showAddForm ? (
+        <>
+          {/* Client List View */}
+          <div className="flex flex-col h-full">
+            {/* Search and Filter Section */}
+            <div className="flex flex-col md:flex-row gap-4 items-end mb-4">
+              <div className="flex-1">
+                <Label>Search Clients</Label>
+                <div className="relative">
+                  <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
+              </div>
+              <div className="w-full md:w-48">
+                <Label>Status Filter</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-          <div className="w-full md:w-48">
-            <Label>Status Filter</Label>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
 
-        {/* Client Table */}
-        <Card>
+            {/* Client Table */}
+            <Card className="flex-1">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Clients</CardTitle>
+                <Button onClick={() => setShowAddForm(true)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add New Client
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Client Name</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Next Session</TableHead>
+                        <TableHead>Sessions Left</TableHead>
+                        <TableHead>Last Update</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredClients?.map((client) => (
+                        <TableRow key={client.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{client.fullName}</div>
+                              <div className="text-sm text-muted-foreground">{client.email}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
+                              {client.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{client.nextSession || 'No session scheduled'}</TableCell>
+                          <TableCell>{client.sessionsRemaining || 0}</TableCell>
+                          <TableCell>{client.lastUpdate ? new Date(client.lastUpdate).toLocaleDateString() : 'No updates'}</TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm">
+                              View Profile
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      ) : (
+        /* Add New Client Form */
+        <Card className="h-full">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Clients</CardTitle>
-            <Button onClick={() => document.getElementById('addClientForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Add New Client
+            <CardTitle>Add New Client</CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => setShowAddForm(false)}>
+              <X className="h-4 w-4" />
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Client Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Next Session</TableHead>
-                    <TableHead>Sessions Left</TableHead>
-                    <TableHead>Last Update</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredClients?.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{client.fullName}</div>
-                          <div className="text-sm text-muted-foreground">{client.email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
-                          {client.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{client.nextSession || 'No session scheduled'}</TableCell>
-                      <TableCell>{client.sessionsRemaining || 0}</TableCell>
-                      <TableCell>{client.lastUpdate ? new Date(client.lastUpdate).toLocaleDateString() : 'No updates'}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          View Profile
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Add New Client Form */}
-        <Card id="addClientForm">
-          <CardHeader>
-            <CardTitle>Add New Client</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-8 pb-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Full Name</Label>
                   <Input
@@ -233,7 +243,7 @@ export default function ClientManagement() {
                     value={newClient.goals}
                     onChange={e => setNewClient(prev => ({ ...prev, goals: e.target.value }))}
                     placeholder="Client's fitness and health goals..."
-                    className="min-h-[100px]"
+                    className="h-20"
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
@@ -242,7 +252,7 @@ export default function ClientManagement() {
                     value={newClient.healthConditions}
                     onChange={e => setNewClient(prev => ({ ...prev, healthConditions: e.target.value }))}
                     placeholder="Any relevant health conditions or contraindications..."
-                    className="min-h-[100px]"
+                    className="h-20"
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
@@ -251,13 +261,13 @@ export default function ClientManagement() {
                     value={newClient.notes}
                     onChange={e => setNewClient(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="Any additional notes about the client..."
-                    className="min-h-[100px]"
+                    className="h-20"
                   />
                 </div>
               </div>
               <Button 
                 type="submit" 
-                className="w-full mt-8"
+                className="w-full"
                 disabled={addClientMutation.isPending}
               >
                 {addClientMutation.isPending ? (
@@ -270,7 +280,7 @@ export default function ClientManagement() {
             </form>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   );
 }
