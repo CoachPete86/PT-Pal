@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
-import DashboardPage from "@/pages/dashboard-page";
+import DashboardPage from "@/pages/dashboard";
 import ContentGeneratorPage from "@/pages/content-generator-page";
 import SettingsPage from "@/pages/settings-page";
 import NotFound from "@/pages/not-found";
@@ -23,9 +23,13 @@ function Router() {
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
-        <ProtectedRoute path="/dashboard" component={DashboardPage} />
-        <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
-        <ProtectedRoute path="/settings" component={SettingsPage} />
+        <Route path="/dashboard" component={DashboardPage} />
+        <Route path="/content-generator">
+          {() => <ProtectedRoute component={ContentGeneratorPage} />}
+        </Route>
+        <Route path="/settings">
+          {() => <ProtectedRoute component={SettingsPage} />}
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>
