@@ -1,8 +1,20 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import cors from 'cors';
 
 const app = express();
+
+// Configure CORS early in the middleware chain
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://YOUR_PRODUCTION_DOMAIN' // This will be replaced with actual domain
+    : 'http://localhost:5000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Increase limit for base64 encoded images
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
@@ -100,7 +112,7 @@ startServer();
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
   log('SIGTERM signal received: closing HTTP server');
-  let server; //This line is added to fix the undefined server issue.
+  let server;
   try{
     server = registerRoutes(app);
   } catch(error){

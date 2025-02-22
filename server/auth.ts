@@ -41,10 +41,12 @@ export function setupAuth(app: Express) {
     cookie: {
       secure: app.get("env") === "production",
       httpOnly: true,
+      sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
   };
 
+  // Trust first proxy if in production
   if (app.get("env") === "production") {
     app.set("trust proxy", 1);
   }
@@ -81,21 +83,27 @@ export function setupAuth(app: Express) {
     )
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    console.log('Serializing user:', user.id);
+    done(null, user.id);
+  });
 
   passport.deserializeUser(async (id: number, done) => {
     try {
+      console.log('Deserializing user:', id);
       const user = await storage.getUser(id);
       if (!user) {
+        console.log('User not found during deserialization');
         return done(null, false);
       }
+      console.log('User deserialized successfully');
       done(null, user);
     } catch (error) {
+      console.error('Deserialization error:', error);
       done(error);
     }
   });
 
-  // Registration endpoint
   app.post("/api/register", async (req, res) => {
     try {
       const { email, password, fullName } = req.body;
@@ -114,23 +122,17 @@ export function setupAuth(app: Express) {
         email,
         username: email.split('@')[0],
         password: hashedPassword,
-        full_name: fullName,
+        fullName,
         role: "trainer",
-        subscription_tier: "free",
-        subscription_status: "active",
-        created_at: new Date(),
-        last_active: new Date(),
-        preferences: {},
-        onboarding_status: "pending"
+        subscriptionTier: "free",
+        subscriptionStatus: "active",
       });
 
-      // Log the user in after registration
       req.login(user, (err) => {
         if (err) {
           console.error("Session error:", err);
           return res.status(500).json({ error: "Failed to create session" });
         }
-        // Remove password from response
         const { password, ...userWithoutPassword } = user;
         res.status(201).json(userWithoutPassword);
       });
@@ -185,6 +187,10 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
+    console.log('GET /api/user - isAuthenticated:', req.isAuthenticated());
+    console.log('Session:', req.session);
+    console.log('User:', req.user);
+
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }

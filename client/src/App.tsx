@@ -23,13 +23,9 @@ function Router() {
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/auth" component={AuthPage} />
-        <Route path="/dashboard" component={DashboardPage} />
-        <Route path="/content-generator">
-          {() => <ProtectedRoute component={ContentGeneratorPage} />}
-        </Route>
-        <Route path="/settings">
-          {() => <ProtectedRoute component={SettingsPage} />}
-        </Route>
+        <ProtectedRoute path="/dashboard" component={DashboardPage} />
+        <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
+        <ProtectedRoute path="/settings" component={SettingsPage} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

@@ -22,12 +22,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
-  // Initialize all form hooks before any conditional returns
+  // Initialize login form
   const loginForm = useForm({
     defaultValues: { 
       email: "", 
@@ -35,23 +37,21 @@ export default function AuthPage() {
     },
   });
 
+  // Initialize register form with proper validation
   const registerForm = useForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
       fullName: "",
-      email: "",
-      role: "trainer" as const,
-      subscriptionTier: "free" as const,
-      subscriptionStatus: "trial" as const,
     },
   });
 
-  // Handle mutations
+  // Handle form submissions
   const handleLogin = async (data: any) => {
     try {
       await loginMutation.mutateAsync(data);
+      setLocation("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -60,12 +60,13 @@ export default function AuthPage() {
   const handleRegistration = async (data: any) => {
     try {
       await registerMutation.mutateAsync(data);
+      setLocation("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);
     }
   };
 
-  // Check authentication status after all hooks are initialized
+  // Redirect if already authenticated
   if (user) {
     setLocation("/dashboard");
     return null;
@@ -101,7 +102,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input type="email" {...field} />
+                            <Input 
+                              type="email" 
+                              placeholder="Enter your email"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -114,7 +119,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} />
+                            <Input 
+                              type="password"
+                              placeholder="Enter your password" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -144,7 +153,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input 
+                              placeholder="Enter your full name"
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -157,20 +169,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
+                            <Input 
+                              type="email"
+                              placeholder="Enter your email" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -183,7 +186,11 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} />
+                            <Input 
+                              type="password"
+                              placeholder="Choose a strong password" 
+                              {...field} 
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -7,6 +7,21 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from '@tanstack/react-query';
 import type { User } from '@shared/schema';
 import { Loader2 } from "lucide-react";
+
+interface SessionPackage {
+  id: number;
+  sessions: Array<{
+    date: string;
+    status: string;
+  }>;
+  paymentStatus: string;
+  expiryDate: string;
+}
+
+interface WorkoutPlan {
+  id: number;
+  status: string;
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -17,22 +32,22 @@ export default function DashboardPage() {
     enabled: user?.role === 'trainer',
   });
 
-  const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
+  const { data: sessionPackages = [], isLoading: isLoadingPackages } = useQuery<SessionPackage[]>({
     queryKey: ['/api/session-packages'],
     enabled: user?.role === 'trainer',
   });
 
-  const { data: workoutPlans, isLoading: isLoadingPlans } = useQuery({
+  const { data: workoutPlans = [], isLoading: isLoadingPlans } = useQuery<WorkoutPlan[]>({
     queryKey: ['/api/workout-plans'],
     enabled: user?.role === 'trainer',
   });
 
-  const todaySessions = sessionPackages?.filter(pkg => {
+  const todaySessions = sessionPackages.filter(pkg => {
     const today = new Date().toISOString().split('T')[0];
     return pkg.sessions?.some(session => session.date.startsWith(today));
   });
 
-  const activePrograms = workoutPlans?.filter(plan => plan.status === 'active');
+  const activePrograms = workoutPlans.filter(plan => plan.status === 'active');
 
   const tabItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart },
@@ -70,7 +85,7 @@ export default function DashboardPage() {
       <div className="flex flex-col flex-1 p-6 space-y-4 overflow-auto">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800">Welcome, {user?.name || 'Trainer'} 👋</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Welcome, {user?.fullName || user?.username} 👋</h1>
           <div className="flex space-x-4">
             <button aria-label='Search'><Search className='cursor-pointer' /></button>
             <button aria-label='Notifications'><Bell className='cursor-pointer' /></button>
@@ -108,7 +123,9 @@ export default function DashboardPage() {
               {isLoadingPackages ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <p className="text-gray-700 text-xl">0</p>
+                <p className="text-gray-700 text-xl">
+                  {sessionPackages.filter(pkg => pkg.paymentStatus === 'pending').length}
+                </p>
               )}
             </CardContent>
           </Card>
@@ -118,7 +135,13 @@ export default function DashboardPage() {
               {isLoadingPackages ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <p className="text-gray-700 text-xl">0</p>
+                <p className="text-gray-700 text-xl">
+                  {sessionPackages.filter(pkg => {
+                    const thirtyDaysFromNow = new Date();
+                    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+                    return new Date(pkg.expiryDate) <= thirtyDaysFromNow;
+                  }).length}
+                </p>
               )}
             </CardContent>
           </Card>
@@ -143,7 +166,7 @@ export default function DashboardPage() {
             clients.map((client) => (
               <div key={client.id} className="flex justify-between items-center p-3 border-b hover:bg-gray-200 transition rounded-lg">
                 <div className="flex-1">
-                  <h3 className="text-lg font-medium">{client.name}</h3>
+                  <h3 className="text-lg font-medium">{client.fullName || client.username}</h3>
                   <p className="text-gray-600">{client.email}</p>
                   <Progress value={75} className="mt-2" />
                 </div>
