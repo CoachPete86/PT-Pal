@@ -8,14 +8,13 @@ import {
   type FormResponse, type InsertFormResponse, type ClientGoal, type InsertClientGoal,
   type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
   branding, type Branding, type InsertBranding,
+  type PaymentReminder, type InsertPaymentReminder, type ClientAnalytics, type InsertClientAnalytics, type ProgressMetrics, type InsertProgressMetrics,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, or, desc } from "drizzle-orm";
+import { eq, and, or, desc, sql } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
-
-const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   // User management
@@ -104,28 +103,9 @@ export interface IStorage {
   createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument>;
   updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument>;
   signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument>;
-
-  // Branding Management
-  getBranding(workspaceId: number): Promise<Branding | undefined>;
-  createBranding(branding: InsertBranding): Promise<Branding>;
-  updateBranding(id: number, data: Partial<Branding>): Promise<Branding>;
-
-  // Payment Reminders
-  getPaymentReminders(workspaceId: number): Promise<PaymentReminder[]>;
-  createPaymentReminder(reminder: InsertPaymentReminder): Promise<PaymentReminder>;
-  updatePaymentReminder(id: number, data: Partial<PaymentReminder>): Promise<PaymentReminder>;
-  getOverdueReminders(): Promise<PaymentReminder[]>;
-
-  // Client Analytics
-  getClientAnalytics(workspaceId: number, clientId: number): Promise<ClientAnalytics[]>;
-  createClientAnalytics(analytics: InsertClientAnalytics): Promise<ClientAnalytics>;
-  updateClientAnalytics(id: number, data: Partial<ClientAnalytics>): Promise<ClientAnalytics>;
-
-  // Progress Metrics
-  getProgressMetrics(clientId: number, category?: string): Promise<ProgressMetrics[]>;
-  createProgressMetric(metric: InsertProgressMetrics): Promise<ProgressMetrics>;
-  getClientProgress(clientId: number, startDate: Date, endDate: Date): Promise<ProgressMetrics[]>;
 }
+
+const PostgresSessionStore = connectPg(session);
 
 export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
@@ -179,9 +159,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(users.id));
   }
 
-  async createClient(data: { 
-    fullName: string; 
-    email: string; 
+  async createClient(data: {
+    fullName: string;
+    email: string;
     trainerId: number;
     workspaceId: number;
     phone?: string;
@@ -242,6 +222,133 @@ export class DatabaseStorage implements IStorage {
       .where(eq(workspaces.id, id))
       .returning();
     return workspace;
+  }
+
+  // Workout Plans
+  async getWorkoutPlans(workspaceId: number, clientId?: number): Promise<WorkoutPlan[]> {
+    let query = db
+      .select()
+      .from(workoutPlans)
+      .where(eq(workoutPlans.workspaceId, workspaceId));
+
+    if (clientId !== undefined) {
+      query = query.where(eq(workoutPlans.clientId, clientId));
+    }
+
+    return query.orderBy(desc(workoutPlans.createdAt));
+  }
+
+  async createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan> {
+    const [newPlan] = await db
+      .insert(workoutPlans)
+      .values({
+        ...plan,
+        startDate: new Date(plan.startDate),
+        endDate: new Date(plan.endDate),
+      })
+      .returning();
+    return newPlan;
+  }
+
+  async updateWorkoutPlan(id: number, data: Partial<WorkoutPlan>): Promise<WorkoutPlan> {
+    const [plan] = await db
+      .update(workoutPlans)
+      .set(data)
+      .where(eq(workoutPlans.id, id))
+      .returning();
+    return plan;
+  }
+
+  // Messages
+  async getMessages(workspaceId: number, userId: number): Promise<Message[]> {
+    return db
+      .select()
+      .from(messages)
+      .where(
+        and(
+          eq(messages.workspaceId, workspaceId),
+          or(
+            eq(messages.senderId, userId),
+            eq(messages.recipientId, userId)
+          )
+        )
+      )
+      .orderBy(desc(messages.timestamp));
+  }
+
+  async createMessage(message: Partial<Message>): Promise<Message> {
+    if (!message.content || !message.senderId || !message.recipientId || !message.workspaceId) {
+      throw new Error("Missing required message fields");
+    }
+
+    const [newMessage] = await db
+      .insert(messages)
+      .values({
+        content: message.content,
+        senderId: message.senderId,
+        recipientId: message.recipientId,
+        workspaceId: message.workspaceId,
+        timestamp: new Date(),
+        isRead: false
+      })
+      .returning();
+    return newMessage;
+  }
+
+  // Bookings
+  async getBookings(workspaceId: number, clientId?: number): Promise<Booking[]> {
+    let query = db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.workspaceId, workspaceId));
+
+    if (clientId !== undefined) {
+      query = query.where(eq(bookings.clientId, clientId));
+    }
+
+    return query.orderBy(desc(bookings.createdAt));
+  }
+
+  async createBooking(booking: Partial<Booking>): Promise<Booking> {
+    const [newBooking] = await db
+      .insert(bookings)
+      .values(booking)
+      .returning();
+    return newBooking;
+  }
+
+  async updateBooking(id: number, data: Partial<Booking>): Promise<Booking> {
+    const [booking] = await db
+      .update(bookings)
+      .set(data)
+      .where(eq(bookings.id, id))
+      .returning();
+    return booking;
+  }
+
+  // Fitness Journey
+  async getFitnessJourney(workspaceId: number, clientId: number): Promise<FitnessJourney[]> {
+    return db
+      .select()
+      .from(fitnessJourney)
+      .where(
+        and(
+          eq(fitnessJourney.workspaceId, workspaceId),
+          eq(fitnessJourney.clientId, clientId)
+        )
+      )
+      .orderBy(desc(fitnessJourney.date));
+  }
+
+  async createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney> {
+    const [newEntry] = await db
+      .insert(fitnessJourney)
+      .values({
+        ...entry,
+        date: new Date(entry.date)
+      })
+      .returning();
+    return newEntry;
   }
 
   // Session Packages
