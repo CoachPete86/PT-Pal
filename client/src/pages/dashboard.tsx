@@ -39,6 +39,7 @@ import {
   UserPlus,
   Loader2,
 } from "lucide-react";
+import ClientProfile from "@/components/client-profile";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -59,6 +60,7 @@ const tabItems = [
 export default function DashboardPage() {
   const { user } = useAuth();
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
 
   const { data: clients, isLoading: isLoadingClients } = useQuery<User[]>({
     queryKey: ['/api/clients'],
@@ -101,7 +103,7 @@ export default function DashboardPage() {
                   Welcome, {user?.fullName || user?.username}
                 </h1>
                 <p className="text-muted-foreground">
-                  {user?.role === 'trainer' 
+                  {user?.role === 'trainer'
                     ? 'Manage your clients and training business'
                     : 'Track your fitness journey and connect with your trainer'}
                 </p>
@@ -135,7 +137,7 @@ export default function DashboardPage() {
                         <h3 className="text-2xl font-bold">
                           {sessionPackages?.filter(pkg => {
                             const today = new Date().toISOString().split('T')[0];
-                            return pkg.sessions?.some(session => 
+                            return pkg.sessions?.some(session =>
                               session.date > today
                             );
                           })?.length || 0}
@@ -154,7 +156,7 @@ export default function DashboardPage() {
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
                         <h3 className="text-2xl font-bold">
-                          {sessionPackages?.filter(pkg => 
+                          {sessionPackages?.filter(pkg =>
                             pkg.paymentStatus === 'pending'
                           )?.length || 0}
                         </h3>
@@ -224,38 +226,74 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="clients">
-              <div className="grid gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>Client Management</CardTitle>
-                      <CardDescription>
-                        Manage your client relationships and track their progress
-                      </CardDescription>
-                    </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button className="flex items-center gap-2">
-                          <UserPlus className="h-4 w-4" />
-                          Add New Client
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Add New Client</DialogTitle>
-                          <DialogDescription>
-                            Enter the client's details below
-                          </DialogDescription>
-                        </DialogHeader>
-                        <ClientManagement />
-                      </DialogContent>
-                    </Dialog>
-                  </CardHeader>
-                  <CardContent>
-                    <ClientManagement />
-                  </CardContent>
-                </Card>
-              </div>
+              {selectedClientId ? (
+                <ClientProfile
+                  clientId={selectedClientId}
+                  onClose={() => setSelectedClientId(null)}
+                />
+              ) : (
+                <div className="grid gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>Client Management</CardTitle>
+                        <CardDescription>
+                          Manage your client relationships and track their progress
+                        </CardDescription>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="flex items-center gap-2">
+                            <UserPlus className="h-4 w-4" />
+                            Add New Client
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Add New Client</DialogTitle>
+                            <DialogDescription>
+                              Enter the client's details below
+                            </DialogDescription>
+                          </DialogHeader>
+                          <ClientManagement />
+                        </DialogContent>
+                      </Dialog>
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingClients ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                      ) : clients?.length ? (
+                        <div className="space-y-4">
+                          {clients.map((client) => (
+                            <Card key={client.id}>
+                              <CardContent className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-4">
+                                  <div className="space-y-1">
+                                    <p className="font-medium">{client.fullName || client.username}</p>
+                                    <p className="text-sm text-muted-foreground">{client.email}</p>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setSelectedClientId(client.id)}
+                                >
+                                  View Profile
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No clients found. Add your first client to get started.
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="sessions">
