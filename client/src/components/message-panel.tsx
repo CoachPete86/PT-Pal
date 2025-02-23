@@ -42,7 +42,7 @@ export default function MessagePanel() {
 
   return (
     <div className="h-[600px] flex flex-col">
-      <ScrollArea className="flex-1 pr-4">
+      <ScrollArea className="flex-1 pr-4 overflow-y-auto -webkit-overflow-scrolling-touch">
         <div className="space-y-4">
           {messages?.map((message) => (
             <div

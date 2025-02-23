@@ -140,7 +140,7 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
           Sync
         </Button>
       </div>
-      <ScrollArea className="h-[calc(100vh-12rem)]">
+      <ScrollArea className="h-[calc(100vh-12rem)] overflow-y-auto -webkit-overflow-scrolling-touch">
         <div className="space-y-1 p-2">
           {documentTree.map((document) => (
             <DocumentNode key={document.id} document={document} />
