@@ -1216,9 +1216,12 @@ The response must be a valid JSON object with this exact structure:
   app.get("/api/workspace", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      let workspace = await storage.getWorkspaceByTrainer(req.user.id);
       if (!workspace) {
-        return res.status(404).json({ error: "Workspace not found" });
+        workspace = await storage.createWorkspace({
+          trainerId: req.user.id,
+          name: `${req.user.username}'s Workspace`,
+        });
       }
       res.json(workspace);
     } catch (error: any) {
