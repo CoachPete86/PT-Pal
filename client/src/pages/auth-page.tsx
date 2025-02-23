@@ -52,8 +52,13 @@ export default function AuthPage() {
     try {
       await loginMutation.mutateAsync(data);
       setLocation("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: error.response?.data?.error || "Failed to login. Please check your credentials.",
+        variant: "destructive"
+      });
     }
   };
 

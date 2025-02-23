@@ -66,8 +66,8 @@ export function setupAuth(app: Express) {
           console.log(`Attempting login for email: ${email}`);
           const user = await storage.getUserByEmail(email);
           if (!user) {
-            console.log('User not found');
-            return done(null, false, { message: "Invalid email or password" });
+            console.log('User not found during login attempt');
+            return done(null, false, { message: "Invalid credentials - no user found with this email" });
           }
           const isValid = await comparePasswords(password, user.password);
           console.log(`Password validation result: ${isValid}`);
