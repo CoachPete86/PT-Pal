@@ -529,12 +529,12 @@ The response must be a valid JSON object with this exact structure:
         });
       }
 
-      // Get workspace for the trainer
-      const workspace = await storage.getWorkspaceByTrainer(req.user.id);
+      // Get or create workspace for the trainer
+      let workspace = await storage.getWorkspaceByTrainer(req.user.id);
       if (!workspace) {
-        return res.status(404).json({
-          error: "Workspace not found",
-          message: "Trainer workspace must be set up first"
+        workspace = await storage.createWorkspace({
+          trainerId: req.user.id,
+          name: `${req.user.username}'s Workspace`,
         });
       }
 
