@@ -700,6 +700,246 @@ The response must be a valid JSON object with this exact structure:
     }
   });
 
+  // Nutrition Tracking endpoints
+  app.get("/api/nutrition/entries", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const { from, to, clientId } = req.query;
+
+      // Allow trainers to view their clients' entries
+      const userId = clientId && req.user.role === 'trainer'
+        ? parseInt(clientId as string)
+        : req.user.id;
+
+      const dateFilter: any = {};
+      if (from) dateFilter.from = new Date(from as string);
+      if (to) dateFilter.to = new Date(to as string);
+
+      const entries = await storage.getNutritionEntries(userId, dateFilter);
+      res.json(entries);
+    } catch (error: any) {
+      console.error("Error fetching nutrition entries:", error);
+      res.status(500).json({
+        error: "Failed to fetch nutrition entries",
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/nutrition/entries", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const entry = await storage.createNutritionEntry({
+        userId: req.user.id,
+        ...req.body,
+      });
+      res.json(entry);
+    } catch (error: any) {
+      console.error("Error creating nutrition entry:", error);
+      res.status(500).json({
+        error: "Failed to create nutrition entry",
+        message: error.message
+      });
+    }
+  });
+
+  app.get("/api/nutrition/meal-plans", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const { clientId } = req.query;
+
+      let mealPlans;
+      if (req.user.role === 'trainer') {
+        if (clientId) {
+          // Trainer viewing specific client's meal plans
+          mealPlans = await storage.getMealPlansByClient(parseInt(clientId as string));
+        } else {
+          // Trainer viewing all their created meal plans
+          mealPlans = await storage.getMealPlansByTrainer(req.user.id);
+        }
+      } else {
+        // Client viewing their meal plans
+        mealPlans = await storage.getMealPlansByClient(req.user.id);
+      }
+
+      res.json(mealPlans);
+    } catch (error: any) {
+      console.error("Error fetching meal plans:", error);
+      res.status(500).json({
+        error: "Failed to fetch meal plans",
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/nutrition/meal-plans", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      if (req.user.role !== 'trainer') {
+        return res.status(403).json({
+          error: "Permission denied",
+          message: "Only trainers can create meal plans"
+        });
+      }
+
+      const mealPlan = await storage.createMealPlan({
+        trainerId: req.user.id,
+        ...req.body,
+      });
+
+      res.json(mealPlan);
+    } catch (error: any) {
+      console.error("Error creating meal plan:", error);
+      res.status(500).json({
+        error: "Failed to create meal plan",
+        message: error.message
+      });
+    }
+  });
+
+  // Nutrition AI endpoints
+  app.post("/api/nutrition/generate-meal-plan", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return res.status(500).json({
+          error: 'API key missing',
+          details: 'Anthropic API key is not configured'
+        });
+      }
+
+      const {
+        clientData,
+        preferences,
+        dietaryRestrictions,
+        goals,
+        nutritionRatios,
+        duration, // days
+        mealsPerDay
+      } = req.body;
+
+      // Build the prompt for Claude
+      let prompt = `Create a personalized meal plan based on the following information:
+
+Client Information:
+- Age: ${clientData?.age || 'Not specified'}
+- Gender: ${clientData?.gender || 'Not specified'}
+- Weight: ${clientData?.weight || 'Not specified'}
+- Height: ${clientData?.height || 'Not specified'}
+- Activity Level: ${clientData?.activityLevel || 'Moderate'}
+
+Dietary Preferences:
+${preferences?.preferred ? `- Preferred Foods: ${preferences.preferred.join(', ')}` : ''}
+${preferences?.disliked ? `- Disliked Foods: ${preferences.disliked.join(', ')}` : ''}
+
+Dietary Restrictions:
+${dietaryRestrictions?.map(r => `- ${r}`).join('\n') || 'None specified'}
+
+Goals:
+${goals?.map(g => `- ${g}`).join('\n') || 'Balanced nutrition'}
+
+Nutrition Ratios:
+- Protein: ${nutritionRatios?.protein || '25%'}
+- Carbs: ${nutritionRatios?.carbs || '50%'}
+- Fats: ${nutritionRatios?.fats || '25%'}
+
+Duration: ${duration || 7} days
+Meals Per Day: ${mealsPerDay || 3}
+
+Please create a structured meal plan with the following:
+1. Daily caloric target
+2. Macro breakdown per day
+3. Each meal with ingredients, preparation instructions, and nutrition information
+4. A weekly grocery list
+
+Present the meal plan in a structured JSON format.`;
+
+      // Call Anthropic API to generate the plan
+      const message = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 4000,
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+      });
+
+      // Parse the JSON content from the response
+      const responseText = message.content[0].text;
+      const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
+        responseText.match(/```\n([\s\S]*?)```/) ||
+        responseText.match(/{[\s\S]*}/);
+
+      let plan;
+
+      if (jsonMatch) {
+        try {
+          plan = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+
+          // Save the generated plan if the user is authenticated
+          if (req.user) {
+            try {
+              const mealPlan = await storage.createMealPlan({
+                trainerId: req.user.id,
+                clientId: req.body.clientId,
+                title: `${duration || 7}-Day Meal Plan`,
+                content: plan,
+                startDate: new Date(),
+                endDate: new Date(Date.now() + (duration || 7) * 24 * 60 * 60 * 1000),
+                status: 'active',
+              });
+
+              return res.status(201).json({
+                success: true,
+                plan,
+                mealPlanId: mealPlan.id
+              });
+            } catch (error) {
+              console.error("Error saving meal plan", error);
+              // Still return the generated plan but with a warning
+              return res.status(200).json({
+                success: true,
+                plan,
+                warning: "Plan was generated but could not besaved to database"
+              });
+            }
+          } else {
+            // Return the plan without saving it
+            return res.status(200).json({
+              success: true,
+              plan
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing JSON from Anthropic response", error);
+          return res.status(500).json({
+            error: "Failed to parse meal plan",
+            details: "The AI generated an invalid JSON response"
+          });
+        }
+      } else {
+        return res.status(500).json({
+          error: "Invalid response format",
+          details: "The AI didn't return a properly formatted meal plan"
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating meal plan:", error);
+      return res.status(500).json({
+        error: "Failed to generate meal plan",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Messages endpoints
   app.get("/api/messages", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
