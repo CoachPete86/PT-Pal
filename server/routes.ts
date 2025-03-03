@@ -949,27 +949,27 @@ Present the meal plan in a structured JSON format.`;
 
   app.post("/api/messages", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    
+
     try {
       // Check required fields
       const { content, recipientId, workspaceId } = req.body;
-      
+
       if (!content || !recipientId || !workspaceId) {
         return res.status(400).json({ 
           error: "Missing required fields", 
           message: "Content, recipientId, and workspaceId are required" 
         });
       }
-      
+
       const message = await storage.createMessage({
         senderId: req.user.id,
         content,
         recipientId,
         workspaceId
       });
-      
+
       res.json(message);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating message:", error);
       res.status(500).json({
         error: "Failed to create message",
