@@ -2,6 +2,50 @@ import { pgTable, text, integer, timestamp, boolean, jsonb } from "drizzle-orm/p
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Define user preferences type for better type safety
+export const userPreferencesSchema = z.object({
+  // Basic Profile
+  gender: z.enum(['male', 'female', 'other', 'prefer-not-to-say']).optional(),
+  birthdate: z.string().optional(),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  emergencyPhone: z.string().optional(),
+
+  // Physical Information
+  height: z.number().optional(),
+  weight: z.number().optional(),
+  bodyFatPercentage: z.number().optional(),
+
+  // Fitness Profile
+  fitnessLevel: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  fitnessGoals: z.array(z.string()).optional(),
+  preferredWorkoutTimes: z.array(z.string()).optional(),
+  availableDays: z.array(z.string()).optional(),
+  previousExperience: z.string().optional(),
+  preferredActivities: z.array(z.string()).optional(),
+  dislikedExercises: z.array(z.string()).optional(),
+
+  // Health Information
+  medicalConditions: z.string().optional(),
+  injuries: z.string().optional(),
+  medications: z.string().optional(),
+  allergies: z.string().optional(),
+  hasInitialAssessment: z.boolean().optional(),
+  healthConditions: z.string().optional(),
+
+  // Nutrition Information
+  dietaryRestrictions: z.array(z.string()).optional(),
+  mealsPerDay: z.number().optional(),
+  supplementsUsed: z.string().optional(),
+  waterIntake: z.string().optional(),
+
+  // Goals & Notes
+  goals: z.string().optional(),
+});
+
+export type UserPreferences = z.infer<typeof userPreferencesSchema>;
+
 // Core tables
 export const users = pgTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
@@ -25,6 +69,7 @@ export const users = pgTable("users", {
   lastActive: timestamp("last_active"),
   profilePicture: text("profile_picture"),
   preferences: jsonb("preferences").default({}).notNull(),
+  status: text("status", { enum: ["active", "inactive"] }).default("active").notNull(),
 });
 
 // Add branding table first since workspaces reference it
@@ -469,10 +514,12 @@ export const insertUserSchema = createInsertSchema(users)
     lastActive: true,
     preferences: true,
     profilePicture: true,
+    status: true,
   })
   .extend({
     password: z.string().min(8, "Password must be at least 8 characters"),
     email: z.string().email("Invalid email address"),
+    preferences: userPreferencesSchema.optional(),
   });
 
 export const insertBrandingSchema = createInsertSchema(branding)
@@ -482,7 +529,9 @@ export const insertBrandingSchema = createInsertSchema(branding)
     updatedAt: true,
   });
 
-export type User = typeof users.$inferSelect;
+export type User = typeof users.$inferSelect & {
+  preferences: UserPreferences;
+};
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Workspace = typeof workspaces.$inferSelect;
 export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;

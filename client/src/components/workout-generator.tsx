@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -54,8 +55,12 @@ import {
   Target,
   Timer,
   Users,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { User } from "@shared/schema";
 
 interface WorkoutPlan {
   id?: number;
@@ -92,6 +97,7 @@ interface WorkoutPlan {
   };
 }
 
+// Add validation schema with conditional fields based on session type
 const workoutFormSchema = z.object({
   sessionType: z.enum(["group", "personal"]),
   planType: z.enum(["oneoff", "program"]),
@@ -103,7 +109,7 @@ const workoutFormSchema = z.object({
     groupSize: z.string().transform((val) => parseInt(val) || 0).optional(),
   }).optional(),
   circuitPreferences: z.object({
-    types: z.array(z.string()),
+    types: z.array(z.string()).min(1, "Select at least one circuit type"),
     stationRotation: z.boolean(),
     restBetweenStations: z.boolean(),
     mixedEquipmentStations: z.boolean(),
@@ -114,7 +120,7 @@ const workoutFormSchema = z.object({
     restInterval: z.number().optional(),
     rounds: z.number().optional(),
   }).optional(),
-  equipment: z.array(z.string()),
+  equipment: z.array(z.string()).min(1, "Select at least one equipment item"),
   clientDetails: z.object({
     age: z.string(),
     gender: z.enum(["male", "female", "other"]),
@@ -123,14 +129,15 @@ const workoutFormSchema = z.object({
     experience: z.string(),
   }).optional(),
   programDetails: z.object({
-    weeks: z.number(),
-    sessionsPerWeek: z.number(),
+    weeks: z.number().min(1).max(24),
+    sessionsPerWeek: z.number().min(1).max(7),
   }).optional(),
+  useFullGym: z.boolean().default(false),
 });
 
 type WorkoutFormValues = z.infer<typeof workoutFormSchema>;
 
-// Base equipment categories that will be filtered based on context
+// Equipment categories with nested items
 const baseEquipment = {
   freeWeights: {
     category: "Free Weights",
@@ -203,6 +210,46 @@ const baseEquipment = {
   },
 };
 
+// Preset equipment groups for quick selection
+const equipmentPresets = [
+  {
+    id: "minimal",
+    name: "Minimal Setup",
+    description: "Basic equipment for home or limited gym access",
+    items: [
+      "dumbbells-light", "kettlebells-light", "resistance-bands", 
+      "yogamat", "jump-rope", "timer"
+    ]
+  },
+  {
+    id: "bodyweight",
+    name: "Bodyweight Focus",
+    description: "Equipment to enhance bodyweight training",
+    items: [
+      "trx", "resistance-bands", "yogamat", "timer", 
+      "agility-ladder", "plyobox"
+    ]
+  },
+  {
+    id: "standard-gym",
+    name: "Standard Gym",
+    description: "Common equipment found in most commercial gyms",
+    items: [
+      "dumbbells-light", "dumbbells-medium", "kettlebells-light",
+      "plates", "barbell", "cables", "trx", "treadmill",
+      "rower", "yogamat", "foam-roller"
+    ]
+  },
+  {
+    id: "full-gym",
+    name: "Full Gym",
+    description: "Complete access to all equipment",
+    items: Object.values(baseEquipment).flatMap(category => 
+      category.items.map(item => item.id)
+    )
+  }
+];
+
 // Circuit types
 const baseCircuitTypes = [
   { id: "timed", label: "Timed Circuits (Fixed Work/Rest)" },
@@ -240,13 +287,26 @@ const groupCircuitTypes = [
   { id: "bootcamp", label: "Bootcamp Style Formats" },
 ];
 
-export default function WorkoutGenerator() {
+interface WorkoutGeneratorProps {
+  clientId?: number;
+  onComplete?: () => void;
+}
+
+export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGeneratorProps) {
   const [sessionType, setSessionType] = useState<"group" | "personal">("group");
   const [planType, setPlanType] = useState<"oneoff" | "program">("oneoff");
   const [fitnessLevel, setFitnessLevel] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [selectedWorkoutPlan, setSelectedWorkoutPlan] = useState<WorkoutPlan | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // If clientId is provided, fetch client data
+  const { data: clientData } = useQuery<User>({
+    queryKey: ['/api/clients', clientId],
+    enabled: !!clientId,
+  });
 
   // Filter equipment based on context
   const getContextualEquipment = () => {
@@ -352,6 +412,7 @@ export default function WorkoutGenerator() {
       planType: "oneoff",
       fitnessLevel: "intermediate",
       equipment: [],
+      useFullGym: false,
       circuitPreferences: {
         types: [],
         stationRotation: true,
@@ -367,6 +428,52 @@ export default function WorkoutGenerator() {
     },
   });
 
+  // Pre-fill form with client data if available
+  useEffect(() => {
+    if (clientData) {
+      // Pre-populate form fields from client data
+      form.setValue("fitnessLevel", clientData.preferences?.fitnessLevel || "intermediate");
+
+      if (clientData.preferences?.gender) {
+        form.setValue("clientDetails.gender", clientData.preferences.gender as any);
+      }
+
+      if (clientData.preferences?.birthdate) {
+        // Calculate age from birthdate
+        const birthdate = new Date(clientData.preferences.birthdate);
+        const today = new Date();
+        const age = today.getFullYear() - birthdate.getFullYear();
+        form.setValue("clientDetails.age", age.toString());
+      }
+
+      if (clientData.preferences?.goals) {
+        form.setValue("clientDetails.goals", clientData.preferences.goals);
+      }
+
+      if (clientData.preferences?.injuries || clientData.preferences?.medicalConditions) {
+        form.setValue("clientDetails.limitations", 
+          [
+            clientData.preferences?.injuries, 
+            clientData.preferences?.medicalConditions
+          ].filter(Boolean).join(". ")
+        );
+      }
+
+      if (clientData.preferences?.previousExperience) {
+        form.setValue("clientDetails.experience", clientData.preferences.previousExperience);
+      }
+
+      // If client has disliked exercises, we'll avoid these in the workout
+      if (clientData.preferences?.dislikedExercises?.length) {
+        // This would be used in the API call later
+      }
+
+      // Default to personal training when used in client profile
+      form.setValue("sessionType", "personal");
+      setSessionType("personal");
+    }
+  }, [clientData, form]);
+
   // Update form values when session type changes
   useEffect(() => {
     // Reset relevant form fields when session type changes
@@ -374,18 +481,26 @@ export default function WorkoutGenerator() {
       form.setValue("planType", "oneoff");
       form.setValue("circuitPreferences.types", []);
       form.setValue("equipment", []);
+      setPlanType("oneoff");
     } else {
       // Personal training default values
       form.setValue("circuitPreferences.types", []);
       form.setValue("equipment", []);
+
+      // Only show program option in client profile view
+      if (!clientId) {
+        form.setValue("planType", "oneoff");
+        setPlanType("oneoff");
+      }
     }
-  }, [sessionType, form]);
+  }, [sessionType, form, clientId]);
 
   // Update form values when fitness level changes
   useEffect(() => {
     // Reset equipment and circuit types when fitness level changes
     form.setValue("circuitPreferences.types", []);
     form.setValue("equipment", []);
+    setSelectedPreset(null);
   }, [fitnessLevel, form]);
 
   // Update form values when plan type changes
@@ -394,24 +509,52 @@ export default function WorkoutGenerator() {
       // Reset relevant fields when plan type changes
       form.setValue("circuitPreferences.types", []);
       form.setValue("equipment", []);
+      setSelectedPreset(null);
     }
   }, [planType, sessionType, form]);
 
+  // Update equipment when preset changes
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPreset(presetId);
+    const preset = equipmentPresets.find(p => p.id === presetId);
+    if (preset) {
+      form.setValue("equipment", preset.items);
+
+      if (presetId === "full-gym") {
+        form.setValue("useFullGym", true);
+      } else {
+        form.setValue("useFullGym", false);
+      }
+    }
+  };
+
   const generateMutation = useMutation({
     mutationFn: async (values: WorkoutFormValues) => {
-      const res = await apiRequest("POST", "/api/generate-workout", values);
+      setIsGenerating(true);
+
+      // Add client data to the request if available
+      const requestData = clientId ? { ...values, clientId } : values;
+
+      const res = await apiRequest("POST", "/api/generate-workout", requestData);
       const data = await res.json();
       if (data.error) throw new Error(data.details || data.error);
       return data.plan as WorkoutPlan;
     },
     onSuccess: (data) => {
       setSelectedWorkoutPlan(data);
+      setIsGenerating(false);
       toast({
         title: "Workout Plan Generated",
         description: "Your workout plan has been generated successfully.",
       });
+
+      if (onComplete) {
+        // Notify parent component that generation is complete
+        onComplete();
+      }
     },
     onError: (error: Error) => {
+      setIsGenerating(false);
       toast({
         title: "Error",
         description: error.message,
@@ -495,17 +638,53 @@ export default function WorkoutGenerator() {
       if (name === "fitnessLevel" && value.fitnessLevel) {
         setFitnessLevel(value.fitnessLevel as "beginner" | "intermediate" | "advanced");
       }
+
+      // Reset preset selection if equipment selection changes manually
+      if (name === "equipment" && selectedPreset && 
+          JSON.stringify(value.equipment) !== JSON.stringify(equipmentPresets.find(p => p.id === selectedPreset)?.items)) {
+        setSelectedPreset(null);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form.watch, selectedPreset]);
 
   // Get contextual equipment and circuit types
   const availableEquipment = getContextualEquipment();
   const circuitTypes = getContextualCircuitTypes();
 
+  // Filter equipment presets based on fitness level and session type
+  const filteredPresets = equipmentPresets.filter(preset => {
+    if (preset.id === "full-gym") return true; // Always show full gym option
+
+    if (sessionType === "personal") {
+      if (fitnessLevel === "beginner" && preset.id === "minimal") return true;
+      if (fitnessLevel === "intermediate") return preset.id !== "full-gym";
+      return true; // Show all presets for advanced
+    } else {
+      // For group sessions
+      if (fitnessLevel === "beginner") return preset.id === "minimal" || preset.id === "bodyweight";
+      if (fitnessLevel === "intermediate") return preset.id !== "full-gym";
+      return true; // Show all presets for advanced
+    }
+  });
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Full-screen loading overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <h2 className="text-xl font-semibold">Generating Your Workout Plan</h2>
+            <p className="text-muted-foreground text-center max-w-md">
+              Coach Pete is designing a personalized workout plan based on your preferences.
+              This may take a moment...
+            </p>
+          </div>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Workout Plan Generator</CardTitle>
@@ -519,42 +698,45 @@ export default function WorkoutGenerator() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="sessionType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Type</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setSessionType(value as "group" | "personal");
-                        }}
-                        defaultValue={field.value}
-                        className="flex gap-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="group" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Group Class
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="personal" />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            Personal Training
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {/* Only show session type selection when not in client profile */}
+              {!clientId && (
+                <FormField
+                  control={form.control}
+                  name="sessionType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Session Type</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSessionType(value as "group" | "personal");
+                          }}
+                          defaultValue={field.value}
+                          className="flex gap-4"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="group" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Group Class
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="personal" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Personal Training
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {sessionType === "group" ? (
                 <>
@@ -776,6 +958,7 @@ export default function WorkoutGenerator() {
                               />
                             ))}
                           </div>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -843,7 +1026,7 @@ export default function WorkoutGenerator() {
                                 Mixed Equipment Stations
                               </FormLabel>
                               <FormDescription>
-                                Allow multiple equipment types per station
+                                Allow different equipment at each station
                               </FormDescription>
                             </div>
                           </FormItem>
@@ -871,21 +1054,21 @@ export default function WorkoutGenerator() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="beginner">Beginner-Friendly</SelectItem>
+                            <SelectItem value="beginner">Beginner</SelectItem>
                             <SelectItem value="intermediate">Intermediate</SelectItem>
                             <SelectItem value="advanced">Advanced</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          This will adjust the difficulty and complexity of exercises for the whole group
+                          This determines exercise selection and intensity
                         </FormDescription>
                       </FormItem>
                     )}
                   />
                 </>
               ) : (
-                // Personal Training fields
                 <>
+                  {/* Personal Training Options */}
                   <FormField
                     control={form.control}
                     name="planType"
@@ -908,105 +1091,109 @@ export default function WorkoutGenerator() {
                               Single Session
                             </FormLabel>
                           </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                              <RadioGroupItem value="program" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                              12-Week Program
-                            </FormLabel>
-                          </FormItem>
+                          {/* Only show program option when in client profile */}
+                          {clientId && (
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="program" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                12-Week Program
+                              </FormLabel>
+                            </FormItem>
+                          )}
                         </RadioGroup>
                       </FormItem>
                     )}
                   />
 
-                  {/* Client Details - Only for Personal Training */}
+                  {/* Client Details Section */}
                   <div className="space-y-4">
                     <FormLabel>Client Details</FormLabel>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="clientDetails.age"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Age</FormLabel>
-                            <FormControl>
-                              <Input type="number" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="clientDetails.gender"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Gender</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {!clientId && (
+                        <>
+                          <FormField
+                            control={form.control}
+                            name="clientDetails.age"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Age</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="clientDetails.gender"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Gender</FormLabel>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select gender" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="female">Female</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
+                      {(!clientId || !clientData?.preferences?.goals) && (
+                        <FormField
+                          control={form.control}
+                          name="clientDetails.goals"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-2">
+                              <FormLabel>Fitness Goals</FormLabel>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select gender" />
-                                </SelectTrigger>
+                                <Input {...field} />
                               </FormControl>
-                              <SelectContent>
-                                <SelectItem value="male">Male</SelectItem>
-                                <SelectItem value="female">Female</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormItem>
-                        )}
-                      />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      {(!clientId || !clientData?.preferences?.injuries) && (
+                        <FormField
+                          control={form.control}
+                          name="clientDetails.limitations"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-2">
+                              <FormLabel>Physical Limitations or Injuries</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      {(!clientId || !clientData?.preferences?.previousExperience) && (
+                        <FormField
+                          control={form.control}
+                          name="clientDetails.experience"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-2">
+                              <FormLabel>Exercise Experience</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </div>
-
-                    <FormField
-                      control={form.control}
-                      name="clientDetails.goals"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Fitness Goals</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g., Weight loss, muscle gain, endurance"
-                              {...field}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="clientDetails.limitations"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Limitations or Injuries</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Any physical limitations or injuries"
-                              {...field}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="clientDetails.experience"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Experience Level</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Describe their experience" {...field} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
                   </div>
 
                   {/* Program Details - Only for 12-Week Program */}
@@ -1103,6 +1290,7 @@ export default function WorkoutGenerator() {
                               />
                             ))}
                           </div>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -1141,26 +1329,79 @@ export default function WorkoutGenerator() {
                 </>
               )}
 
-              {/* Equipment Selection - Common for both types but filtered based on context */}
-              <FormField
-                control={form.control}
-                name="equipment"
-                render={() => (
-                  <FormItem>
-                    <div className="mb-4">
-                      <FormLabel>Available Equipment</FormLabel>
-                      <FormDescription>
-                        Select the equipment you want to include in the workout
-                      </FormDescription>
-                    </div>
-                    <div className="space-y-6">
-                      {availableEquipment.map((category) => (
-                        <div key={category.category} className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <category.icon className="h-5 w-5 text-muted-foreground" />
+              {/* Equipment Selection - Improved UI with presets and accordion */}
+              <div className="space-y-4">
+                <FormLabel>Equipment Selection</FormLabel>
+
+                {/* Equipment Presets */}
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium mb-2">Equipment Presets</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {filteredPresets.map(preset => (
+                      <Button
+                        key={preset.id}
+                        type="button"
+                        variant={selectedPreset === preset.id ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => handlePresetChange(preset.id)}
+                      >
+                        {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2" />}
+                        {preset.name}
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {selectedPreset ? 
+                      equipmentPresets.find(p => p.id === selectedPreset)?.description :
+                      "Select a preset or customize your equipment selection below"}
+                  </p>
+                </div>
+
+                {/* Show Full Gym checkbox */}
+                <FormField
+                  control={form.control}
+                  name="useFullGym"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 border p-3 rounded-md mb-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (checked) {
+                              handlePresetChange("full-gym");
+                            } else if (selectedPreset === "full-gym") {
+                              setSelectedPreset(null);
+                              form.setValue("equipment", []);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="font-medium">
+                          Use Full Gym Equipment
+                        </FormLabel>
+                        <FormDescription>
+                          Enables access to all equipment for maximum workout variety
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Detailed Equipment Selection with Accordions */}
+                {!form.watch("useFullGym") && (
+                  <Accordion type="multiple" className="w-full">
+                    {availableEquipment.map((category) => (
+                      <AccordionItem key={category.category} value={category.category}>
+                        <AccordionTrigger className="py-2">
+                          <div className="flex items-center">
+                            <category.icon className="h-5 w-5 mr-2 text-muted-foreground" />
                             <h4 className="font-medium">{category.category}</h4>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ml-7">
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-7">
                             {category.items.map((item) => (
                               <FormField
                                 key={item.id}
@@ -1175,13 +1416,14 @@ export default function WorkoutGenerator() {
                                       <Checkbox
                                         checked={field.value?.includes(item.id)}
                                         onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...field.value, item.id])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item.id
-                                                )
-                                              )
+                                          const newEquipment = checked
+                                            ? [...field.value, item.id]
+                                            : field.value?.filter(
+                                                (value) => value !== item.id
+                                              );
+
+                                          field.onChange(newEquipment);
+                                          setSelectedPreset(null);
                                         }}
                                       />
                                     </FormControl>
@@ -1198,17 +1440,25 @@ export default function WorkoutGenerator() {
                               />
                             ))}
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </FormItem>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 )}
-              />
+
+                <FormField
+                  control={form.control}
+                  name="equipment"
+                  render={({ field }) => (
+                    <FormMessage />
+                  )}
+                />
+              </div>
 
               <Button
                 type="submit"
-                disabled={generateMutation.isPending}
                 className="w-full"
+                disabled={generateMutation.isPending}
               >
                 {generateMutation.isPending ? (
                   <>
@@ -1224,6 +1474,7 @@ export default function WorkoutGenerator() {
         </CardContent>
       </Card>
 
+      {/* Display the generated workout plan */}
       {selectedWorkoutPlan && (
         <Card>
           <CardHeader>
@@ -1237,13 +1488,11 @@ export default function WorkoutGenerator() {
                   disabled={exportPdfMutation.isPending}
                 >
                   {exportPdfMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
-                    <>
-                      <Download className="h-4 w-4 mr-2" />
-                      {selectedWorkoutPlan.id ? "Export PDF" : "Download JSON"}
-                    </>
+                    <FileText className="h-4 w-4 mr-2" />
                   )}
+                  Export PDF
                 </Button>
               </div>
             </CardTitle>
@@ -1252,158 +1501,158 @@ export default function WorkoutGenerator() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-                    <div className="space-y-6">
-                      {/* Introduction */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Introduction</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-medium">Intensity</h4>
-                            <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.intensity}</p>
-                          </div>
-                          <div>
-                            <h4 className="font-medium">Preparation</h4>
-                            <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.preparation}</p>
-                          </div>
-                        </div>
+            <div className="space-y-6">
+              {/* Introduction */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Introduction</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium">Intensity</h4>
+                    <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.intensity}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Preparation</h4>
+                    <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.preparation}</p>
+                  </div>
+                </div>
 
-                        <div>
-                          <h4 className="font-medium">Objectives</h4>
-                          <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                            {selectedWorkoutPlan.introduction.objectives.map((objective, index) => (
-                              <li key={index}>{objective}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
+                <div>
+                  <h4 className="font-medium">Objectives</h4>
+                  <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                    {selectedWorkoutPlan.introduction.objectives.map((objective, index) => (
+                      <li key={index}>{objective}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
 
-                      {/* Main Workout */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Main Workout</h3>
+              {/* Main Workout */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Main Workout</h3>
 
-                        {selectedWorkoutPlan.mainWorkout.map((circuit, index) => (
-                          <Card key={index} className="border border-border">
-                            <CardHeader className="pb-2">
-                              <CardTitle className="text-base">Circuit {circuit.circuitNumber}</CardTitle>
-                              <CardDescription>{circuit.objective}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                              <p className="text-sm">{circuit.explanation}</p>
-                              <p className="text-sm font-medium">Setup: {circuit.setupInstructions}</p>
+                {selectedWorkoutPlan.mainWorkout.map((circuit, index) => (
+                  <Card key={index} className="border border-border">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Circuit {circuit.circuitNumber}</CardTitle>
+                      <CardDescription>{circuit.objective}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm">{circuit.explanation}</p>
+                      <p className="text-sm font-medium">Setup: {circuit.setupInstructions}</p>
 
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Exercise</TableHead>
-                                    <TableHead>Sets</TableHead>
-                                    <TableHead>Reps</TableHead>
-                                    <TableHead>Technique</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {circuit.exercises.map((exercise, exIndex) => (
-                                    <TableRow key={exIndex}>
-                                      <TableCell className="font-medium">{exercise.exercise}</TableCell>
-                                      <TableCell>{exercise.sets}</TableCell>
-                                      <TableCell>{exercise.reps}</TableCell>
-                                      <TableCell className="max-w-[300px]">
-                                        <AlertDialog>
-                                          <AlertDialogTrigger asChild>
-                                            <Button variant="link" className="p-0 h-auto">View Technique</Button>
-                                          </AlertDialogTrigger>
-                                          <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                              <AlertDialogTitle>{exercise.exercise}</AlertDialogTitle>
-                                              <AlertDialogDescription>
-                                                <div className="space-y-4">
-                                                  <div>
-                                                    <h4 className="font-bold">Technique:</h4>
-                                                    <p>{exercise.technique}</p>
-                                                  </div>
-                                                  {(exercise.men || exercise.woman) && (
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                      {exercise.men && (
-                                                        <div>
-                                                          <h4 className="font-bold">Men:</h4>
-                                                          <p>{exercise.men}</p>
-                                                        </div>
-                                                      )}
-                                                      {exercise.woman && (
-                                                        <div>
-                                                          <h4 className="font-bold">Women:</h4>
-                                                          <p>{exercise.woman}</p>
-                                                        </div>
-                                                      )}
-                                                    </div>
-                                                  )}
-                                                  {exercise.notes && (
-                                                    <div>
-                                                      <h4 className="font-bold">Notes:</h4>
-                                                      <p>{exercise.notes}</p>
-                                                    </div>
-                                                  )}
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Exercise</TableHead>
+                            <TableHead>Sets</TableHead>
+                            <TableHead>Reps</TableHead>
+                            <TableHead>Technique</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {circuit.exercises.map((exercise, exIndex) => (
+                            <TableRow key={exIndex}>
+                              <TableCell className="font-medium">{exercise.exercise}</TableCell>
+                              <TableCell>{exercise.sets}</TableCell>
+                              <TableCell>{exercise.reps}</TableCell>
+                              <TableCell className="max-w-[300px]">
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="link" className="p-0 h-auto">View Technique</Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>{exercise.exercise}</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        <div className="space-y-4">
+                                          <div>
+                                            <h4 className="font-bold">Technique:</h4>
+                                            <p>{exercise.technique}</p>
+                                          </div>
+                                          {(exercise.men || exercise.woman) && (
+                                            <div className="grid grid-cols-2 gap-4">
+                                              {exercise.men && (
+                                                <div>
+                                                  <h4 className="font-bold">Men:</h4>
+                                                  <p>{exercise.men}</p>
                                                 </div>
-                                              </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                              <AlertDialogAction>Close</AlertDialogAction>
-                                            </AlertDialogFooter>
-                                          </AlertDialogContent>
-                                        </AlertDialog>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                                              )}
+                                              {exercise.woman && (
+                                                <div>
+                                                  <h4 className="font-bold">Women:</h4>
+                                                  <p>{exercise.woman}</p>
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
+                                          {exercise.notes && (
+                                            <div>
+                                              <h4 className="font-bold">Notes:</h4>
+                                              <p>{exercise.notes}</p>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogAction>Close</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-                      {/* Recovery */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Recovery</h3>
+              {/* Recovery */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Recovery</h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-medium">Immediate Steps</h4>
-                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                              {selectedWorkoutPlan.recovery.immediateSteps.map((step, index) => (
-                                <li key={index}>{step}</li>
-                              ))}
-                            </ul>
-                          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium">Immediate Steps</h4>
+                    <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                      {selectedWorkoutPlan.recovery.immediateSteps.map((step, index) => (
+                        <li key={index}>{step}</li>
+                      ))}
+                    </ul>
+                  </div>
 
-                          <div>
-                            <h4 className="font-medium">Nutrition Tips</h4>
-                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                              {selectedWorkoutPlan.recovery.nutritionTips.map((tip, index) => (
-                                <li key={index}>{tip}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                  <div>
+                    <h4 className="font-medium">Nutrition Tips</h4>
+                    <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                      {selectedWorkoutPlan.recovery.nutritionTips.map((tip, index) => (
+                        <li key={index}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-medium">Rest Recommendations</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedWorkoutPlan.recovery.restRecommendations}
-                            </p>
-                          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium">Rest Recommendations</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedWorkoutPlan.recovery.restRecommendations}
+                    </p>
+                  </div>
 
-                          <div>
-                            <h4 className="font-medium">Next Day Guidance</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedWorkoutPlan.recovery.nextDayGuidance}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-            </Card>
-          )}
-        </div>
-      );
-    }
+                  <div>
+                    <h4 className="font-medium">Next Day Guidance</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedWorkoutPlan.recovery.nextDayGuidance}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
