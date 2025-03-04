@@ -111,6 +111,23 @@ interface WorkoutPlan {
 // Add validation schema with conditional fields based on session type
 // Update schema to include session type
 type SessionType = "group" | "personal";
+type ClassFormatType = "amrap" | "emom" | "tabata" | "rep-based" | "timed-sets" | "ladder" | "pyramid" | "complex" | "chipper" | "custom";
+
+interface ClassFormat {
+  type: ClassFormatType;
+  workInterval?: number;
+  restInterval?: number;
+  rounds?: number;
+  description?: string;
+}
+
+interface ClassFormatTemplate {
+  id: string;
+  name: string;
+  classType: string;
+  description: string;
+  formats: ClassFormat[];
+}
 
 const workoutFormSchema = z.object({
   sessionType: z.enum(["group", "personal"]),
@@ -450,6 +467,158 @@ const classFormatOptions = [
   { id: "custom", name: "Custom Format", description: "Create your own workout format" }
 ];
 
+// Class format templates for different class types
+const classFormatTemplates = [
+  {
+    id: "hiit-standard",
+    name: "Standard HIIT",
+    classType: "hiit",
+    description: "Classic high-intensity interval training with work/rest periods",
+    formats: [
+      { 
+        type: "tabata", 
+        workInterval: 20, 
+        restInterval: 10, 
+        rounds: 8,
+        description: "Tabata Protocol - 20s work/10s rest × 8"
+      },
+      { 
+        type: "amrap", 
+        workInterval: 300, 
+        restInterval: 60, 
+        rounds: 3,
+        description: "5-minute AMRAP blocks with 1-minute rest between rounds"
+      }
+    ]
+  },
+  {
+    id: "hiit-pyramid",
+    name: "HIIT Pyramid",
+    classType: "hiit",
+    description: "Increasing then decreasing work intervals",
+    formats: [
+      { 
+        type: "timed-sets", 
+        workInterval: 30, 
+        restInterval: 15, 
+        rounds: 5,
+        description: "Build-up phase: 30s work/15s rest × 5"
+      },
+      { 
+        type: "pyramid", 
+        workInterval: 45, 
+        restInterval: 15, 
+        rounds: 3,
+        description: "Peak phase: 45s work/15s rest × 3"
+      },
+      { 
+        type: "timed-sets", 
+        workInterval: 30, 
+        restInterval: 15, 
+        rounds: 5,
+        description: "Decrease phase: 30s work/15s rest × 5"
+      }
+    ]
+  },
+  {
+    id: "strength-circuit",
+    name: "Strength Circuit",
+    classType: "strength",
+    description: "Progressive strength-building circuit",
+    formats: [
+      { 
+        type: "emom", 
+        workInterval: 50, 
+        restInterval: 10, 
+        rounds: 10,
+        description: "Strength EMOM: 50s work/10s transition × 10 minutes"
+      },
+      { 
+        type: "timed-sets", 
+        workInterval: 40, 
+        restInterval: 20, 
+        rounds: 4,
+        description: "Heavy compound exercises: 40s work/20s rest × 4"
+      }
+    ]
+  },
+  {
+    id: "bootcamp-mixed",
+    name: "Mixed Bootcamp",
+    classType: "bootcamp",
+    description: "Varied format bootcamp with strength and cardio",
+    formats: [
+      { 
+        type: "amrap", 
+        workInterval: 360, 
+        restInterval: 60, 
+        rounds: 3,
+        description: "6-minute AMRAP circuits with 1-minute rest"
+      },
+      { 
+        type: "tabata", 
+        workInterval: 20, 
+        restInterval: 10, 
+        rounds: 8,
+        description: "Cardio Tabata burst"
+      },
+      { 
+        type: "rep-based", 
+        rounds: 3,
+        description: "Strength finisher: 3 rounds of fixed reps"
+      }
+    ]
+  },
+  {
+    id: "endurance",
+    name: "Endurance Training",
+    classType: "cardio",
+    description: "Long-format endurance workout",
+    formats: [
+      { 
+        type: "timed-sets", 
+        workInterval: 120, 
+        restInterval: 30, 
+        rounds: 5,
+        description: "Long endurance blocks: 2 min work/30s rest × 5"
+      },
+      { 
+        type: "ladder", 
+        rounds: 5,
+        description: "Decreasing intensity ladder: 5 rounds with decreasing work"
+      }
+    ]
+  },
+  {
+    id: "circuit-training",
+    name: "Classic Circuit",
+    classType: "circuit",
+    description: "Traditional circuit training format",
+    formats: [
+      { 
+        type: "timed-sets", 
+        workInterval: 45, 
+        restInterval: 15, 
+        rounds: 3,
+        description: "Circuit 1: 45s work/15s rest × 3 rounds"
+      },
+      { 
+        type: "timed-sets", 
+        workInterval: 30, 
+        restInterval: 10, 
+        rounds: 4,
+        description: "Circuit 2: 30s work/10s rest × 4 rounds"
+      },
+      { 
+        type: "amrap", 
+        workInterval: 180, 
+        rounds: 1,
+        description: "Finisher: 3-minute AMRAP challenge"
+      }
+    ]
+  }
+];
+
 // Circuit types
 const baseCircuitTypes = [
   { id: "timed", label: "Timed Circuits (Fixed Work/Rest)" },
@@ -502,7 +671,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
   const [wizardStep, setWizardStep] = useState<number>(1);
   const [wizardEnabled, setWizardEnabled] = useState<boolean>(true);
   // New state for managing multiple class formats
-  const [classFormats, setClassFormats] = useState<Array<{ type: "amrap" | "emom" | "tabata" | "rep-based" | "timed-sets" | "ladder" | "pyramid" | "complex" | "chipper" | "custom", workInterval?: number, restInterval?: number, rounds?: number, description?: string }>>([]);
+  const [classFormats, setClassFormats] = useState<ClassFormat[]>([]);
   const [addingNewFormat, setAddingNewFormat] = useState(false);
   const [currentFormatIndex, setCurrentFormatIndex] = useState<number | null>(null);
   const { toast } = useToast();
@@ -896,8 +1065,26 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     exportPdfMutation.mutate(workoutId);
   };
 
+  // Load a class format template
+  const loadFormatTemplate = (templateId: string) => {
+    const template = classFormatTemplates.find(t => t.id === templateId);
+    if (template) {
+      const formats = template.formats.map(f => ({
+        ...f,
+        type: f.type as ClassFormatType
+      }));
+      setClassFormats(formats);
+      form.setValue('classFormats', formats);
+      
+      toast({
+        title: "Template Applied",
+        description: `Loaded "${template.name}" template with ${formats.length} format sections.`,
+      });
+    }
+  };
+
   // Add a class format
-  const addClassFormat = (format: { type: string, workInterval?: number, restInterval?: number, rounds?: number, description?: string }) => {
+  const addClassFormat = (format: ClassFormat) => {
     const currentFormats = form.getValues().classFormats || [];
     form.setValue('classFormats', [...currentFormats, format]);
     setClassFormats([...currentFormats, format]);
@@ -906,7 +1093,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
   };
 
   // Edit a class format
-  const editClassFormat = (index: number, format: { type: string, workInterval?: number, restInterval?: number, rounds?: number, description?: string }) => {
+  const editClassFormat = (index: number, format: ClassFormat) => {
     const currentFormats = [...(form.getValues().classFormats || [])];
     currentFormats[index] = format;
     form.setValue('classFormats', currentFormats);
@@ -1159,6 +1346,27 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                     <FormDescription>
                       Create a varied class with multiple workout formats (e.g., EMOM, Tabata, etc.)
                     </FormDescription>
+                    
+                    {/* Template selection */}
+                    <div className="mb-4">
+                      <h3 className="text-sm font-medium mb-2">Format Templates</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {classFormatTemplates
+                          .filter(template => !form.watch('classType') || template.classType === form.watch('classType'))
+                          .map(template => (
+                            <Button
+                              key={template.id}
+                              type="button"
+                              variant="outline"
+                              className="h-auto py-2 justify-start flex flex-col items-start text-left"
+                              onClick={() => loadFormatTemplate(template.id)}
+                            >
+                              <span className="font-medium">{template.name}</span>
+                              <span className="text-xs text-muted-foreground">{template.formats.length} format sections</span>
+                            </Button>
+                          ))}
+                      </div>
+                    </div>
                     
                     {/* List of added formats */}
                     {classFormats.length > 0 ? (
