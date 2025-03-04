@@ -57,10 +57,20 @@ import {
   Users,
   CheckCircle2,
   AlertCircle,
+  Home,
+  Building,
+  Warehouse,
+  Footprints,
+  Weight,
+  ChevronRight,
+  Zap,
+  LucideIcon
 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
 
 interface WorkoutPlan {
   id?: number;
@@ -133,6 +143,12 @@ const workoutFormSchema = z.object({
     sessionsPerWeek: z.number().min(1).max(7),
   }).optional(),
   useFullGym: z.boolean().default(false),
+  // New fields for the equipment wizard
+  wizardEnabled: z.boolean().default(true),
+  trainingLocation: z.enum(["commercial-gym", "home-gym", "outdoor", "hybrid"]).optional(),
+  workoutGoal: z.enum(["strength", "hypertrophy", "endurance", "weight-loss", "general-fitness"]).optional(),
+  equipmentAvailability: z.enum(["minimal", "moderate", "extensive"]).optional(),
+  specialtyEquipment: z.array(z.string()).default([]),
 });
 
 type WorkoutFormValues = z.infer<typeof workoutFormSchema>;
@@ -210,6 +226,103 @@ const baseEquipment = {
   },
 };
 
+// Training locations with equipment recommendations
+const trainingLocations = [
+  {
+    id: "commercial-gym",
+    name: "Commercial Gym",
+    icon: Building,
+    description: "Full-service fitness facility with extensive equipment options",
+    recommended: ["dumbbells-light", "dumbbells-medium", "dumbbells-heavy", "kettlebells-light", "kettlebells-heavy", 
+                 "barbell", "ez-curl", "plates", "cables", "rower", "treadmill"]
+  },
+  {
+    id: "home-gym",
+    name: "Home Gym",
+    icon: Home,
+    description: "Limited equipment in a home setting",
+    recommended: ["dumbbells-light", "dumbbells-medium", "kettlebells-light", "resistance-bands", "jump-rope", "yogamat"]
+  },
+  {
+    id: "outdoor",
+    name: "Outdoor Training",
+    icon: Footprints,
+    description: "Parks, beaches, or outdoor spaces with minimal equipment",
+    recommended: ["resistance-bands", "jump-rope", "agility-ladder", "cones", "timer"]
+  },
+  {
+    id: "hybrid",
+    name: "Hybrid Environment",
+    icon: Warehouse,
+    description: "Mix of gym equipment and outdoor/functional training",
+    recommended: ["dumbbells-light", "kettlebells-light", "resistance-bands", "medicine-balls", "trx", "agility-ladder"]
+  }
+];
+
+// Workout goals with equipment recommendations
+const workoutGoals = [
+  {
+    id: "strength",
+    name: "Strength Building",
+    icon: Weight,
+    description: "Heavy resistance training for maximum strength gains",
+    recommended: ["barbell", "dumbbells-heavy", "kettlebells-heavy", "plates", "cables"]
+  },
+  {
+    id: "hypertrophy",
+    name: "Muscle Building",
+    icon: Dumbbell,
+    description: "Moderate weights with higher volume for muscle growth",
+    recommended: ["dumbbells-medium", "dumbbells-heavy", "cables", "barbell", "ez-curl"]
+  },
+  {
+    id: "endurance",
+    name: "Muscular Endurance",
+    icon: Clock,
+    description: "Light to moderate weights with high repetitions",
+    recommended: ["dumbbells-light", "kettlebells-light", "resistance-bands", "bodybar", "rower", "assault-bike"]
+  },
+  {
+    id: "weight-loss",
+    name: "Weight Loss",
+    icon: FlameKindling,
+    description: "High-intensity workouts with minimal rest",
+    recommended: ["kettlebells-light", "battle-ropes", "rower", "assault-bike", "jump-rope", "medicine-balls"]
+  },
+  {
+    id: "general-fitness",
+    name: "General Fitness",
+    icon: Zap,
+    description: "Balanced approach for overall health and fitness",
+    recommended: ["dumbbells-medium", "kettlebells-light", "resistance-bands", "trx", "medicine-balls", "yogamat"]
+  }
+];
+
+// Equipment availability levels
+const equipmentAvailability = [
+  {
+    id: "minimal",
+    name: "Minimal",
+    icon: Snowflake,
+    description: "Basic equipment only (dumbbells, resistance bands, bodyweight)",
+    recommended: ["dumbbells-light", "resistance-bands", "jump-rope", "yogamat", "timer"]
+  },
+  {
+    id: "moderate",
+    name: "Moderate",
+    icon: ListChecks,
+    description: "Standard home gym or small studio setup",
+    recommended: ["dumbbells-light", "dumbbells-medium", "kettlebells-light", "resistance-bands", "medicine-balls", "trx"]
+  },
+  {
+    id: "extensive",
+    name: "Extensive",
+    icon: ScrollText,
+    description: "Full commercial gym or well-equipped training facility",
+    maxItems: 25
+  }
+];
+
 // Preset equipment groups for quick selection
 const equipmentPresets = [
   {
@@ -248,6 +361,15 @@ const equipmentPresets = [
       category.items.map(item => item.id)
     )
   }
+];
+
+// Specialty equipment for specific training goals
+const specialtyEquipment = [
+  { id: "olympic-lifting", name: "Olympic Lifting", items: ["olympic-platform", "bumper-plates", "lifting-blocks"] },
+  { id: "powerlifting", name: "Powerlifting", items: ["power-rack", "competition-bench", "deadlift-platform"] },
+  { id: "crossfit", name: "CrossFit", items: ["wall-ball", "climbing-rope", "ghd-machine", "gymnastics-rings"] },
+  { id: "boxing", name: "Boxing/MMA", items: ["heavy-bag", "speed-bag", "focus-mitts", "boxing-gloves"] },
+  { id: "yoga-pilates", name: "Yoga/Pilates", items: ["yoga-blocks", "pilates-reformer", "resistance-rings"] }
 ];
 
 // Circuit types
@@ -299,6 +421,8 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
   const [selectedWorkoutPlan, setSelectedWorkoutPlan] = useState<WorkoutPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+  const [wizardStep, setWizardStep] = useState<number>(1);
+  const [wizardEnabled, setWizardEnabled] = useState<boolean>(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -405,6 +529,49 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     return circuitTypes;
   };
 
+  // Get recommended equipment based on form values
+  const getRecommendedEquipment = () => {
+    const values = form.getValues();
+    let recommended: string[] = [];
+
+    // Add equipment based on training location
+    if (values.trainingLocation) {
+      const locationRecs = trainingLocations.find(loc => loc.id === values.trainingLocation)?.recommended || [];
+      recommended = [...recommended, ...locationRecs];
+    }
+
+    // Add equipment based on workout goal
+    if (values.workoutGoal) {
+      const goalRecs = workoutGoals.find(goal => goal.id === values.workoutGoal)?.recommended || [];
+      recommended = [...recommended, ...goalRecs];
+    }
+
+    // Add specialty equipment
+    if (values.specialtyEquipment && values.specialtyEquipment.length > 0) {
+      const specialtyItems = values.specialtyEquipment.flatMap(
+        id => specialtyEquipment.find(s => s.id === id)?.items || []
+      );
+      recommended = [...recommended, ...specialtyItems];
+    }
+
+    // If extensive equipment is available, include more items
+    if (values.equipmentAvailability === "extensive") {
+      // Add more comprehensive equipment options
+      const standardGymItems = equipmentPresets.find(p => p.id === "standard-gym")?.items || [];
+      recommended = [...recommended, ...standardGymItems];
+    } else if (values.equipmentAvailability === "minimal") {
+      // Filter to only keep minimal equipment
+      const minimalItems = equipmentPresets.find(p => p.id === "minimal")?.items || [];
+      recommended = recommended.filter(item => minimalItems.includes(item));
+
+      // Make sure we have at least the minimal items
+      recommended = [...new Set([...recommended, ...minimalItems])];
+    }
+
+    // Remove duplicates
+    return [...new Set(recommended)];
+  };
+
   const form = useForm<WorkoutFormValues>({
     resolver: zodResolver(workoutFormSchema),
     defaultValues: {
@@ -413,6 +580,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
       fitnessLevel: "intermediate",
       equipment: [],
       useFullGym: false,
+      wizardEnabled: true,
       circuitPreferences: {
         types: [],
         stationRotation: true,
@@ -425,6 +593,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
         restInterval: 20,
         rounds: 5,
       },
+      specialtyEquipment: [],
     },
   });
 
@@ -513,6 +682,42 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     }
   }, [planType, sessionType, form]);
 
+  // Apply equipment recommendations when wizard form values change
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (wizardEnabled && (
+        value.trainingLocation !== undefined || 
+        value.workoutGoal !== undefined || 
+        value.equipmentAvailability !== undefined ||
+        value.specialtyEquipment !== undefined
+      )) {
+        // Wait for the next tick to ensure all form values are updated
+        setTimeout(() => {
+          const recommended = getRecommendedEquipment();
+          if (recommended.length > 0) {
+            form.setValue("equipment", recommended);
+          }
+        }, 0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, wizardEnabled]);
+
+  // Handle moving to next step in wizard
+  const handleNextStep = () => {
+    if (wizardStep < 4) {
+      setWizardStep(wizardStep + 1);
+    }
+  };
+
+  // Handle moving to previous step in wizard
+  const handlePrevStep = () => {
+    if (wizardStep > 1) {
+      setWizardStep(wizardStep - 1);
+    }
+  };
+
   // Update equipment when preset changes
   const handlePresetChange = (presetId: string) => {
     setSelectedPreset(presetId);
@@ -526,6 +731,17 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
         form.setValue("useFullGym", false);
       }
     }
+  };
+
+  // Complete the wizard and apply all recommendations
+  const completeWizard = () => {
+    const recommended = getRecommendedEquipment();
+    form.setValue("equipment", recommended);
+    setWizardStep(4); // Move to manual selection step
+    toast({
+      title: "Equipment Recommendations Applied",
+      description: "The wizard has selected equipment based on your preferences. You can still modify the selection manually.",
+    });
   };
 
   const generateMutation = useMutation({
@@ -614,7 +830,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
       URL.revokeObjectURL(url);
 
       toast({
-        title: "Download Complete",
+        title: "DownloadComplete",
         description: "Your workout plan has been downloaded as a JSON file.",
       });
     } catch (error) {
@@ -637,6 +853,9 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
       }
       if (name === "fitnessLevel" && value.fitnessLevel) {
         setFitnessLevel(value.fitnessLevel as "beginner" | "intermediate" | "advanced");
+      }
+      if (name === "wizardEnabled" && value.wizardEnabled !== undefined) {
+        setWizardEnabled(value.wizardEnabled);
       }
 
       // Reset preset selection if equipment selection changes manually
@@ -668,6 +887,36 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
       return true; // Show all presets for advanced
     }
   });
+
+  // Render a card with icon for selection options
+  const renderOptionCard = (
+    id: string, 
+    name: string, 
+    description: string, 
+    icon: LucideIcon, 
+    isSelected: boolean, 
+    onClick: () => void
+  ) => {
+    const Icon = icon;
+    return (
+      <div 
+        key={id}
+        className={`border rounded-lg p-4 cursor-pointer transition-colors duration-200 ${
+          isSelected ? 'border-primary bg-primary/5' : 'hover:border-muted-foreground'
+        }`}
+        onClick={onClick}
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className={`p-2 rounded-full ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+          <h3 className="font-medium">{name}</h3>
+          {isSelected && <CheckCircle2 className="h-4 w-4 ml-auto text-primary" />}
+        </div>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 relative">
@@ -877,11 +1126,14 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="individual">Individual Stations</SelectItem>
-                              <SelectItem value="partner">Partner Workout</SelectItem>
-                              <SelectItem value="groups">Small Groups</SelectItem>
+                              <SelectItem value="individual">Individual Work</SelectItem>
+                              <SelectItem value="partner">Partner Workouts</SelectItem>
+                              <SelectItem value="groups">Small Groups (3-5)</SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormDescription>
+                            The format influences exercise selection and setup
+                          </FormDescription>
                         </FormItem>
                       )}
                     />
@@ -892,12 +1144,13 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                         name="participantInfo.groupSize"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Participants per Group</FormLabel>
+                            <FormLabel>Group Size</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
-                                min="2"
-                                max="6"
+                                min="3"
+                                max="8"
+                                placeholder="3"
                                 {...field}
                                 onChange={(e) => field.onChange(e.target.value)}
                               />
@@ -908,131 +1161,76 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                     )}
                   </div>
 
-                  {/* Circuit Preferences Section */}
+                  {/* Group Circuit Preferences */}
                   <div className="space-y-4">
                     <FormLabel>Circuit Preferences</FormLabel>
-
                     <FormField
                       control={form.control}
-                      name="circuitPreferences.types"
-                      render={() => (
-                        <FormItem>
-                          <div className="mb-4">
-                            <FormLabel>Circuit Types</FormLabel>
+                      name="circuitPreferences.stationRotation"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Station Rotations
+                            </FormLabel>
                             <FormDescription>
-                              Select the types of circuits you want to include
+                              Participants rotate between exercise stations
                             </FormDescription>
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            {circuitTypes.map((type) => (
-                              <FormField
-                                key={type.id}
-                                control={form.control}
-                                name="circuitPreferences.types"
-                                render={({ field }) => {
-                                  return (
-                                    <FormItem
-                                      key={type.id}
-                                      className="flex flex-row items-start space-x-3 space-y-0"
-                                    >
-                                      <FormControl>
-                                        <Checkbox
-                                          checked={field.value?.includes(type.id)}
-                                          onCheckedChange={(checked) => {
-                                            return checked
-                                              ? field.onChange([...field.value, type.id])
-                                              : field.onChange(
-                                                  field.value?.filter(
-                                                    (value) => value !== type.id
-                                                  )
-                                                )
-                                          }}
-                                        />
-                                      </FormControl>
-                                      <FormLabel className="font-normal">
-                                        {type.label}
-                                      </FormLabel>
-                                    </FormItem>
-                                  )
-                                }}
-                              />
-                            ))}
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="circuitPreferences.restBetweenStations"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Rest Between Stations
+                            </FormLabel>
+                            <FormDescription>
+                              Include dedicated rest periods between stations
+                            </FormDescription>
                           </div>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="circuitPreferences.stationRotation"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Station Rotation
-                              </FormLabel>
-                              <FormDescription>
-                                Participants move between stations
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="circuitPreferences.restBetweenStations"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Rest Between Stations
-                              </FormLabel>
-                              <FormDescription>
-                                Include rest periods during rotations
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="circuitPreferences.mixedEquipmentStations"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Mixed Equipment Stations
-                              </FormLabel>
-                              <FormDescription>
-                                Allow different equipment at each station
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="circuitPreferences.mixedEquipmentStations"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Mixed Equipment Stations
+                            </FormLabel>
+                            <FormDescription>
+                              Allow different equipment at each station
+                            </FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
                   <FormField
@@ -1329,137 +1527,492 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                 </>
               )}
 
-              {/* Equipment Selection - Improved UI with presets and accordion */}
-              <div className="space-y-4">
-                <FormLabel>Equipment Selection</FormLabel>
-
-                {/* Equipment Presets */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium mb-2">Equipment Presets</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {filteredPresets.map(preset => (
-                      <Button
-                        key={preset.id}
-                        type="button"
-                        variant={selectedPreset === preset.id ? "default" : "outline"}
-                        className="justify-start"
-                        onClick={() => handlePresetChange(preset.id)}
-                      >
-                        {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2" />}
-                        {preset.name}
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {selectedPreset ? 
-                      equipmentPresets.find(p => p.id === selectedPreset)?.description :
-                      "Select a preset or customize your equipment selection below"}
-                  </p>
-                </div>
-
-                {/* Show Full Gym checkbox */}
-                <FormField
-                  control={form.control}
-                  name="useFullGym"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 border p-3 rounded-md mb-4">
-                      <FormControl>
+              {/* Equipment Selection Wizard or Manual Selection */}
+              <FormField
+                control={form.control}
+                name="wizardEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Equipment Selection Method
+                      </FormLabel>
+                      <FormDescription>
+                        Choose between a guided wizard or manual equipment selection
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <div className="flex items-center space-x-2">
+                        <span className={!field.value ? "font-medium text-primary" : "text-muted-foreground"}>Manual</span>
                         <Checkbox
                           checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            if (checked) {
-                              handlePresetChange("full-gym");
-                            } else if (selectedPreset === "full-gym") {
-                              setSelectedPreset(null);
-                              form.setValue("equipment", []);
-                            }
-                          }}
+                          onCheckedChange={field.onChange}
+                          className="rounded-full h-6 w-6"
                         />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-medium">
-                          Use Full Gym Equipment
-                        </FormLabel>
-                        <FormDescription>
-                          Enables access to all equipment for maximum workout variety
-                        </FormDescription>
+                        <span className={field.value ? "font-medium text-primary" : "text-muted-foreground"}>Wizard</span>
                       </div>
-                    </FormItem>
-                  )}
-                />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-                {/* Detailed Equipment Selection with Accordions */}
-                {!form.watch("useFullGym") && (
-                  <Accordion type="multiple" className="w-full">
-                    {availableEquipment.map((category) => (
-                      <AccordionItem key={category.category} value={category.category}>
-                        <AccordionTrigger className="py-2">
-                          <div className="flex items-center">
-                            <category.icon className="h-5 w-5 mr-2 text-muted-foreground" />
-                            <h4 className="font-medium">{category.category}</h4>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-7">
-                            {category.items.map((item) => (
-                              <FormField
-                                key={item.id}
-                                control={form.control}
-                                name="equipment"
-                                render={({ field }) => (
-                                  <FormItem
-                                    key={item.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                          const newEquipment = checked
-                                            ? [...field.value, item.id]
-                                            : field.value?.filter(
-                                                (value) => value !== item.id
-                                              );
+              {/* Equipment Selection */}
+              {form.watch("wizardEnabled") ? (
+                <Card className="border">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Equipment Selection Wizard</CardTitle>
+                    <CardDescription>
+                      Let's find the perfect equipment for your workout based on your preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Wizard Step Indicator */}
+                    <div className="mb-6">
+                      <div className="flex justify-between">
+                        <div className={`${wizardStep >= 1 ? "text-primary" : "text-muted-foreground"}`}>Location</div>
+                        <div className={`${wizardStep >= 2 ? "text-primary" : "text-muted-foreground"}`}>Goals</div>
+                        <div className={`${wizardStep >= 3 ? "text-primary" : "text-muted-foreground"}`}>Availability</div>
+                        <div className={`${wizardStep >= 4 ? "text-primary" : "text-muted-foreground"}`}>Selection</div>
+                      </div>
+                      <div className="w-full bg-secondary h-2 mt-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-primary h-full transition-all duration-300"
+                          style={{ width: `${(wizardStep / 4) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
 
-                                          field.onChange(newEquipment);
-                                          setSelectedPreset(null);
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <div className="space-y-1 leading-none">
-                                      <FormLabel className="font-normal">
-                                        {item.label}
-                                      </FormLabel>
-                                      <p className="text-xs text-muted-foreground">
-                                        {item.count}
+                    {/* Step 1: Training Location */}
+                    {wizardStep === 1 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-lg">Where will this workout take place?</h3>
+                        <FormField
+                          control={form.control}
+                          name="trainingLocation"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {trainingLocations.map((location) => 
+                                    renderOptionCard(
+                                      location.id,
+                                      location.name,
+                                      location.description,
+                                      location.icon,
+                                      field.value === location.id,
+                                      () => field.onChange(location.id)
+                                    )
+                                  )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Step 2: Workout Goals */}
+                    {wizardStep === 2 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-lg">What's the primary goal of this workout?</h3>
+                        <FormField
+                          control={form.control}
+                          name="workoutGoal"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {workoutGoals.map((goal) => 
+                                    renderOptionCard(
+                                      goal.id,
+                                      goal.name,
+                                      goal.description,
+                                      goal.icon,
+                                      field.value === goal.id,
+                                      () => field.onChange(goal.id)
+                                    )
+                                  )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Step 3: Equipment Availability */}
+                    {wizardStep === 3 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-lg">How much equipment is available?</h3>
+                        <FormField
+                          control={form.control}
+                          name="equipmentAvailability"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                  {equipmentAvailability.map((availability) => 
+                                    renderOptionCard(
+                                      availability.id,
+                                      availability.name,
+                                      availability.description,
+                                      availability.icon,
+                                      field.value === availability.id,
+                                      () => field.onChange(availability.id)
+                                    )
+                                  )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <h3 className="font-medium text-lg mt-8">Any specialty equipment available?</h3>
+                        <FormField
+                          control={form.control}
+                          name="specialtyEquipment"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {specialtyEquipment.map((specialty) => (
+                                    <div 
+                                      key={specialty.id}
+                                      className={`border rounded-lg p-3 cursor-pointer transition-colors duration-200 ${
+                                        field.value?.includes(specialty.id) ? 'border-primary bg-primary/5' : 'hover:border-muted-foreground'
+                                      }`}
+                                      onClick={() => {
+                                        const newValue = field.value?.includes(specialty.id)
+                                          ? field.value.filter(id => id !== specialty.id)
+                                          : [...(field.value || []), specialty.id];
+                                        field.onChange(newValue);
+                                      }}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <h4 className="font-medium">{specialty.name}</h4>
+                                        {field.value?.includes(specialty.id) && (
+                                          <CheckCircle2 className="h-4 w-4 text-primary" />
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {specialty.items.join(', ')}
                                       </p>
                                     </div>
-                                  </FormItem>
-                                )}
-                              />
+                                  ))}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Step 4: Manual Equipment Selection */}
+                    {wizardStep === 4 && (
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-medium text-lg">Recommended Equipment</h3>
+                          <Badge variant="outline" className="ml-2">
+                            {form.watch("equipment")?.length || 0} items selected
+                          </Badge>
+                        </div>
+
+                        {/* Equipment Presets for Quick Selection */}
+                        <div className="mb-6">
+                          <h3 className="text-sm font-medium mb-2">Equipment Presets</h3>
+                          <div className="grid grid-cols-2 gap-2">
+                            {filteredPresets.map(preset => (
+                              <Button
+                                key={preset.id}
+                                type="button"
+                                variant={selectedPreset === preset.id ? "default" : "outline"}
+                                className="justify-start"
+                                onClick={() => handlePresetChange(preset.id)}
+                              >
+                                {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2" />}
+                                {preset.name}
+                              </Button>
                             ))}
                           </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                )}
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {selectedPreset ? 
+                              equipmentPresets.find(p => p.id === selectedPreset)?.description :
+                              "Select a preset or customize your equipment selection below"}
+                          </p>
+                        </div>
 
-                <FormField
-                  control={form.control}
-                  name="equipment"
-                  render={({ field }) => (
-                    <FormMessage />
+                        {/* Show Full Gym checkbox */}
+                        <FormField
+                          control={form.control}
+                          name="useFullGym"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 border p-3 rounded-md mb-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked);
+                                    if (checked) {
+                                      handlePresetChange("full-gym");
+                                    } else if (selectedPreset === "full-gym") {
+                                      setSelectedPreset(null);
+                                      form.setValue("equipment", []);
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel className="font-medium">
+                                  Use Full Gym Equipment
+                                </FormLabel>
+                                <FormDescription>
+                                  Enables access to all equipment for maximum workout variety
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        {/* Detailed Equipment Selection with Accordions */}
+                        {!form.watch("useFullGym") && (
+                          <FormField
+                            control={form.control}
+                            name="equipment"
+                            render={() => (
+                              <FormItem>
+                                <div className="space-y-2">
+                                  <Accordion type="multiple" className="w-full">
+                                    {availableEquipment.map((category) => (
+                                      <AccordionItem key={category.category} value={category.category}>
+                                        <AccordionTrigger className="py-2">
+                                          <div className="flex items-center">
+                                            <category.icon className="h-5 w-5 mr-2 text-muted-foreground" />
+                                            <h4 className="font-medium">{category.category}</h4>
+                                          </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-7">
+                                            {category.items.map((item) => (
+                                              <FormField
+                                                key={item.id}
+                                                control={form.control}
+                                                name="equipment"
+                                                render={({ field }) => (
+                                                  <FormItem
+                                                    key={item.id}
+                                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                                  >
+                                                    <FormControl>
+                                                      <Checkbox
+                                                        checked={field.value?.includes(item.id)}
+                                                        onCheckedChange={(checked) => {
+                                                          const newEquipment = checked
+                                                            ? [...field.value, item.id]
+                                                            : field.value?.filter(
+                                                                (value) => value !== item.id
+                                                              );
+
+                                                          field.onChange(newEquipment);
+                                                          setSelectedPreset(null);
+                                                        }}
+                                                      />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                      <FormLabel className="font-normal">
+                                                        {item.label}
+                                                      </FormLabel>
+                                                      <p className="text-xs text-muted-foreground">
+                                                        {item.count}
+                                                      </p>
+                                                    </div>
+                                                  </FormItem>
+                                                )}
+                                              />
+                                            ))}
+                                          </div>
+                                        </AccordionContent>
+                                      </AccordionItem>
+                                    ))}
+                                  </Accordion>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex justify-between border-t pt-4">
+                    {wizardStep > 1 ? (
+                      <Button variant="outline" type="button" onClick={handlePrevStep}>
+                        Previous
+                      </Button>
+                    ) : (
+                      <div /> // Empty div for layout consistency
+                    )}
+
+                    {wizardStep < 4 ? (
+                      <Button 
+                        type="button" 
+                        onClick={handleNextStep}
+                        disabled={
+                          (wizardStep === 1 && !form.watch("trainingLocation")) ||
+                          (wizardStep === 2 && !form.watch("workoutGoal")) ||
+                          (wizardStep === 3 && !form.watch("equipmentAvailability"))
+                        }
+                      >
+                        Next
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button type="button" onClick={completeWizard}>
+                        Apply Recommendations
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Equipment Selection</FormLabel>
+                    <Badge variant="outline" className="ml-2">
+                      {form.watch("equipment")?.length || 0} items selected
+                    </Badge>
+                  </div>
+
+                  {/* Equipment Presets */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium mb-2">Equipment Presets</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {filteredPresets.map(preset => (
+                        <Button
+                          key={preset.id}
+                          type="button"
+                          variant={selectedPreset === preset.id ? "default" : "outline"}
+                          className="justify-start"
+                          onClick={() => handlePresetChange(preset.id)}
+                        >
+                          {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2" />}
+                          {preset.name}
+                        </Button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {selectedPreset ? 
+                        equipmentPresets.find(p => p.id === selectedPreset)?.description :
+                        "Select a preset or customize your equipment selection below"}
+                    </p>
+                  </div>
+
+                  {/* Show Full Gym checkbox */}
+                  <FormField
+                    control={form.control}
+                    name="useFullGym"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 border p-3 rounded-md mb-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={(checked) => {
+                              field.onChange(checked);
+                              if (checked) {
+                                handlePresetChange("full-gym");
+                              } else if (selectedPreset === "full-gym") {
+                                setSelectedPreset(null);
+                                form.setValue("equipment", []);
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-medium">
+                            Use Full Gym Equipment
+                          </FormLabel>
+                          <FormDescription>
+                            Enables access to all equipment for maximum workout variety
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Detailed Equipment Selection with Accordions */}
+                  {!form.watch("useFullGym") && (
+                    <FormField
+                      control={form.control}
+                      name="equipment"
+                      render={() => (
+                        <FormItem>
+                          <div className="space-y-2">
+                            <Accordion type="multiple" className="w-full">
+                              {availableEquipment.map((category) => (
+                                <AccordionItem key={category.category} value={category.category}>
+                                  <AccordionTrigger className="py-2">
+                                    <div className="flex items-center">
+                                      <category.icon className="h-5 w-5 mr-2 text-muted-foreground" />
+                                      <h4 className="font-medium">{category.category}</h4>
+                                    </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-7">
+                                      {category.items.map((item) => (
+                                        <FormField
+                                          key={item.id}
+                                          control={form.control}
+                                          name="equipment"
+                                          render={({ field }) => (
+                                            <FormItem
+                                              key={item.id}
+                                              className="flex flex-row items-start space-x-3 space-y-0"
+                                            >
+                                              <FormControl>
+                                                <Checkbox
+                                                  checked={field.value?.includes(item.id)}
+                                                  onCheckedChange={(checked) => {
+                                                    const newEquipment = checked
+                                                      ? [...field.value, item.id]
+                                                      : field.value?.filter(
+                                                          (value) => value !== item.id
+                                                        );
+
+                                                    field.onChange(newEquipment);
+                                                    setSelectedPreset(null);
+                                                  }}
+                                                />
+                                              </FormControl>
+                                              <div className="space-y-1 leading-none">
+                                                <FormLabel className="font-normal">
+                                                  {item.label}
+                                                </FormLabel>
+                                                <p className="text-xs text-muted-foreground">
+                                                  {item.count}
+                                                </p>
+                                              </div>
+                                            </FormItem>
+                                          )}
+                                        />
+                                      ))}
+                                    </div>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              ))}
+                            </Accordion>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
-              </div>
+                </div>
+              )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={generateMutation.isPending}
-              >
+              {/* Submit Button */}
+              <Button type="submit" className="w-full">
                 {generateMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1474,7 +2027,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
         </CardContent>
       </Card>
 
-      {/* Display the generated workout plan */}
+      {/* Display Generated Workout Plan */}
       {selectedWorkoutPlan && (
         <Card>
           <CardHeader>
@@ -1482,17 +2035,22 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
               <span>Generated Workout Plan</span>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
+                  variant="outline" 
                   size="sm"
                   onClick={handleDownload}
                   disabled={exportPdfMutation.isPending}
                 >
-                  {exportPdfMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  {selectedWorkoutPlan.id ? (
+                    <>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Export PDF
+                    </>
                   ) : (
-                    <FileText className="h-4 w-4 mr-2" />
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </>
                   )}
-                  Export PDF
                 </Button>
               </div>
             </CardTitle>
@@ -1501,158 +2059,158 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {/* Introduction */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Introduction</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium">Intensity</h4>
-                    <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.intensity}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium">Preparation</h4>
-                    <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.preparation}</p>
-                  </div>
-                </div>
+                    <div className="space-y-6">
+                      {/* Introduction */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Introduction</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium">Intensity</h4>
+                            <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.intensity}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-medium">Preparation</h4>
+                            <p className="text-sm text-muted-foreground">{selectedWorkoutPlan.introduction.preparation}</p>
+                          </div>
+                        </div>
 
-                <div>
-                  <h4 className="font-medium">Objectives</h4>
-                  <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                    {selectedWorkoutPlan.introduction.objectives.map((objective, index) => (
-                      <li key={index}>{objective}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+                        <div>
+                          <h4 className="font-medium">Objectives</h4>
+                          <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                            {selectedWorkoutPlan.introduction.objectives.map((objective, index) => (
+                              <li key={index}>{objective}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
 
-              {/* Main Workout */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Main Workout</h3>
+                      {/* Main Workout */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Main Workout</h3>
 
-                {selectedWorkoutPlan.mainWorkout.map((circuit, index) => (
-                  <Card key={index} className="border border-border">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Circuit {circuit.circuitNumber}</CardTitle>
-                      <CardDescription>{circuit.objective}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm">{circuit.explanation}</p>
-                      <p className="text-sm font-medium">Setup: {circuit.setupInstructions}</p>
+                        {selectedWorkoutPlan.mainWorkout.map((circuit, index) => (
+                          <Card key={index} className="border border-border">
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-base">Circuit {circuit.circuitNumber}</CardTitle>
+                              <CardDescription>{circuit.objective}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              <p className="text-sm">{circuit.explanation}</p>
+                              <p className="text-sm font-medium">Setup: {circuit.setupInstructions}</p>
 
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Exercise</TableHead>
-                            <TableHead>Sets</TableHead>
-                            <TableHead>Reps</TableHead>
-                            <TableHead>Technique</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {circuit.exercises.map((exercise, exIndex) => (
-                            <TableRow key={exIndex}>
-                              <TableCell className="font-medium">{exercise.exercise}</TableCell>
-                              <TableCell>{exercise.sets}</TableCell>
-                              <TableCell>{exercise.reps}</TableCell>
-                              <TableCell className="max-w-[300px]">
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="link" className="p-0 h-auto">View Technique</Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>{exercise.exercise}</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        <div className="space-y-4">
-                                          <div>
-                                            <h4 className="font-bold">Technique:</h4>
-                                            <p>{exercise.technique}</p>
-                                          </div>
-                                          {(exercise.men || exercise.woman) && (
-                                            <div className="grid grid-cols-2 gap-4">
-                                              {exercise.men && (
-                                                <div>
-                                                  <h4 className="font-bold">Men:</h4>
-                                                  <p>{exercise.men}</p>
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Exercise</TableHead>
+                                    <TableHead>Sets</TableHead>
+                                    <TableHead>Reps</TableHead>
+                                    <TableHead>Technique</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {circuit.exercises.map((exercise, exIndex) => (
+                                    <TableRow key={exIndex}>
+                                      <TableCell className="font-medium">{exercise.exercise}</TableCell>
+                                      <TableCell>{exercise.sets}</TableCell>
+                                      <TableCell>{exercise.reps}</TableCell>
+                                      <TableCell className="max-w-[300px]">
+                                        <AlertDialog>
+                                          <AlertDialogTrigger asChild>
+                                            <Button variant="link" className="p-0 h-auto">View Technique</Button>
+                                          </AlertDialogTrigger>
+                                          <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                              <AlertDialogTitle>{exercise.exercise}</AlertDialogTitle>
+                                              <AlertDialogDescription>
+                                                <div className="space-y-4">
+                                                  <div>
+                                                    <h4 className="font-bold">Technique:</h4>
+                                                    <p>{exercise.technique}</p>
+                                                  </div>
+                                                  {(exercise.men || exercise.woman) && (
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                      {exercise.men && (
+                                                        <div>
+                                                          <h4 className="font-bold">Men:</h4>
+                                                          <p>{exercise.men}</p>
+                                                        </div>
+                                                      )}
+                                                      {exercise.woman && (
+                                                        <div>
+                                                          <h4 className="font-bold">Women:</h4>
+                                                          <p>{exercise.woman}</p>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  )}
+                                                  {exercise.notes && (
+                                                    <div>
+                                                      <h4 className="font-bold">Notes:</h4>
+                                                      <p>{exercise.notes}</p>
+                                                    </div>
+                                                  )}
                                                 </div>
-                                              )}
-                                              {exercise.woman && (
-                                                <div>
-                                                  <h4 className="font-bold">Women:</h4>
-                                                  <p>{exercise.woman}</p>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
-                                          {exercise.notes && (
-                                            <div>
-                                              <h4 className="font-bold">Notes:</h4>
-                                              <p>{exercise.notes}</p>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogAction>Close</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                                              </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                              <AlertDialogAction>Close</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                          </AlertDialogContent>
+                                        </AlertDialog>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
 
-              {/* Recovery */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Recovery</h3>
+                      {/* Recovery */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Recovery</h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium">Immediate Steps</h4>
-                    <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                      {selectedWorkoutPlan.recovery.immediateSteps.map((step, index) => (
-                        <li key={index}>{step}</li>
-                      ))}
-                    </ul>
-                  </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium">Immediate Steps</h4>
+                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                              {selectedWorkoutPlan.recovery.immediateSteps.map((step, index) => (
+                                <li key={index}>{step}</li>
+                              ))}
+                            </ul>
+                          </div>
 
-                  <div>
-                    <h4 className="font-medium">Nutrition Tips</h4>
-                    <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                      {selectedWorkoutPlan.recovery.nutritionTips.map((tip, index) => (
-                        <li key={index}>{tip}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                          <div>
+                            <h4 className="font-medium">Nutrition Tips</h4>
+                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                              {selectedWorkoutPlan.recovery.nutritionTips.map((tip, index) => (
+                                <li key={index}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium">Rest Recommendations</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedWorkoutPlan.recovery.restRecommendations}
-                    </p>
-                  </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-medium">Rest Recommendations</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedWorkoutPlan.recovery.restRecommendations}
+                            </p>
+                          </div>
 
-                  <div>
-                    <h4 className="font-medium">Next Day Guidance</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedWorkoutPlan.recovery.nextDayGuidance}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
+                          <div>
+                            <h4 className="font-medium">Next Day Guidance</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedWorkoutPlan.recovery.nextDayGuidance}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+            </Card>
+          )}
+        </div>
+      );
+    }
