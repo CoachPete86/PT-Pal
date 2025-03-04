@@ -74,7 +74,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/">
-              <a className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 cursor-pointer">
                 {user?.branding?.logoUrl ? (
                   <img 
                     src={user.branding.logoUrl} 
@@ -89,7 +89,7 @@ export default function Navbar() {
                 }}>
                   {user?.businessName || "PTpal"}
                 </span>
-              </a>
+              </div>
             </Link>
           </div>
 
@@ -135,26 +135,26 @@ export default function Navbar() {
                     <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuItem asChild>
                         <Link href="/profile">
-                          <a className="flex items-center">
+                          <div className="flex items-center cursor-pointer">
                             <User className="mr-2 h-4 w-4" />
                             Profile
-                          </a>
+                          </div>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/settings">
-                          <a className="flex items-center">
+                          <div className="flex items-center cursor-pointer">
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
-                          </a>
+                          </div>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/documents">
-                          <a className="flex items-center">
+                          <div className="flex items-center cursor-pointer">
                             <BookOpen className="mr-2 h-4 w-4" />
                             Documents
-                          </a>
+                          </div>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -195,20 +195,20 @@ export default function Navbar() {
                         </a>
                       ))}
                       <Link href="/dashboard">
-                        <a
-                          className="flex items-center py-2 text-sm font-medium text-primary"
+                        <div
+                          className="flex items-center py-2 text-sm font-medium text-primary cursor-pointer"
                           onClick={() => setIsOpen(false)}
                         >
                           Dashboard
-                        </a>
+                        </div>
                       </Link>
                       <Link href="/settings">
-                        <a
-                          className="flex items-center py-2 text-sm font-medium"
+                        <div
+                          className="flex items-center py-2 text-sm font-medium cursor-pointer"
                           onClick={() => setIsOpen(false)}
                         >
                           Settings
-                        </a>
+                        </div>
                       </Link>
                       <button
                         onClick={() => {
