@@ -962,6 +962,54 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     return () => subscription.unsubscribe();
   }, [form.watch, wizardEnabled]);
 
+  // This effect will load default class formats when class type changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "classType" && value.classType && sessionType === "group") {
+        const classType = value.classType;
+        let templateId = "";
+      
+        // Map class types to template IDs
+        const templateMap: Record<string, string> = {
+          "HIIT": "hiit-standard",
+          "BURN": "bootcamp-mixed", 
+          "LIFT": "strength-circuit",
+          "GLC": "circuit-training",
+          "METCON": "endurance"
+        };
+      
+        templateId = templateMap[classType] || "";
+      
+        if (templateId) {
+          const template = classFormatTemplates.find(t => t.id === templateId);
+          if (template && template.formats.length > 0) {
+            // Map the formats to ensure they have the right type
+            const formattedItems = template.formats.map(format => ({
+              ...format,
+              type: format.type as ClassFormatType
+            }));
+          
+            // Update both the state and form
+            setClassFormats(formattedItems);
+            form.setValue('classFormats', formattedItems, {
+              shouldDirty: true,
+              shouldTouch: true,
+              shouldValidate: true
+            });
+
+            // Notify user
+            toast({
+              title: "Class Format Applied",
+              description: `Loaded template with ${formattedItems.length} format sections.`
+            });
+          }
+        }
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form, sessionType, toast]);
+
   // Handle moving to next step in wizard
   const handleNextStep = () => {
     if (wizardStep < 4) {
