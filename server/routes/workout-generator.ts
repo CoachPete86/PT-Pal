@@ -32,7 +32,7 @@ export async function generateWorkout(req: Request, res: Response) {
 
 Session Type: ${sessionType} (${sessionType === 'group' ? 'Group Class' : 'Personal Training'})
 Fitness Level: ${fitnessLevel}
-Available Equipment: ${equipment.join(', ')}
+Available Equipment: ${Array.isArray(equipment) ? equipment.join(', ') : equipment}
 Circuit Types Preferred: ${circuitPreferences.types.join(', ')}
 
 `;
@@ -63,39 +63,85 @@ I need a structured workout plan with:
 2. Main Workout - detailed breakdown of circuits, each with specific exercises, reps/sets, and technique notes
 3. Recovery recommendations
 
-Present the workout in a structured JSON format with the following structure:
+Present the workout as a structured SessionPlan JSON with the following structure:
 {
-  "introduction": {
-    "overview": "Brief overview of the workout",
-    "intensity": "Intensity level description",
-    "objectives": ["Objective 1", "Objective 2"],
-    "preparation": "Preparation instructions"
+  "sessionDetails": {
+    "sessionType": "Group Training or Personal Training",
+    "clientName": "Client name from request or 'Client'",
+    "coach": "Coach name from request or 'Coach'",
+    "duration": "45 Minutes",
+    "location": "Location from request or 'Gym'",
+    "date": "Current date"
+  },
+  "equipmentNeeded": {
+    "equipmentList": ["Equipment 1", "Equipment 2", "Equipment 3"],
+    "other": "Additional equipment notes"
+  },
+  "warmup": {
+    "explanation": "Brief explanation of warmup purpose",
+    "exercises": [
+      {
+        "exercise": "Exercise name",
+        "durationOrReps": "Time or rep count",
+        "notes": "Form cues or other notes"
+      }
+    ]
   },
   "mainWorkout": [
     {
-      "circuitNumber": 1,
-      "explanation": "Description of circuit purpose",
-      "objective": "Specific goal of this circuit",
-      "setupInstructions": "How to set up for this circuit",
+      "blockTitle": "WORKOUT BLOCK 1",
+      "format": "Format description (e.g., '3 rounds, 40s work/20s rest')",
+      "explanation": "Instructions for completing this block",
       "exercises": [
         {
           "exercise": "Exercise name",
-          "reps": "Rep count or time",
-          "sets": "Number of sets",
-          "men": "Modified rep/weight for men if applicable",
-          "woman": "Modified rep/weight for women if applicable",
-          "technique": "Detailed technique instructions",
-          "notes": "Additional important notes"
+          "repsOrTime": "Rep count or duration",
+          "notes": "Form cues, modifications, or other guidance"
         }
       ]
     }
   ],
-  "recovery": {
-    "immediateSteps": ["Step 1", "Step 2"],
-    "nutritionTips": ["Tip 1", "Tip 2"],
-    "restRecommendations": "Rest period advice",
-    "nextDayGuidance": "Guidance for following day"
-  }
+  "extraWork": {
+    "explanation": "Instructions for optional additional work",
+    "exercises": [
+      {
+        "exercise": "Exercise name",
+        "sets": "Number of sets",
+        "reps": "Reps per set",
+        "notes": "Additional notes"
+      }
+    ]
+  },
+  "cooldown": {
+    "explanation": "Brief explanation of cooldown purpose",
+    "exercises": [
+      {
+        "exercise": "Exercise name",
+        "duration": "Duration to hold stretch or perform movement",
+        "notes": "Form cues or breathing instructions"
+      }
+    ]
+  },
+  "machineSetupGuide": {
+    "explanation": "General guidance on machine setup",
+    "machines": [
+      {
+        "machine": "Machine name",
+        "setupInstructions": "Detailed setup instructions"
+      }
+    ]
+  },
+  "closingMessage": "Final encouragement and key reminders",
+  "progressNotes": [
+    "Note about exercise form",
+    "Note about improvements",
+    "Areas for future focus"
+  ],
+  "nextSessionPreparation": [
+    "What to focus on next time",
+    "Equipment to prepare",
+    "Recovery guidance"
+  ]
 }
 `;
 
