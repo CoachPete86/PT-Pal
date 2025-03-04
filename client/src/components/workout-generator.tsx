@@ -1305,7 +1305,28 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                       <FormItem>
                         <FormLabel>Class Type</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            
+                            // Auto-select appropriate equipment preset based on class type
+                            if (value === "HIIT") {
+                              handlePresetChange("hiit-class");
+                            } else if (value === "GLC") {
+                              handlePresetChange("circuit-class");
+                            } else if (value === "BURN") {
+                              handlePresetChange("bootcamp");
+                            } else if (value === "LIFT") {
+                              handlePresetChange("strength-class");
+                            } else if (value === "CORE") {
+                              handlePresetChange("minimal");
+                            } else if (value === "FLEX") {
+                              handlePresetChange("bodyweight");
+                            }
+                            
+                            // Reset any formats already added
+                            setClassFormats([]);
+                            form.setValue('classFormats', []);
+                          }}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -1323,6 +1344,9 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                             <SelectItem value="FLEX">FLEX (Mobility & Flexibility)</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormDescription>
+                          Selecting a class type will auto-suggest appropriate equipment and formats
+                        </FormDescription>
                       </FormItem>
                     )}
                   />
@@ -1436,15 +1460,45 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                               <Select 
                                 value={currentFormatIndex !== null ? classFormats[currentFormatIndex].type : undefined}
                                 onValueChange={(value) => {
+                                  const formatType = value as ClassFormatType;
+                                  
+                                  // Set default values based on format type
+                                  let defaultWorkInterval, defaultRestInterval, defaultRounds;
+                                  
+                                  if (formatType === 'tabata') {
+                                    defaultWorkInterval = 20;
+                                    defaultRestInterval = 10;
+                                    defaultRounds = 8;
+                                  } else if (formatType === 'emom') {
+                                    defaultWorkInterval = 50;
+                                    defaultRestInterval = 10;
+                                    defaultRounds = 10;
+                                  } else if (formatType === 'amrap') {
+                                    defaultWorkInterval = 300;
+                                    defaultRounds = 1;
+                                  } else if (formatType === 'timed-sets') {
+                                    defaultWorkInterval = 40;
+                                    defaultRestInterval = 20;
+                                    defaultRounds = 3;
+                                  }
+                                  
                                   if (currentFormatIndex !== null) {
                                     const updatedFormats = [...classFormats];
                                     updatedFormats[currentFormatIndex] = {
                                       ...updatedFormats[currentFormatIndex],
-                                      type: value
+                                      type: formatType,
+                                      workInterval: defaultWorkInterval || updatedFormats[currentFormatIndex].workInterval,
+                                      restInterval: defaultRestInterval || updatedFormats[currentFormatIndex].restInterval,
+                                      rounds: defaultRounds || updatedFormats[currentFormatIndex].rounds
                                     };
                                     setClassFormats(updatedFormats);
                                   } else {
-                                    setClassFormats([...classFormats, { type: value }]);
+                                    setClassFormats([...classFormats, { 
+                                      type: formatType,
+                                      workInterval: defaultWorkInterval,
+                                      restInterval: defaultRestInterval,
+                                      rounds: defaultRounds
+                                    }]);
                                   }
                                 }}
                               >
@@ -1459,19 +1513,31 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                                   ))}
                                 </SelectContent>
                               </Select>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {classFormatOptions.find(f => 
+                                  currentFormatIndex !== null 
+                                    ? f.id === classFormats[currentFormatIndex].type 
+                                    : false
+                                )?.description || 'Select a format type'}
+                              </p>
                             </div>
 
                             <div className="space-y-2">
-                              <Label>Rounds</Label>
+                              <Label htmlFor="rounds">Rounds</Label>
                               <Input
+                                id="rounds"
                                 type="number"
                                 min="1"
                                 max="20"
+                                step="1" 
+                                className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 placeholder="Number of rounds"
-                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].rounds ? 
-                                  classFormats[currentFormatIndex].rounds : ''}
+                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].rounds !== undefined 
+                                  ? classFormats[currentFormatIndex].rounds 
+                                  : ''}
                                 onChange={(e) => {
-                                  const rounds = parseInt(e.target.value) || undefined;
+                                  const rounds = e.target.value ? parseInt(e.target.value) : undefined;
+                                  
                                   if (currentFormatIndex !== null) {
                                     const updatedFormats = [...classFormats];
                                     updatedFormats[currentFormatIndex] = {
@@ -1480,164 +1546,294 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                                     };
                                     setClassFormats(updatedFormats);
                                   } else if (classFormats.length > 0) {
-                                    const lastFormat = classFormats[classFormats.length - 1];
-                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, rounds }]);
+                                    const lastIndex = classFormats.length - 1;
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[lastIndex] = {
+                                      ...updatedFormats[lastIndex],
+                                      rounds
+                                    };
+                                    setClassFormats(updatedFormats);
                                   }
                                 }}
                               />
                             </div>
 
                             <div className="space-y-2">
-                              <Label>Work Interval (seconds)</Label>
+                              <Label htmlFor="workInterval">Work Interval (seconds)</Label>
                               <Input
+                                id="workInterval"
                                 type="number"
                                 min="5"
                                 max="300"
+                                step="5"
+                                className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 placeholder="e.g. 30 seconds"
-                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].workInterval ? 
-                                  classFormats[currentFormatIndex].workInterval : ''}
-                                onChange={(e) => {
-                                  const workInterval = parseInt(e.target.value) || undefined;
-                                  if (currentFormatIndex !== null) {
-                                    const updatedFormats = [...classFormats];
-                                    updatedFormats[currentFormatIndex] = {
-                                      ...updatedFormats[currentFormatIndex],
-                                      workInterval
-                                    };
-                                    setClassFormats(updatedFormats);
-                                  } else if (classFormats.length > 0) {
-                                    const lastFormat = classFormats[classFormats.length - 1];
-                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, workInterval }]);
-                                  }
-                                }}
-                              />
-                            </div>
+            value={currentFormatIndex !== null && classFormats[currentFormatIndex].workInterval !== undefined 
+              ? classFormats[currentFormatIndex].workInterval 
+              : ''}
+            onChange={(e) => {
+              const workInterval = e.target.value ? parseInt(e.target.value) : undefined;
+              
+              if (currentFormatIndex !== null) {
+                const updatedFormats = [...classFormats];
+                updatedFormats[currentFormatIndex] = {
+                  ...updatedFormats[currentFormatIndex],
+                  workInterval
+                };
+                setClassFormats(updatedFormats);
+              } else if (classFormats.length > 0) {
+                const lastIndex = classFormats.length - 1;
+                const updatedFormats = [...classFormats];
+                updatedFormats[lastIndex] = {
+                  ...updatedFormats[lastIndex],
+                  workInterval
+                };
+                setClassFormats(updatedFormats);
+              }
+            }}
+          />
+          <div className="flex justify-between mt-1">
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 20;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    workInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              20s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 30;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    workInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              30s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 45;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    workInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              45s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 60;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    workInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              60s
+            </button>
+          </div>
+        </div>
 
-                            <div className="space-y-2">
-                              <Label>Rest Interval (seconds)</Label>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="300"
-                                placeholder="e.g. 10 seconds"
-                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].restInterval ? 
-                                  classFormats[currentFormatIndex].restInterval : ''}
-                                onChange={(e) => {
-                                  const restInterval = parseInt(e.target.value) || undefined;
-                                  if (currentFormatIndex !== null) {
-                                    const updatedFormats = [...classFormats];
-                                    updatedFormats[currentFormatIndex] = {
-                                      ...updatedFormats[currentFormatIndex],
-                                      restInterval
-                                    };
-                                    setClassFormats(updatedFormats);
-                                  } else if (classFormats.length > 0) {
-                                    const lastFormat = classFormats[classFormats.length - 1];
-                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, restInterval }]);
-                                  }
-                                }}
-                              />
-                            </div>
+        <div className="space-y-2">
+          <Label htmlFor="restInterval">Rest Interval (seconds)</Label>
+          <Input
+            id="restInterval"
+            type="number"
+            min="0"
+            max="300"
+            step="5"
+            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder="e.g. 10 seconds"
+            value={currentFormatIndex !== null && classFormats[currentFormatIndex].restInterval !== undefined 
+              ? classFormats[currentFormatIndex].restInterval 
+              : ''}
+            onChange={(e) => {
+              const restInterval = e.target.value ? parseInt(e.target.value) : undefined;
+              
+              if (currentFormatIndex !== null) {
+                const updatedFormats = [...classFormats];
+                updatedFormats[currentFormatIndex] = {
+                  ...updatedFormats[currentFormatIndex],
+                  restInterval
+                };
+                setClassFormats(updatedFormats);
+              } else if (classFormats.length > 0) {
+                const lastIndex = classFormats.length - 1;
+                const updatedFormats = [...classFormats];
+                updatedFormats[lastIndex] = {
+                  ...updatedFormats[lastIndex],
+                  restInterval
+                };
+                setClassFormats(updatedFormats);
+              }
+            }}
+          />
+          <div className="flex justify-between mt-1">
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 10;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    restInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              10s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 15;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    restInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              15s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 30;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    restInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              30s
+            </button>
+            <button 
+              type="button" 
+              className="text-xs text-primary"
+              onClick={() => {
+                const value = 60;
+                if (currentFormatIndex !== null) {
+                  const updatedFormats = [...classFormats];
+                  updatedFormats[currentFormatIndex] = {
+                    ...updatedFormats[currentFormatIndex],
+                    restInterval: value
+                  };
+                  setClassFormats(updatedFormats);
+                }
+              }}
+            >
+              60s
+            </button>
+          </div>
+        </div>
 
-                            <div className="space-y-2 md:col-span-2">
-                              <Label>Description</Label>
-                              <Input
-                                placeholder="Optional description or notes"
-                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].description ? 
-                                  classFormats[currentFormatIndex].description : ''}
-                                onChange={(e) => {
-                                  const description = e.target.value || undefined;
-                                  if (currentFormatIndex !== null) {
-                                    const updatedFormats = [...classFormats];
-                                    updatedFormats[currentFormatIndex] = {
-                                      ...updatedFormats[currentFormatIndex],
-                                      description
-                                    };
-                                    setClassFormats(updatedFormats);
-                                  } else if (classFormats.length > 0) {
-                                    const lastFormat = classFormats[classFormats.length - 1];
-                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, description }]);
-                                  }
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-end gap-2 p-0 pt-4">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              setAddingNewFormat(false);
-                              setCurrentFormatIndex(null);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={() => {
-                              const formatData = currentFormatIndex !== null ? 
-                                classFormats[currentFormatIndex] : 
-                                classFormats.length > 0 ? 
-                                  classFormats[classFormats.length - 1] : 
-                                  { type: 'custom' };
-                              
-                              if (currentFormatIndex !== null) {
-                                editClassFormat(currentFormatIndex, formatData);
-                              } else {
-                                addClassFormat(formatData);
-                              }
-                            }}
-                            disabled={!classFormats.length && !currentFormatIndex !== null}
-                          >
-                            {currentFormatIndex !== null ? 'Update' : 'Add'}
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    )}
-                  </div>
-
-                  {form.watch("groupFormat.type") === "custom" && (
-                    <div className="grid grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="groupFormat.workInterval"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Work Interval (seconds)</FormLabel>
-                            <FormControl>
-                              <Input type="number" min="10" max="300" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="groupFormat.restInterval"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Rest Interval (seconds)</FormLabel>
-                            <FormControl>
-                              <Input type="number" min="5" max="120" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="groupFormat.rounds"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Number of Rounds</FormLabel>
-                            <FormControl>
-                              <Input type="number" min="1" max="20" {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>Description</Label>
+          <Input
+            placeholder="Optional description or notes"
+            value={currentFormatIndex !== null && classFormats[currentFormatIndex].description 
+              ? classFormats[currentFormatIndex].description 
+              : ''}
+            onChange={(e) => {
+              const description = e.target.value || undefined;
+              
+              if (currentFormatIndex !== null) {
+                const updatedFormats = [...classFormats];
+                updatedFormats[currentFormatIndex] = {
+                  ...updatedFormats[currentFormatIndex],
+                  description
+                };
+                setClassFormats(updatedFormats);
+              } else if (classFormats.length > 0) {
+                const lastIndex = classFormats.length - 1;
+                const updatedFormats = [...classFormats];
+                updatedFormats[lastIndex] = {
+                  ...updatedFormats[lastIndex],
+                  description
+                };
+                setClassFormats(updatedFormats);
+              }
+            }}
+          />
+        </div>
+      </div>
+    </CardContent>
+    <CardFooter className="flex justify-end gap-2 p-0 pt-4">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          setAddingNewFormat(false);
+          setCurrentFormatIndex(null);
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        type="button"
+        onClick={() => {
+          if (currentFormatIndex !== null) {
+            // We're editing an existing format
+            editClassFormat(currentFormatIndex, classFormats[currentFormatIndex]);
+          } else if (classFormats.length > 0) {
+            // We have a new format in the state
+            const newFormat = classFormats[classFormats.length - 1];
+            if (newFormat.type) {
+              addClassFormat(newFormat);
+            }
+          }
+        }}
+        disabled={currentFormatIndex === null && classFormats.length === 0}
+                        >
+                          {currentFormatIndex !== null ? 'Update' : 'Add'}
+                        </Button>
+                      </CardFooter>
+                    </Card>
                   )}
+                </div>
 
                   {/* Participant Information Section */}
                   <div className="space-y-4">
@@ -2169,7 +2365,19 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                     {/* Step 2: Workout Goals */}
                     {wizardStep === 2 && (
                       <div className="space-y-4">
-                        <h3 className="font-medium text-lg">What's the primary goal of this workout?</h3>
+                        <h3 className="font-medium text-lg">What is the primary goal of this workout?</h3>
+                        
+                        {sessionType === "group" && (
+                          <div className="bg-muted p-3 rounded-md mb-4">
+                            <div className="flex gap-2 items-center text-sm">
+                              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                              <span>
+                                Showing goals specific to {form.watch('classType') || 'group'} classes.
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        
                         <FormField
                           control={form.control}
                           name="workoutGoal"
@@ -2177,16 +2385,28 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                             <FormItem>
                               <FormControl>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {workoutGoals.map((goal) => 
-                                    renderOptionCard(
-                                      goal.id,
-                                      goal.name,
-                                      goal.description,
-                                      goal.icon,
-                                      field.value === goal.id,
-                                      () => field.onChange(goal.id)
+                                  {availableWorkoutGoals
+                                    .filter(goal => {
+                                      // For group sessions, further filter based on class type if selected
+                                      if (sessionType === "group" && form.watch('classType')) {
+                                        if (form.watch('classType') === 'HIIT' && goal.id !== 'hiit' && goal.id !== 'weight-loss') return false;
+                                        if (form.watch('classType') === 'LIFT' && goal.id !== 'strength' && goal.id !== 'endurance') return false;
+                                        if (form.watch('classType') === 'GLC' && goal.id !== 'general-fitness' && goal.id !== 'endurance') return false;
+                                        if (form.watch('classType') === 'METCON' && goal.id !== 'weight-loss' && goal.id !== 'endurance') return false;
+                                      }
+                                      return true;
+                                    })
+                                    .map((goal) => 
+                                      renderOptionCard(
+                                        goal.id,
+                                        goal.name,
+                                        goal.description,
+                                        goal.icon,
+                                        field.value === goal.id,
+                                        () => field.onChange(goal.id)
+                                      )
                                     )
-                                  )}
+                                  }
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -2442,25 +2662,54 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                   {/* Equipment Presets */}
                   <div className="mb-6">
                     <h3 className="text-sm font-medium mb-2">Equipment Presets</h3>
+                    
+                    {sessionType === "group" && form.watch('classType') && (
+                      <div className="bg-muted/50 p-3 rounded-md mb-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
+                          <span>
+                            Showing recommended equipment for {
+                              form.watch('classType') === 'hiit' ? 'HIIT' :
+                              form.watch('classType') === 'circuit' ? 'Circuit Training' :
+                              form.watch('classType') === 'strength' ? 'Group Strength' :
+                              form.watch('classType') === 'bootcamp' ? 'Bootcamp' :
+                              form.watch('classType') === 'cardio' ? 'Cardio Focus' :
+                              form.watch('classType')
+                            } classes
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="grid grid-cols-2 gap-2">
-                      {filteredPresets.map(preset => (
-                        <Button
-                          key={preset.id}
-                          type="button"
-                          variant={selectedPreset === preset.id ? "default" : "outline"}
-                          className="justify-start"
-                          onClick={() => handlePresetChange(preset.id)}
-                        >
-                          {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2" />}
-                          {preset.name}
-                        </Button>
-                      ))}
+                      {filteredPresets
+                        .filter(preset => {
+                          // For group sessions, filter presets based on class type
+                          if (sessionType === "group" && form.watch('classType')) {
+                            if (form.watch('classType') === 'hiit' && preset.id !== 'hiit-class' && preset.id !== 'minimal') return false;
+                            if (form.watch('classType') === 'circuit' && preset.id !== 'circuit-class' && preset.id !== 'minimal') return false;
+                            if (form.watch('classType') === 'bootcamp' && preset.id !== 'bootcamp' && preset.id !== 'minimal') return false;
+                            if (form.watch('classType') === 'strength' && preset.id !== 'strength-class' && preset.id !== 'standard-gym') return false;
+                          }
+                          return true;
+                        })
+                        .map(preset => (
+                          <Button
+                            key={preset.id}
+                            type="button"
+                            variant={selectedPreset === preset.id ? "default" : "outline"}
+                            className="justify-start h-auto py-2 text-left"
+                            onClick={() => handlePresetChange(preset.id)}
+                          >
+                            <div>
+                              {selectedPreset === preset.id && <CheckCircle2 className="h-4 w-4 mr-2 inline-block" />}
+                              <span className="font-medium">{preset.name}</span>
+                              <p className="text-xs text-muted-foreground mt-1">{preset.description}</p>
+                            </div>
+                          </Button>
+                        ))
+                      }
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {selectedPreset ? 
-                        equipmentPresets.find(p => p.id === selectedPreset)?.description :
-                        "Select a preset or customize your equipment selection below"}
-                    </p>
                   </div>
 
                   {/* Show Full Gym checkbox */}
