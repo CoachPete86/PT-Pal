@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileText, Download, ChevronRight } from "lucide-react";
+import { Loader2, FileText, Download, ChevronRight, HelpCircle, Info as InfoIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -590,6 +590,13 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 >
                   Load Strength Template
                 </Button>
+                <HelpTooltip 
+                  character="physio" 
+                  content="Strength circuits focus on building muscle and improving overall strength through resistance exercises. These circuits typically use weights and compound movements."
+                  side="bottom"
+                >
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </HelpTooltip>
                 <Button 
                   size="sm" 
                   onClick={addFormat}
@@ -597,6 +604,13 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 >
                   Add Format
                 </Button>
+                <HelpTooltip 
+                  character="yoga-instructor" 
+                  content="Create a custom workout format with your own work/rest intervals. Mix and match multiple formats to create varied and engaging sessions."
+                  side="bottom"
+                >
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </HelpTooltip>
               </div>
             </div>
             {classFormats.length === 0 ? (
@@ -719,7 +733,15 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           </AlertDialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label>Format Type</Label>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Label>Format Type</Label>
+                <HelpTooltip 
+                  character="gym-buddy" 
+                  content="The format type determines how exercises will be structured during the workout session. Different formats emphasize various training aspects like intensity, endurance, or strength."
+                >
+                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                </HelpTooltip>
+              </div>
               <Select
                 value={localType}
                 onValueChange={(val) => setLocalType(val as ClassFormatType)}
@@ -738,7 +760,16 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Rounds</Label>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label>Rounds</Label>
+                  <HelpTooltip 
+                    character="coach" 
+                    content="The number of times you'll repeat the exercise sequence. For example, '8 rounds' means the entire circuit will be performed 8 times."
+                    side="top"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
                 <Input
                   type="text"
                   value={localRounds}
@@ -747,7 +778,16 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <Label>Work Interval (s)</Label>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label>Work Interval (s)</Label>
+                  <HelpTooltip 
+                    character="scientist" 
+                    content="This is the time spent actively performing the exercise. For example, '20' means 20 seconds of work per exercise per round."
+                    side="top"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
                 <Input
                   type="text"
                   value={localWork}
@@ -756,7 +796,16 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <Label>Rest Interval (s)</Label>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label>Rest Interval (s)</Label>
+                  <HelpTooltip 
+                    character="physio" 
+                    content="This is the recovery time between exercises. For example, '10' means 10 seconds of rest after each exercise before starting the next one."
+                    side="top"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
                 <Input
                   type="text"
                   value={localRest}
