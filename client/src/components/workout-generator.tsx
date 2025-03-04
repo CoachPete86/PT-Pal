@@ -823,11 +823,11 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
       recommended = recommended.filter(item => minimalItems.includes(item));
 
       // Make sure we have at least the minimal items
-      recommended = [...new Set([...recommended, ...minimalItems])];
+      recommended = [...recommended, ...minimalItems].filter((item, index, array) => array.indexOf(item) === index);
     }
 
     // Remove duplicates
-    return [...new Set(recommended)];
+    return recommended.filter((item, index) => recommended.indexOf(item) === index);
   };
 
   const form = useForm<WorkoutFormValues>({
@@ -845,12 +845,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
         restBetweenStations: true,
         mixedEquipmentStations: true,
       },
-      groupFormat: {
-        type: "amrap",
-        workInterval: 40,
-        restInterval: 20,
-        rounds: 5,
-      },
+      classFormats: [],
       specialtyEquipment: [],
     },
   });
@@ -969,38 +964,107 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
         const classType = value.classType;
         let templateId = "";
       
-        // Map class types to template IDs
-        const templateMap: Record<string, string> = {
-          "HIIT": "hiit-standard",
-          "BURN": "bootcamp-mixed", 
-          "LIFT": "strength-circuit",
-          "GLC": "circuit-training",
-          "METCON": "endurance"
+        // Map class types to template IDs and equipment presets
+        const classConfig: Record<string, { template: string; preset: string; circuitTypes: string[]; formats?: Partial<ClassFormat>[] }> = {
+          "HIIT": {
+            template: "hiit-standard",
+            preset: "hiit-class",
+            circuitTypes: ["tabata", "amrap", "intervals"]
+          },
+          "BURN": {
+            template: "bootcamp-mixed",
+            preset: "bootcamp",
+            circuitTypes: ["intervals", "emom", "tabata"]
+          },
+          "LIFT": {
+            template: "strength-circuit",
+            preset: "strength-class",
+            circuitTypes: ["timed", "superset", "resistance-cardio"]
+          },
+          "GLC": {
+            template: "circuit-training",
+            preset: "circuit-class",
+            circuitTypes: ["station", "superset", "tri-set"]
+          },
+          "METCON": {
+            template: "endurance",
+            preset: "circuit-class",
+            circuitTypes: ["amrap", "emom", "intervals"]
+          },
+          "CORE": {
+            template: "circuit-training",
+            preset: "minimal",
+            circuitTypes: ["timed", "superset"],
+            formats: [
+              { type: "timed-sets", workInterval: 40, restInterval: 20, rounds: 3 },
+              { type: "tabata", workInterval: 20, restInterval: 10, rounds: 8 }
+            ]
+          },
+          "FLEX": {
+            template: "circuit-training",
+            preset: "bodyweight",
+            circuitTypes: ["timed", "superset"],
+            formats: [
+              { type: "timed-sets", workInterval: 60, restInterval: 30, rounds: 2 },
+              { type: "timed-sets", workInterval: 45, restInterval: 15, rounds: 3 }
+            ]
+          }
         };
       
-        templateId = templateMap[classType] || "";
-      
-        if (templateId) {
-          const template = classFormatTemplates.find(t => t.id === templateId);
-          if (template && template.formats.length > 0) {
-            // Map the formats to ensure they have the right type
-            const formattedItems = template.formats.map(format => ({
-              ...format,
-              type: format.type as ClassFormatType
-            }));
+        const config = classConfig[classType];
+        if (config) {
+          templateId = config.template;
           
-            // Update both the state and form
+          // Apply equipment preset
+          handlePresetChange(config.preset);
+          
+          // Set up formats
+          let formattedItems: ClassFormat[] = [];
+          
+          if (config.formats) {
+            // Use predefined formats for special cases like CORE and FLEX
+            formattedItems = config.formats.map(format => ({
+              type: format.type as ClassFormatType,
+              workInterval: format.workInterval,
+              restInterval: format.restInterval,
+              rounds: format.rounds,
+              description: `${format.type === 'timed-sets' ? 'Timed Set' : 'Tabata'} Format`
+            }));
+          } else {
+            // Use template formats for standard classes
+            const template = classFormatTemplates.find(t => t.id === templateId);
+            if (template?.formats.length) {
+              formattedItems = template.formats.map(format => ({
+                ...format,
+                type: format.type as ClassFormatType
+              }));
+            }
+          }
+          
+          if (formattedItems.length > 0) {
+            // Update formats
             setClassFormats(formattedItems);
             form.setValue('classFormats', formattedItems, {
               shouldDirty: true,
               shouldTouch: true,
               shouldValidate: true
             });
+            
+            // Update circuit preferences
+            form.setValue('circuitPreferences', {
+              types: config.circuitTypes,
+              stationRotation: !["CORE", "FLEX"].includes(classType),
+              restBetweenStations: true,
+              mixedEquipmentStations: !["CORE", "FLEX"].includes(classType)
+            }, {
+              shouldValidate: true
+            });
 
             // Notify user
             toast({
               title: "Class Format Applied",
-              description: `Loaded template with ${formattedItems.length} format sections.`
+              description: `Configured ${classType} with ${formattedItems.length} format sections and ${config.circuitTypes.length} circuit types.`,
+              variant: "default"
             });
           }
         }
