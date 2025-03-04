@@ -13,8 +13,6 @@ async function createTestUser() {
       subscriptionStatus: "active",
       status: "active", 
       fullName: "Test User",
-      created_at: new Date(),
-      last_active: new Date(),
       preferences: {
         goals: "Test goals",
         healthConditions: "None",

@@ -75,19 +75,10 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/">
               <div className="flex items-center space-x-2 cursor-pointer">
-                {user?.branding?.logoUrl ? (
-                  <img 
-                    src={user.branding.logoUrl} 
-                    alt="Logo" 
-                    className="h-8 w-auto"
-                  />
-                ) : (
-                  <BarChart className="h-6 w-6 text-primary" />
-                )}
-                <span className="text-xl font-bold" style={{
-                  color: user?.branding?.primaryColor || 'inherit'
-                }}>
-                  {user?.businessName || "PTpal"}
+                {/* We use the default icon since branding is not directly available in User type */}
+                <BarChart className="h-6 w-6 text-primary" />
+                <span className="text-xl font-bold">
+                  {"PTpal"}
                 </span>
               </div>
             </Link>
