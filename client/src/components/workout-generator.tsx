@@ -71,6 +71,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 
 interface WorkoutPlan {
   id?: number;
@@ -124,12 +125,13 @@ const workoutFormSchema = z.object({
     restBetweenStations: z.boolean(),
     mixedEquipmentStations: z.boolean(),
   }),
-  groupFormat: z.object({
-    type: z.enum(["amrap", "emom", "tabata", "custom"]),
+  classFormats: z.array(z.object({
+    type: z.enum(["amrap", "emom", "tabata", "rep-based", "timed-sets", "ladder", "pyramid", "complex", "chipper", "custom"]),
     workInterval: z.number().optional(),
     restInterval: z.number().optional(),
     rounds: z.number().optional(),
-  }).optional(),
+    description: z.string().optional(),
+  })).optional(),
   equipment: z.array(z.string()).min(1, "Select at least one equipment item"),
   clientDetails: z.object({
     age: z.string(),
@@ -372,6 +374,20 @@ const specialtyEquipment = [
   { id: "yoga-pilates", name: "Yoga/Pilates", items: ["yoga-blocks", "pilates-reformer", "resistance-rings"] }
 ];
 
+// Enhanced class formats
+const classFormatOptions = [
+  { id: "amrap", name: "AMRAP", description: "As Many Rounds As Possible in a set time" },
+  { id: "emom", name: "EMOM", description: "Every Minute On the Minute" },
+  { id: "tabata", name: "Tabata", description: "20 seconds work, 10 seconds rest" },
+  { id: "rep-based", name: "Rep Based", description: "Fixed number of repetitions" },
+  { id: "timed-sets", name: "Timed Sets", description: "Work for a set time period" },
+  { id: "ladder", name: "Ladder", description: "Increasing or decreasing reps" },
+  { id: "pyramid", name: "Pyramid", description: "Increase then decrease reps" },
+  { id: "complex", name: "Complex", description: "Multiple exercises with same weight" },
+  { id: "chipper", name: "Chipper", description: "Work through a list of exercises once" },
+  { id: "custom", name: "Custom Format", description: "Create your own workout format" }
+];
+
 // Circuit types
 const baseCircuitTypes = [
   { id: "timed", label: "Timed Circuits (Fixed Work/Rest)" },
@@ -423,6 +439,10 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [wizardStep, setWizardStep] = useState<number>(1);
   const [wizardEnabled, setWizardEnabled] = useState<boolean>(true);
+  // New state for managing multiple class formats
+  const [classFormats, setClassFormats] = useState<Array<{ type: "amrap" | "emom" | "tabata" | "rep-based" | "timed-sets" | "ladder" | "pyramid" | "complex" | "chipper" | "custom", workInterval?: number, restInterval?: number, rounds?: number, description?: string }>>([]);
+  const [addingNewFormat, setAddingNewFormat] = useState(false);
+  const [currentFormatIndex, setCurrentFormatIndex] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -807,6 +827,33 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     exportPdfMutation.mutate(workoutId);
   };
 
+  // Add a class format
+  const addClassFormat = (format: { type: string, workInterval?: number, restInterval?: number, rounds?: number, description?: string }) => {
+    const currentFormats = form.getValues().classFormats || [];
+    form.setValue('classFormats', [...currentFormats, format]);
+    setClassFormats([...currentFormats, format]);
+    setAddingNewFormat(false);
+    setCurrentFormatIndex(null);
+  };
+
+  // Edit a class format
+  const editClassFormat = (index: number, format: { type: string, workInterval?: number, restInterval?: number, rounds?: number, description?: string }) => {
+    const currentFormats = [...(form.getValues().classFormats || [])];
+    currentFormats[index] = format;
+    form.setValue('classFormats', currentFormats);
+    setClassFormats(currentFormats);
+    setAddingNewFormat(false);
+    setCurrentFormatIndex(null);
+  };
+
+  // Remove a class format
+  const removeClassFormat = (index: number) => {
+    const currentFormats = form.getValues().classFormats || [];
+    const newFormats = currentFormats.filter((_, i) => i !== index);
+    form.setValue('classFormats', newFormats);
+    setClassFormats(newFormats);
+  };
+
   const handleDownload = () => {
     if (!selectedWorkoutPlan) return;
 
@@ -1018,31 +1065,255 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="groupFormat.type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Class Format</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select format" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="amrap">AMRAP (As Many Rounds As Possible)</SelectItem>
-                            <SelectItem value="emom">EMOM (Every Minute On the Minute)</SelectItem>
-                            <SelectItem value="tabata">Tabata</SelectItem>
-                            <SelectItem value="custom">Custom Work/Rest Intervals</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
+                  {/* Class Formats Section - Multiple formats allowed */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Class Formats</FormLabel>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setAddingNewFormat(true);
+                          setCurrentFormatIndex(null);
+                        }}
+                      >
+                        Add Format
+                      </Button>
+                    </div>
+                    <FormDescription>
+                      Create a varied class with multiple workout formats (e.g., EMOM, Tabata, etc.)
+                    </FormDescription>
+                    
+                    {/* List of added formats */}
+                    {classFormats.length > 0 ? (
+                      <div className="space-y-3">
+                        {classFormats.map((format, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <span className="font-medium">
+                                {classFormatOptions.find(opt => opt.id === format.type)?.name || format.type}
+                              </span>
+                              {format.workInterval && format.restInterval && (
+                                <span className="text-sm text-muted-foreground ml-2">
+                                  {format.workInterval}s work / {format.restInterval}s rest
+                                </span>
+                              )}
+                              {format.rounds && (
+                                <span className="text-sm text-muted-foreground ml-2">
+                                  {format.rounds} rounds
+                                </span>
+                              )}
+                              {format.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{format.description}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setCurrentFormatIndex(index);
+                                  setAddingNewFormat(true);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeClassFormat(index)}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center p-4 border border-dashed rounded-lg text-muted-foreground">
+                        No formats added yet. Add your first workout format.
+                      </div>
                     )}
-                  />
+
+                    {/* Format editor */}
+                    {addingNewFormat && (
+                      <Card className="border p-4">
+                        <CardHeader className="p-0 pb-4">
+                          <CardTitle className="text-lg">
+                            {currentFormatIndex !== null ? 'Edit Format' : 'Add New Format'}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label>Format Type</Label>
+                              <Select 
+                                value={currentFormatIndex !== null ? classFormats[currentFormatIndex].type : undefined}
+                                onValueChange={(value) => {
+                                  if (currentFormatIndex !== null) {
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[currentFormatIndex] = {
+                                      ...updatedFormats[currentFormatIndex],
+                                      type: value
+                                    };
+                                    setClassFormats(updatedFormats);
+                                  } else {
+                                    setClassFormats([...classFormats, { type: value }]);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select format type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {classFormatOptions.map(format => (
+                                    <SelectItem key={format.id} value={format.id}>
+                                      {format.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Rounds</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                max="20"
+                                placeholder="Number of rounds"
+                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].rounds ? 
+                                  classFormats[currentFormatIndex].rounds : ''}
+                                onChange={(e) => {
+                                  const rounds = parseInt(e.target.value) || undefined;
+                                  if (currentFormatIndex !== null) {
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[currentFormatIndex] = {
+                                      ...updatedFormats[currentFormatIndex],
+                                      rounds
+                                    };
+                                    setClassFormats(updatedFormats);
+                                  } else if (classFormats.length > 0) {
+                                    const lastFormat = classFormats[classFormats.length - 1];
+                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, rounds }]);
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Work Interval (seconds)</Label>
+                              <Input
+                                type="number"
+                                min="5"
+                                max="300"
+                                placeholder="e.g. 30 seconds"
+                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].workInterval ? 
+                                  classFormats[currentFormatIndex].workInterval : ''}
+                                onChange={(e) => {
+                                  const workInterval = parseInt(e.target.value) || undefined;
+                                  if (currentFormatIndex !== null) {
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[currentFormatIndex] = {
+                                      ...updatedFormats[currentFormatIndex],
+                                      workInterval
+                                    };
+                                    setClassFormats(updatedFormats);
+                                  } else if (classFormats.length > 0) {
+                                    const lastFormat = classFormats[classFormats.length - 1];
+                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, workInterval }]);
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Rest Interval (seconds)</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="300"
+                                placeholder="e.g. 10 seconds"
+                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].restInterval ? 
+                                  classFormats[currentFormatIndex].restInterval : ''}
+                                onChange={(e) => {
+                                  const restInterval = parseInt(e.target.value) || undefined;
+                                  if (currentFormatIndex !== null) {
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[currentFormatIndex] = {
+                                      ...updatedFormats[currentFormatIndex],
+                                      restInterval
+                                    };
+                                    setClassFormats(updatedFormats);
+                                  } else if (classFormats.length > 0) {
+                                    const lastFormat = classFormats[classFormats.length - 1];
+                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, restInterval }]);
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                              <Label>Description</Label>
+                              <Input
+                                placeholder="Optional description or notes"
+                                value={currentFormatIndex !== null && classFormats[currentFormatIndex].description ? 
+                                  classFormats[currentFormatIndex].description : ''}
+                                onChange={(e) => {
+                                  const description = e.target.value || undefined;
+                                  if (currentFormatIndex !== null) {
+                                    const updatedFormats = [...classFormats];
+                                    updatedFormats[currentFormatIndex] = {
+                                      ...updatedFormats[currentFormatIndex],
+                                      description
+                                    };
+                                    setClassFormats(updatedFormats);
+                                  } else if (classFormats.length > 0) {
+                                    const lastFormat = classFormats[classFormats.length - 1];
+                                    setClassFormats([...classFormats.slice(0, -1), { ...lastFormat, description }]);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2 p-0 pt-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setAddingNewFormat(false);
+                              setCurrentFormatIndex(null);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              const formatData = currentFormatIndex !== null ? 
+                                classFormats[currentFormatIndex] : 
+                                classFormats.length > 0 ? 
+                                  classFormats[classFormats.length - 1] : 
+                                  { type: 'custom' };
+                              
+                              if (currentFormatIndex !== null) {
+                                editClassFormat(currentFormatIndex, formatData);
+                              } else {
+                                addClassFormat(formatData);
+                              }
+                            }}
+                            disabled={!classFormats.length && !currentFormatIndex !== null}
+                          >
+                            {currentFormatIndex !== null ? 'Update' : 'Add'}
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    )}
+                  </div>
 
                   {form.watch("groupFormat.type") === "custom" && (
                     <div className="grid grid-cols-3 gap-4">
