@@ -306,7 +306,13 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         stationRotation,
         restBetweenStations,
         mixedEquipmentStations,
+        types: [],
       },
+      equipment: [
+        "Dumbbells", "Kettlebells", "Plyo Boxes", "Concept 2 Rowers",
+        "Ski Erg Machines", "Watt Bike", "Spin Bike", "Sledge",
+        "Battle Ropes", "Bodybar with plates", "Step up Box", "Yoga Matt"
+      ],
       classFormats: classFormats.map((fmt) => ({
         type: fmt.type,
         rounds: parseInt(fmt.rounds || "0") || 0,
