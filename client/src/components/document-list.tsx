@@ -26,6 +26,36 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
     queryKey: ["/api/documents"],
   });
 
+  // Default templates in UK English format
+  const defaultTemplates = [
+    { id: -1, title: "Session Plan Template", type: "document", isTemplate: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: -2, title: "PAR-Q Health Questionnaire", type: "document", isTemplate: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: -3, title: "Initial Consultation Form", type: "document", isTemplate: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: -4, title: "Client Contract & Terms", type: "document", isTemplate: true, createdAt: new Date(), updatedAt: new Date() },
+    { id: -5, title: "Fitness Assessment Form", type: "document", isTemplate: true, createdAt: new Date(), updatedAt: new Date() }
+  ];
+
+  const handleTemplateSelect = (templateId: number) => {
+    // Find the selected template
+    const template = defaultTemplates.find(t => t.id === templateId);
+    if (template) {
+      onSelect(template as Document);
+    }
+  };
+
+  const handleCreateDocument = () => {
+    const newDoc = {
+      id: null,
+      title: "New Document",
+      content: "",
+      type: "document",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as unknown as Document;
+    
+    onSelect(newDoc);
+  };
+
   const syncMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/documents/sync");
@@ -58,9 +88,14 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
   if (!documents?.length) {
     return (
       <div className="text-center p-4">
-        <p className="text-sm text-muted-foreground mb-4">No documents yet</p>
+        <p className="text-sm text-muted-foreground mb-4">No saved documents yet</p>
         <div className="space-y-2">
-          <Button variant="outline" size="sm" className="w-full">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+            onClick={handleCreateDocument}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Create Document
           </Button>
@@ -77,6 +112,28 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
             )} />
             Sync with Notion
           </Button>
+        </div>
+        
+        {/* Display default templates even when no documents exist */}
+        <div className="mt-6 border-t pt-4">
+          <h3 className="text-sm font-medium mb-3">Template Library</h3>
+          <div className="space-y-2">
+            {defaultTemplates.map(template => (
+              <div 
+                key={template.id}
+                className={cn(
+                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colors text-left",
+                  selectedId === template.id && "bg-muted border-primary"
+                )}
+                onClick={() => handleTemplateSelect(template.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">{template.title}</span>
+                  <span className="text-xs text-muted-foreground">Template</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -139,14 +196,47 @@ export default function DocumentList({ onSelect, selectedId }: DocumentListProps
           )} />
           Sync
         </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleCreateDocument}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New
+        </Button>
       </div>
-      <ScrollArea className="h-[calc(100vh-12rem)] overflow-y-auto -webkit-overflow-scrolling-touch">
+      <ScrollArea className="h-[calc(100vh-24rem)] overflow-y-auto -webkit-overflow-scrolling-touch">
         <div className="space-y-1 p-2">
+          <h3 className="text-sm font-medium mb-2 text-muted-foreground">Your Documents</h3>
           {documentTree.map((document) => (
             <DocumentNode key={document.id} document={document} />
           ))}
         </div>
       </ScrollArea>
+      
+      {/* Templates section - always show */}
+      <div className="border-t pt-4">
+        <h3 className="text-sm font-medium mb-2 text-muted-foreground">Template Library</h3>
+        <ScrollArea className="h-[calc(100vh-28rem)] overflow-y-auto -webkit-overflow-scrolling-touch">
+          <div className="space-y-2 p-1">
+            {defaultTemplates.map(template => (
+              <div 
+                key={template.id}
+                className={cn(
+                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colors text-left",
+                  selectedId === template.id && "bg-muted border-primary"
+                )}
+                onClick={() => handleTemplateSelect(template.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">{template.title}</span>
+                  <span className="text-xs text-muted-foreground">Template</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
