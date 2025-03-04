@@ -9,13 +9,16 @@ async function createTestUser() {
       username: "n",
       password: hashedPassword,
       role: "trainer",
-      subscription_tier: "free",
-      subscription_status: "active",
-      full_name: "Test User",
+      subscriptionTier: "free",
+      subscriptionStatus: "active",
+      status: "active", 
+      fullName: "Test User",
       created_at: new Date(),
       last_active: new Date(),
-      preferences: {},
-      onboarding_status: "completed"
+      preferences: {
+        goals: "Test goals",
+        healthConditions: "None",
+      }
     });
     console.log("Test user created successfully:", user);
   } catch (error) {

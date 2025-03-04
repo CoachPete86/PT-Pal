@@ -74,7 +74,15 @@ export function setupAuth(app: Express) {
           if (!isValid) {
             return done(null, false, { message: "Invalid email or password" });
           }
-          return done(null, user);
+
+          // Ensure the user has all required fields
+          const userWithDefaults = {
+            ...user,
+            status: user.status || 'active',
+            preferences: user.preferences || {}
+          };
+
+          return done(null, userWithDefaults);
         } catch (error) {
           console.error('Login error:', error);
           return done(error);
@@ -97,7 +105,15 @@ export function setupAuth(app: Express) {
         return done(null, false);
       }
       console.log('User deserialized successfully');
-      done(null, user);
+
+      // Ensure user has all required fields
+      const userWithDefaults = {
+        ...user,
+        status: user.status || 'active',
+        preferences: user.preferences || {}
+      };
+
+      done(null, userWithDefaults);
     } catch (error) {
       console.error('Deserialization error:', error);
       done(error);
@@ -126,6 +142,7 @@ export function setupAuth(app: Express) {
         role: "trainer",
         subscriptionTier: "free",
         subscriptionStatus: "active",
+        status: "active" // Added status field here
       });
 
       req.login(user, (err) => {

@@ -120,36 +120,36 @@ export class DatabaseStorage implements IStorage {
 
   // User Management
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    const results = await db.select().from(users).where(eq(users.id, id));
+    return results.length > 0 ? results[0] as User : undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    const results = await db.select().from(users).where(eq(users.username, username));
+    return results.length > 0 ? results[0] as User : undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+    const results = await db.select().from(users).where(eq(users.email, email));
+    return results.length > 0 ? results[0] as User : undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
-    return user;
+    const results = await db.insert(users).values(insertUser).returning();
+    return results[0] as User;
   }
 
   async updateUser(id: number, data: Partial<User>): Promise<User> {
-    const [user] = await db
+    const results = await db
       .update(users)
       .set(data)
       .where(eq(users.id, id))
       .returning();
-    return user;
+    return results[0] as User;
   }
 
   async getClients(trainerId: number): Promise<User[]> {
-    return db
+    const results = await db
       .select()
       .from(users)
       .where(and(
@@ -157,6 +157,7 @@ export class DatabaseStorage implements IStorage {
         eq(users.trainerId, trainerId)
       ))
       .orderBy(desc(users.id));
+    return results as User[];
   }
 
   async createClient(data: {
@@ -170,7 +171,7 @@ export class DatabaseStorage implements IStorage {
     goals?: string;
     healthConditions?: string;
   }): Promise<User> {
-    const [client] = await db
+    const results = await db
       .insert(users)
       .values({
         username: data.email.split('@')[0],
@@ -181,47 +182,48 @@ export class DatabaseStorage implements IStorage {
         password: Math.random().toString(36).slice(-8), // Generate a random password that will be changed on first login
         subscriptionTier: "free" as const,
         subscriptionStatus: "trial" as const,
+        status: "active" as const,
         preferences: {
           goals: data.goals,
           healthConditions: data.healthConditions
         }
       })
       .returning();
-    return client;
+    return results[0] as User;
   }
 
   // Workspace Management
   async getWorkspace(id: number): Promise<Workspace | undefined> {
-    const [workspace] = await db
+    const results = await db
       .select()
       .from(workspaces)
       .where(eq(workspaces.id, id));
-    return workspace;
+    return results.length > 0 ? results[0] as Workspace : undefined;
   }
 
   async getWorkspaceByTrainer(trainerId: number): Promise<Workspace | undefined> {
-    const [workspace] = await db
+    const results = await db
       .select()
       .from(workspaces)
       .where(eq(workspaces.trainerId, trainerId));
-    return workspace;
+    return results.length > 0 ? results[0] as Workspace : undefined;
   }
 
   async createWorkspace(workspace: InsertWorkspace): Promise<Workspace> {
-    const [newWorkspace] = await db
+    const results = await db
       .insert(workspaces)
       .values(workspace)
       .returning();
-    return newWorkspace;
+    return results[0] as Workspace;
   }
 
   async updateWorkspace(id: number, data: Partial<Workspace>): Promise<Workspace> {
-    const [workspace] = await db
+    const results = await db
       .update(workspaces)
       .set(data)
       .where(eq(workspaces.id, id))
       .returning();
-    return workspace;
+    return results[0] as Workspace;
   }
 
   // Workout Plans
