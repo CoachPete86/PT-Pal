@@ -379,8 +379,9 @@ export default function DocumentEditor({
         onSave({
           title: "",
           content: editor?.getHTML() || "",
-          type: "document",
-          parentId: null,
+          type: "general",
+          workspaceId: 1, // Will be replaced by actual workspace ID in real usage
+          trainerId: 1,   // Will be replaced by actual trainer ID in real usage
         });
       }
     },
@@ -588,8 +589,9 @@ export default function DocumentEditor({
               saveMutation.mutate({
                 title: "Untitled Document",
                 content: editor.getHTML(),
-                type: "document",
-                parentId: null,
+                type: "general",
+                workspaceId: 1, // Will be replaced by actual workspace ID in real usage
+                trainerId: 1,   // Will be replaced by actual trainer ID in real usage
                 notionSync: true,
               })
             }
@@ -604,7 +606,8 @@ export default function DocumentEditor({
               title: "Untitled Document",
               content: editor.getHTML(),
               type: "general",
-              parentId: null,
+              workspaceId: 1, // Will be replaced by actual workspace ID in real usage
+              trainerId: 1,   // Will be replaced by actual trainer ID in real usage
             })
           }
           disabled={saveMutation.isPending}
