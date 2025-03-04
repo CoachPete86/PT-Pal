@@ -8,6 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard";
 import ContentGeneratorPage from "@/pages/content-generator-page";
 import SettingsPage from "@/pages/settings-page";
+import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -26,6 +27,7 @@ function Router() {
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
         <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />
+        <ProtectedRoute path="/workout-features" component={WorkoutFeaturesDemo} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

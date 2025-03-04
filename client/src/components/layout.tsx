@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Home, Users, Calendar, Settings, LogOut, BarChart } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { Home, Users, Calendar, Settings, LogOut, BarChart, Dumbbell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -15,10 +15,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }
   
   const navItems = [
-    { path: "/", icon: <Home className="w-5 h-5" />, label: "Dashboard" },
+    { path: "/dashboard", icon: <Home className="w-5 h-5" />, label: "Dashboard" },
     { path: "/clients", icon: <Users className="w-5 h-5" />, label: "Clients" },
     { path: "/calendar", icon: <Calendar className="w-5 h-5" />, label: "Calendar" },
     { path: "/analytics", icon: <BarChart className="w-5 h-5" />, label: "Analytics" },
+    { path: "/workout-features", icon: <Dumbbell className="w-5 h-5" />, label: "Workout AI" },
     { path: "/settings", icon: <Settings className="w-5 h-5" />, label: "Settings" },
   ];
   
