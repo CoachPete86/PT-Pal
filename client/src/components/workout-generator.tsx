@@ -435,22 +435,22 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
   // GROUP FLOW
   function renderGroupFlow() {
     return (
-      <Card>
+      <Card className="animate-in fade-in duration-500">
         <CardHeader>
           <CardTitle>Group Class Setup</CardTitle>
           <CardDescription>
             Choose your class type, participants, and define formats.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           {/* Class Type */}
           <div>
-            <Label>Class Type</Label>
+            <Label className="text-sm font-medium">Class Type</Label>
             <Select
               value={groupClassType}
               onValueChange={(val) => setGroupClassType(val)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.5">
                 <SelectValue placeholder="Select Class Type" />
               </SelectTrigger>
               <SelectContent>
@@ -465,12 +465,12 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
           {/* Fitness Level */}
           <div>
-            <Label>Group Fitness Level</Label>
+            <Label className="text-sm font-medium">Group Fitness Level</Label>
             <Select
               value={groupFitnessLevel}
               onValueChange={(val) => setGroupFitnessLevel(val as any)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="mt-1.5">
                 <SelectValue placeholder="Select Level" />
               </SelectTrigger>
               <SelectContent>
@@ -481,76 +481,88 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </Select>
           </div>
 
-          {/* Participants */}
-          <div>
-            <Label>Number of Participants</Label>
-            <Input
-              type="number"
-              value={participantCount}
-              onChange={(e) => setParticipantCount(+e.target.value)}
-            />
-          </div>
-          <div>
-            <Label>Workout Format</Label>
-            <Select
-              value={participantFormat}
-              onValueChange={(val) => setParticipantFormat(val as any)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Format" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="individual">Individual</SelectItem>
-                <SelectItem value="partner">Partner</SelectItem>
-                <SelectItem value="groups">Groups (3-5)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {participantFormat === "groups" && (
-            <div>
-              <Label>Group Size</Label>
-              <Input
-                type="number"
-                value={groupSize}
-                onChange={(e) => setGroupSize(+e.target.value)}
-              />
+          {/* Participants Section */}
+          <div className="space-y-4 rounded-lg bg-secondary/10 p-4">
+            <h3 className="font-medium">Participants</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm">Number of Participants</Label>
+                <Input
+                  type="number"
+                  value={participantCount}
+                  onChange={(e) => setParticipantCount(+e.target.value)}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Workout Format</Label>
+                <Select
+                  value={participantFormat}
+                  onValueChange={(val) => setParticipantFormat(val as any)}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Select Format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individual">Individual</SelectItem>
+                    <SelectItem value="partner">Partner</SelectItem>
+                    <SelectItem value="groups">Groups (3-5)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          )}
+            {participantFormat === "groups" && (
+              <div>
+                <Label className="text-sm">Group Size</Label>
+                <Input
+                  type="number"
+                  value={groupSize}
+                  onChange={(e) => setGroupSize(+e.target.value)}
+                  className="mt-1.5 w-full md:w-1/3"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Circuit Preferences */}
-          <div className="border p-3 rounded-md space-y-2">
+          <div className="border p-4 rounded-md space-y-3 bg-muted/30">
+            <h3 className="font-medium mb-2">Circuit Preferences</h3>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={stationRotation}
                 onCheckedChange={(val) => setStationRotation(!!val)}
+                id="station-rotation"
               />
-              <Label>Station Rotation</Label>
+              <Label htmlFor="station-rotation" className="cursor-pointer">Station Rotation</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={restBetweenStations}
                 onCheckedChange={(val) => setRestBetweenStations(!!val)}
+                id="rest-between"
               />
-              <Label>Rest Between Stations</Label>
+              <Label htmlFor="rest-between" className="cursor-pointer">Rest Between Stations</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
                 checked={mixedEquipmentStations}
                 onCheckedChange={(val) => setMixedEquipmentStations(!!val)}
+                id="mixed-equipment"
               />
-              <Label>Mixed Equipment Stations</Label>
+              <Label htmlFor="mixed-equipment" className="cursor-pointer">Mixed Equipment Stations</Label>
             </div>
           </div>
 
           {/* Class Formats */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label>Class Formats</Label>
-              <div className="flex items-center gap-2">
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <Label className="text-sm font-medium">Class Formats</Label>
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => loadFormatTemplate("hiit-standard")}
+                  className="flex-grow sm:flex-grow-0"
                 >
                   Load HIIT Template
                 </Button>
@@ -558,38 +570,43 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                   variant="outline"
                   size="sm"
                   onClick={() => loadFormatTemplate("strength-circuit")}
+                  className="flex-grow sm:flex-grow-0"
                 >
                   Load Strength Template
                 </Button>
-                <Button size="sm" onClick={addFormat}>
+                <Button 
+                  size="sm" 
+                  onClick={addFormat}
+                  className="flex-grow sm:flex-grow-0"
+                >
                   Add Format
                 </Button>
               </div>
             </div>
             {classFormats.length === 0 ? (
-              <div className="text-center text-sm text-muted-foreground p-4 border border-dashed rounded-md">
+              <div className="text-center text-sm text-muted-foreground p-6 border border-dashed rounded-md">
                 No formats yet. Add or load a template.
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {classFormats.map((fmt, idx) => {
                   const fmtOption = classFormatOptions.find(
                     (o) => o.id === fmt.type,
                   );
                   return (
-                    <Card key={idx} className="border">
+                    <Card key={idx} className="border hover:shadow-md transition-shadow">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base">
                           {fmtOption ? fmtOption.name : fmt.type}
                         </CardTitle>
-                        <CardDescription>{fmt.description}</CardDescription>
+                        {fmt.description && <CardDescription>{fmt.description}</CardDescription>}
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm">
-                          Rounds: {fmt.rounds || "?"} | Work:{" "}
-                          {fmt.workInterval || "?"}s | Rest:{" "}
-                          {fmt.restInterval || "?"}s
-                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline" className="bg-primary/10">Rounds: {fmt.rounds || "?"}</Badge>
+                          <Badge variant="outline" className="bg-primary/10">Work: {fmt.workInterval || "?"}s</Badge>
+                          <Badge variant="outline" className="bg-primary/10">Rest: {fmt.restInterval || "?"}s</Badge>
+                        </div>
                       </CardContent>
                       <CardFooter className="flex justify-end gap-2">
                         <Button
@@ -618,7 +635,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           <Button className="w-full" onClick={handleSubmitGroupPlan}>
             {generateMutation.isPending ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                 Generating...
               </>
             ) : (
