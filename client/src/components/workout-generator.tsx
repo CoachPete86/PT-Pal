@@ -211,6 +211,18 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
   const [stationRotation, setStationRotation] = useState(true);
   const [restBetweenStations, setRestBetweenStations] = useState(true);
   const [mixedEquipmentStations, setMixedEquipmentStations] = useState(true);
+  
+  // Equipment selection state
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+  
+  // Available equipment options
+  const equipmentOptions = [
+    "Dumbbells", "Kettlebells", "Plyo Boxes", "Concept 2 Rowers",
+    "Ski Erg Machines", "Watt Bike", "Spin Bike", "Sledge",
+    "Battle Ropes", "Bodybar with plates", "Step up Box", "Yoga Matt",
+    "Resistance Bands", "Medicine Balls", "Slam Balls", "TRX Straps",
+    "Barbell & Plates", "Cable Machine", "Smith Machine", "Bosu Ball"
+  ];
 
   // Single list of “classFormats” for group. No second list.
   const [classFormats, setClassFormats] = useState<ClassFormat[]>([]);
@@ -314,11 +326,9 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         mixedEquipmentStations,
         types: [],
       },
-      equipment: [
-        "Dumbbells", "Kettlebells", "Plyo Boxes", "Concept 2 Rowers",
-        "Ski Erg Machines", "Watt Bike", "Spin Bike", "Sledge",
-        "Battle Ropes", "Bodybar with plates", "Step up Box", "Yoga Matt"
-      ],
+      equipment: selectedEquipment.length > 0 
+        ? selectedEquipment 
+        : equipmentOptions.slice(0, 8), // Default to first 8 equipment if nothing selected
       classFormats: classFormats.map((fmt) => ({
         type: fmt.type,
         rounds: parseInt(fmt.rounds || "0") || 0,
@@ -551,6 +561,44 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 id="mixed-equipment"
               />
               <Label htmlFor="mixed-equipment" className="cursor-pointer">Mixed Equipment Stations</Label>
+            </div>
+          </div>
+          
+          {/* Equipment Selection */}
+          <div className="border p-4 rounded-md space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Available Equipment</h3>
+              <HelpTooltip 
+                character="gym-buddy" 
+                content="Select the equipment available for this workout. The workout plan will be customized based on your equipment selection."
+              >
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </HelpTooltip>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
+              {equipmentOptions.map((item) => (
+                <div key={item} className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={selectedEquipment.includes(item)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedEquipment((prev) => [...prev, item]);
+                      } else {
+                        setSelectedEquipment((prev) => 
+                          prev.filter((equip) => equip !== item)
+                        );
+                      }
+                    }}
+                    id={`equipment-${item.toLowerCase().replace(/\s+/g, '-')}`}
+                  />
+                  <Label 
+                    htmlFor={`equipment-${item.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="cursor-pointer text-sm"
+                  >
+                    {item}
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1067,7 +1115,13 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
   // Generate new session plan template
   function generateSessionPlanTemplate() {
-    // Create a mock sample session plan for demonstration
+    // Create a session plan based on the selected plan
+    // Extract exercises and details from the generated workout plan
+    const usedEquipment = selectedEquipment.length > 0 
+      ? selectedEquipment 
+      : (sessionType === "group" ? equipmentOptions.slice(0, 8) : ["Dumbbells", "Kettlebells", "Resistance Bands"]);
+    
+    // Create a plan following the required structure
     const sampleSessionPlan: SessionPlan = {
       sessionDetails: {
         sessionType: sessionType === "group" ? "Group Training" : "Personal Training",
@@ -1078,7 +1132,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         date: new Date().toLocaleDateString(),
       },
       equipmentNeeded: {
-        equipmentList: ["Dumbbells", "Kettlebells", "Resistance Bands", "Yoga Mat"],
+        equipmentList: usedEquipment,
         other: "Water bottle and towel"
       },
       warmup: {
