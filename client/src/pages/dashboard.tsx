@@ -8,9 +8,15 @@ import FitnessTimeline from "@/components/fitness-timeline";
 import DocumentEditor from "@/components/document-editor";
 import DocumentList from "@/components/document-list";
 import WorkoutGenerator from "@/components/workout-generator";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import WorkoutMascot from "@/components/workout-mascot";
+import AIMotivationCoach from "@/components/ai-motivation-coach";
+import VoiceActivatedWorkout from "@/components/voice-activated-workout";
+import ContentGeneratorPage from "@/pages/content-generator-page";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +44,11 @@ import {
   FileText,
   UserPlus,
   Loader2,
+  Download,
+  PenLine,
+  Share2,
+  Trash,
+  Plus,
 } from "lucide-react";
 import ClientProfile from "@/components/client-profile";
 
@@ -51,10 +62,12 @@ const tabItems = [
   { id: "clients", label: "Client Management", icon: Users },
   { id: "sessions", label: "Session Tracking", icon: Calendar },
   { id: "workouts", label: "Workout Plans", icon: Dumbbell },
+  { id: "workout-ai", label: "Workout AI", icon: Activity },
   { id: "progress", label: "Progress Tracking", icon: Trophy },
   { id: "messages", label: "Messages", icon: MessageSquare },
   { id: "nutrition", label: "Nutrition", icon: Heart },
   { id: "documents", label: "Documents", icon: FileText },
+  { id: "content", label: "Content Creator", icon: ClipboardList },
 ];
 
 export default function DashboardPage() {
@@ -304,6 +317,47 @@ export default function DashboardPage() {
               <WorkoutGenerator />
             </TabsContent>
 
+            <TabsContent value="workout-ai">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>AI Workout Coach</CardTitle>
+                      <CardDescription>
+                        Get real-time motivation and guidance during your workouts
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <AIMotivationCoach character="coach" currentPhase="main-workout" autoPlay={false} />
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Voice-Activated Workouts</CardTitle>
+                      <CardDescription>
+                        Control your workout with voice commands for a hands-free experience
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <VoiceActivatedWorkout 
+                        workoutTitle="Quick HIIT Workout"
+                        totalDuration={15}
+                        exercises={[
+                          { id: "ex1", name: "Jumping Jacks", duration: 30, instruction: "Full range of motion", restAfter: 10 },
+                          { id: "ex2", name: "Mountain Climbers", duration: 30, instruction: "Keep hips stable", restAfter: 10 },
+                          { id: "ex3", name: "Burpees", duration: 30, instruction: "Full extension at the top", restAfter: 10 },
+                          { id: "ex4", name: "High Knees", duration: 30, instruction: "Drive knees up", restAfter: 10 }
+                        ]}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
             <TabsContent value="progress">
               <FitnessTimeline />
             </TabsContent>
@@ -334,20 +388,81 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5" />
-                        Documents
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <DocumentList
-                        onSelect={setSelectedDocument}
-                        selectedId={selectedDocument?.id}
-                      />
-                    </CardContent>
-                  </Card>
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <BookOpen className="h-5 w-5" />
+                          Documents
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <DocumentList
+                          onSelect={setSelectedDocument}
+                          selectedId={selectedDocument?.id}
+                        />
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          PT Forms
+                        </CardTitle>
+                        <CardDescription>
+                          Generate fitness forms for your clients
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <Select defaultValue="consultation">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select form type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="consultation">Initial Consultation Form</SelectItem>
+                              <SelectItem value="parq">PAR-Q Form</SelectItem>
+                              <SelectItem value="consent">Informed Consent</SelectItem>
+                              <SelectItem value="assessment">Fitness Assessment</SelectItem>
+                              <SelectItem value="nutrition">Nutrition Questionnaire</SelectItem>
+                              <SelectItem value="goal">Goal Setting Worksheet</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" className="w-full">
+                              <PenLine className="h-4 w-4 mr-2" />
+                              Customize
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" className="w-full">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download PDF
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" className="w-full">
+                              <Share2 className="h-4 w-4 mr-2" />
+                              Share with Client
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4 border-t">
+                          <h4 className="text-sm font-medium mb-2">Notion Integration</h4>
+                          <div className="space-y-2">
+                            <Button variant="outline" className="w-full" size="sm">
+                              Sync with Notion
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </motion.div>
 
                 <motion.div
@@ -357,10 +472,22 @@ export default function DashboardPage() {
                   transition={{ duration: 0.3 }}
                 >
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between">
                       <CardTitle>
                         {selectedDocument ? selectedDocument.title : "New Document"}
                       </CardTitle>
+                      {selectedDocument && (
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            Export PDF
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Share2 className="h-4 w-4 mr-2" />
+                            Share
+                          </Button>
+                        </div>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <DocumentEditor
@@ -372,6 +499,25 @@ export default function DashboardPage() {
                   </Card>
                 </motion.div>
               </div>
+            </TabsContent>
+            
+            <TabsContent value="content">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ClipboardList className="h-5 w-5" />
+                    Content Creator
+                  </CardTitle>
+                  <CardDescription>
+                    Generate social media content, emails, and other marketing materials for your fitness business
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[800px] overflow-hidden">
+                    <ContentGeneratorPage />
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </main>

@@ -15,7 +15,7 @@ import { format } from "date-fns";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Label } from "./ui/label";
 
-export default function ClientProfile({ clientId }: { clientId: number }) {
+export default function ClientProfile({ clientId, onClose }: { clientId: number, onClose?: () => void }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [showWorkoutGenerator, setShowWorkoutGenerator] = useState(false);
 
@@ -56,7 +56,14 @@ export default function ClientProfile({ clientId }: { clientId: number }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">{client.name}</h2>
+        <div className="flex items-center gap-4">
+          {onClose && (
+            <Button variant="outline" size="sm" onClick={onClose}>
+              Back to Client List
+            </Button>
+          )}
+          <h2 className="text-3xl font-bold tracking-tight">{client.name || client.fullName || client.username}</h2>
+        </div>
         <Button onClick={() => setShowWorkoutGenerator(true)}>Create Workout Plan</Button>
       </div>
 
