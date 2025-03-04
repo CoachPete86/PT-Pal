@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import SessionPlanTemplate, { SessionPlan } from "./session-plan-template";
 
 // UI imports
 import {
@@ -191,6 +192,10 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
   const [sessionType, setSessionType] = useState<SessionType>("group");
   const [selectedPlan, setSelectedPlan] = useState<WorkoutPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // New session plan template feature
+  const [sessionPlan, setSessionPlan] = useState<SessionPlan | null>(null);
+  const [showNewTemplate, setShowNewTemplate] = useState(false);
 
   // -------------- GROUP STATES --------------
   const [groupClassType, setGroupClassType] = useState("");
@@ -611,7 +616,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         </CardContent>
         <CardFooter>
           <Button className="w-full" onClick={handleSubmitGroupPlan}>
-            {generateMutation.isLoading ? (
+            {generateMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Generating...
@@ -954,7 +959,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </Button>
           ) : (
             <Button onClick={handleSubmitPersonalPlan}>
-              {generateMutation.isLoading ? (
+              {generateMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Generating...
@@ -969,6 +974,131 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
     );
   }
 
+  // Generate new session plan template
+  function generateSessionPlanTemplate() {
+    // Create a mock sample session plan for demonstration
+    const sampleSessionPlan: SessionPlan = {
+      sessionDetails: {
+        sessionType: sessionType === "group" ? "Group Training" : "Personal Training",
+        clientName: clientData?.fullName || "Client",
+        coach: "Coach Pete",
+        duration: "45 Minutes",
+        location: trainingLocation || "Gym",
+        date: new Date().toLocaleDateString(),
+      },
+      equipmentNeeded: {
+        equipmentList: ["Dumbbells", "Kettlebells", "Resistance Bands", "Yoga Mat"],
+        other: "Water bottle and towel"
+      },
+      warmup: {
+        explanation: "Start with gentle movements to increase heart rate and prepare your joints for the workout.",
+        exercises: [
+          { exercise: "Arm Circles", durationOrReps: "30 seconds", notes: "Both directions" },
+          { exercise: "Bodyweight Squats", durationOrReps: "10 reps", notes: "Focus on form" },
+          { exercise: "Walkouts", durationOrReps: "5 reps", notes: "Slow and controlled" },
+          { exercise: "Shoulder Taps", durationOrReps: "20 seconds", notes: "Engage core" }
+        ]
+      },
+      mainWorkout: [
+        {
+          blockTitle: "WORKOUT BLOCK 1",
+          format: "3 rounds, 40 sec work/20 sec rest",
+          explanation: "Complete all exercises in sequence with minimal rest between exercises. Rest 2 minutes between rounds.",
+          exercises: [
+            { exercise: "Kettlebell Swings", repsOrTime: "40 seconds", notes: "Medium weight" },
+            { exercise: "Push-ups", repsOrTime: "40 seconds", notes: "Modify on knees if needed" },
+            { exercise: "Goblet Squats", repsOrTime: "40 seconds", notes: "Keep weight in heels" },
+            { exercise: "Plank Hold", repsOrTime: "40 seconds", notes: "Engage core throughout" }
+          ]
+        },
+        {
+          blockTitle: "WORKOUT BLOCK 2",
+          format: "AMRAP in 10 minutes",
+          explanation: "Complete as many rounds as possible in 10 minutes.",
+          exercises: [
+            { exercise: "Dumbbell Rows", repsOrTime: "8 each side", notes: "Focus on back engagement" },
+            { exercise: "Lunges", repsOrTime: "10 each leg", notes: "Alternating legs" },
+            { exercise: "Mountain Climbers", repsOrTime: "20 total", notes: "Fast pace" }
+          ]
+        }
+      ],
+      extraWork: {
+        explanation: "If time permits and energy levels are sufficient, complete this additional work.",
+        exercises: [
+          { exercise: "Tricep Dips", sets: "3", reps: "12", notes: "Use bench or chair" },
+          { exercise: "Bicep Curls", sets: "3", reps: "12", notes: "Light to medium weight" }
+        ]
+      },
+      cooldown: {
+        explanation: "Gradually reduce heart rate and stretch worked muscles to promote recovery.",
+        exercises: [
+          { exercise: "Child's Pose", duration: "30 seconds", notes: "Deep breathing" },
+          { exercise: "Hamstring Stretch", duration: "30 seconds each leg", notes: "Gentle stretch" },
+          { exercise: "Chest Stretch", duration: "30 seconds", notes: "Open chest wide" },
+          { exercise: "Deep Breathing", duration: "1 minute", notes: "Inhale 4s, exhale 4s" }
+        ]
+      },
+      machineSetupGuide: {
+        explanation: "For proper form and safety, set up machines according to these specifications.",
+        machines: [
+          { machine: "Cable Machine", setupInstructions: "Set to hip height for rows, shoulder height for pushes." },
+          { machine: "Adjustable Bench", setupInstructions: "Incline to 45 degrees for incline presses." }
+        ]
+      },
+      closingMessage: "Great work today! Remember to stay hydrated and get adequate protein within 30 minutes of completing this workout. This session targeted multiple muscle groups with a focus on building both strength and endurance.",
+      progressNotes: [
+        "Client completed all exercises with proper form",
+        "Increased weight on goblet squats from last session",
+        "Need to work on hip mobility for deeper squats",
+        "Core strength improving based on plank hold duration"
+      ],
+      nextSessionPreparation: [
+        "Focus on upper body strength next session",
+        "Prepare cardio intervals for metabolic conditioning",
+        "Bring resistance bands for mobility work"
+      ]
+    };
+    
+    setSessionPlan(sampleSessionPlan);
+    setShowNewTemplate(true);
+  }
+  
+  // Render the session plan template
+  function renderSessionPlanTemplate() {
+    if (!sessionPlan || !showNewTemplate) return null;
+    
+    return (
+      <div className="mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Session Plan Template</h2>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowNewTemplate(false)}
+          >
+            Back to Generator
+          </Button>
+        </div>
+        <div className="border rounded-lg p-1 bg-card">
+          <SessionPlanTemplate 
+            plan={sessionPlan} 
+            onExportPdf={() => {
+              toast({ 
+                title: "PDF Export", 
+                description: "PDF export functionality will be implemented soon." 
+              });
+            }}
+            onExportNotion={() => {
+              toast({ 
+                title: "Notion Export", 
+                description: "Notion export functionality will be implemented soon." 
+              });
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   // MAIN RENDER
   return (
     <div className="relative space-y-6">
@@ -979,7 +1109,8 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         </div>
       )}
 
-      {!selectedPlan && (
+      {/* Show template selection if nothing else is displayed */}
+      {!selectedPlan && !showNewTemplate && (
         <Card>
           <CardHeader>
             <CardTitle>Session Type</CardTitle>

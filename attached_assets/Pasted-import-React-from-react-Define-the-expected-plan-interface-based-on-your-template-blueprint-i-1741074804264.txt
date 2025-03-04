@@ -1,0 +1,299 @@
+import React from "react";
+
+// Define the expected plan interface based on your template blueprint
+interface SessionPlan {
+  sessionDetails: {
+    sessionType: string;
+    clientName: string;
+    coach: string;
+    duration: string; // e.g., "45 Minutes"
+    location: string;
+    date?: string;
+  };
+  equipmentNeeded: {
+    equipmentList: string[]; // main equipment list
+    other?: string;
+  };
+  warmup: {
+    explanation: string;
+    exercises: Array<{
+      exercise: string;
+      durationOrReps: string;
+      notes: string;
+    }>;
+  };
+  mainWorkout: Array<{
+    blockTitle: string; // e.g., "WORKOUT BLOCK 1"
+    format: string;     // e.g., "3 rounds, 40 sec work/20 sec rest..."
+    explanation: string;
+    exercises: Array<{
+      exercise: string;
+      repsOrTime: string;
+      notes: string;
+    }>;
+  }>;
+  extraWork?: {
+    explanation: string;
+    exercises: Array<{
+      exercise: string;
+      sets: string;
+      reps: string;
+      notes: string;
+    }>;
+  };
+  cooldown: {
+    explanation: string;
+    exercises: Array<{
+      exercise: string;
+      duration: string;
+      notes: string;
+    }>;
+  };
+  machineSetupGuide: {
+    explanation: string;
+    machines: Array<{
+      machine: string;
+      setupInstructions: string;
+    }>;
+  };
+  closingMessage: string;
+  progressNotes: string[];
+  nextSessionPreparation: string[];
+}
+
+interface SessionPlanTemplateProps {
+  plan: SessionPlan;
+}
+
+const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({ plan }) => {
+  const {
+    sessionDetails,
+    equipmentNeeded,
+    warmup,
+    mainWorkout,
+    extraWork,
+    cooldown,
+    machineSetupGuide,
+    closingMessage,
+    progressNotes,
+    nextSessionPreparation,
+  } = plan;
+
+  return (
+    <div className="p-6 font-sans text-gray-800">
+      {/* Header */}
+      <h1 className="text-3xl font-bold mb-4">🏋️‍♂️ Session Plan Template</h1>
+
+      {/* Session Plan Details */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">📋 Session Plan Details</h2>
+        <p>
+          <strong>🎯 Session Type:</strong> {sessionDetails.sessionType}
+        </p>
+        <p>
+          <strong>👤 Client Name:</strong> {sessionDetails.clientName}
+        </p>
+        <p>
+          <strong>� Coach:</strong> {sessionDetails.coach}
+        </p>
+        <p>
+          <strong>⏱ Duration:</strong> {sessionDetails.duration}
+        </p>
+        <p>
+          <strong>📍 Location:</strong> {sessionDetails.location}
+        </p>
+        {sessionDetails.date && (
+          <p>
+            <strong>📅 Date:</strong> {sessionDetails.date}
+          </p>
+        )}
+      </section>
+
+      {/* Equipment Needed */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">🎒 Equipment Needed</h2>
+        <ul className="list-disc ml-6 mb-2">
+          {equipmentNeeded.equipmentList.map((item, idx) => (
+            <li key={idx}>{item}</li>
+          ))}
+        </ul>
+        {equipmentNeeded.other && (
+          <p>
+            <strong>Other:</strong> {equipmentNeeded.other}
+          </p>
+        )}
+      </section>
+
+      {/* Warm-Up */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">🌅 1. Mobility & Warm-Up (10-12 mins)</h2>
+        <p className="mb-2">
+          <strong>Purpose:</strong> {warmup.explanation}
+        </p>
+        <table className="w-full border-collapse mb-2">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left p-1">Exercise</th>
+              <th className="text-left p-1">Duration/Reps</th>
+              <th className="text-left p-1">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {warmup.exercises.map((ex, idx) => (
+              <tr key={idx} className="border-b">
+                <td className="p-1">{ex.exercise}</td>
+                <td className="p-1">{ex.durationOrReps}</td>
+                <td className="p-1">{ex.notes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      {/* The Workout */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">💪 2. THE WORKOUT</h2>
+        <p className="mb-4">
+          Add an explanation of the workout format here. Explain the structure (e.g., circuit, EMOM, AMRAP), the number of rounds, and any specific instructions for moving between exercises or blocks.
+        </p>
+        {mainWorkout.map((block, idx) => (
+          <div key={idx} className="mb-4">
+            <h3 className="font-semibold">{block.blockTitle}</h3>
+            <p className="mb-1">
+              <strong>Format:</strong> {block.format}
+            </p>
+            <p className="mb-2">
+              <strong>Explanation:</strong> {block.explanation}
+            </p>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-1">Exercise</th>
+                  <th className="text-left p-1">Reps/Time</th>
+                  <th className="text-left p-1">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {block.exercises.map((ex, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="p-1">{ex.exercise}</td>
+                    <td className="p-1">{ex.repsOrTime}</td>
+                    <td className="p-1">{ex.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </section>
+
+      {/* Extra Work */}
+      {extraWork && extraWork.exercises.length > 0 && (
+        <section className="mb-6 border-b pb-4">
+          <h2 className="text-xl font-bold mb-2">🎯 3. Extra Work (Optional)</h2>
+          <p className="mb-2">
+            {extraWork.explanation}
+          </p>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left p-1">Exercise</th>
+                <th className="text-left p-1">Sets</th>
+                <th className="text-left p-1">Reps</th>
+                <th className="text-left p-1">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {extraWork.exercises.map((ex, idx) => (
+                <tr key={idx} className="border-b">
+                  <td className="p-1">{ex.exercise}</td>
+                  <td className="p-1">{ex.sets}</td>
+                  <td className="p-1">{ex.reps}</td>
+                  <td className="p-1">{ex.notes}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {/* Cool-Down & Mobility */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">� 4. Cool-Down & Mobility (5-10 mins)</h2>
+        <p className="mb-2">
+          <strong>Purpose:</strong> {cooldown.explanation}
+        </p>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left p-1">Exercise</th>
+              <th className="text-left p-1">Duration</th>
+              <th className="text-left p-1">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cooldown.exercises.map((ex, idx) => (
+              <tr key={idx} className="border-b">
+                <td className="p-1">{ex.exercise}</td>
+                <td className="p-1">{ex.duration}</td>
+                <td className="p-1">{ex.notes}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      {/* Machine Setup Guide */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">⚙ 5. Machine Setup Guide</h2>
+        <p className="mb-2">
+          <strong>Explanation:</strong> {machineSetupGuide.explanation}
+        </p>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left p-1">Machine/Equipment</th>
+              <th className="text-left p-1">Setup Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {machineSetupGuide.machines.map((m, idx) => (
+              <tr key={idx} className="border-b">
+                <td className="p-1">{m.machine}</td>
+                <td className="p-1">{m.setupInstructions}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      {/* Closing Message */}
+      <section className="mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold mb-2">📝 6. Closing Message</h2>
+        <p>{closingMessage}</p>
+      </section>
+
+      {/* Progress Notes */}
+      <section className="mb-6 border-b pb-4">
+        <h3 className="text-lg font-bold">🎯 Progress Notes (For Next Session)</h3>
+        <ul className="list-disc ml-6">
+          {progressNotes.map((note, idx) => (
+            <li key={idx}>{note}</li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Next Session Preparation */}
+      <section>
+        <h3 className="text-lg font-bold">📅 Next Session Preparation</h3>
+        <ul className="list-disc ml-6">
+          {nextSessionPreparation.map((prep, idx) => (
+            <li key={idx}>{prep}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+};
+
+export default SessionPlanTemplate;
