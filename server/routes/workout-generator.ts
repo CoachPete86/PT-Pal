@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { anthropic } from '@anthropic-ai/sdk';
+import { Anthropic } from '@anthropic-ai/sdk';
 import { storage } from '../storage';
 
 // Initialize Anthropic client
-const client = new anthropic({
+const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 
@@ -159,7 +159,18 @@ Present the workout as a structured SessionPlan JSON with the following structur
     });
     
     // Parse the JSON content from the response
-    const responseText = message.content[0].text;
+    const contentBlock = message.content[0];
+    
+    // Check content type and extract text
+    let responseText = '';
+    if ('text' in contentBlock) {
+      responseText = contentBlock.text;
+    } else {
+      return res.status(500).json({
+        error: "Invalid response format",
+        details: "The AI didn't return a proper text response"
+      });
+    }
     const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) || 
                      responseText.match(/```\n([\s\S]*?)```/) || 
                      responseText.match(/{[\s\S]*}/);
@@ -190,13 +201,12 @@ Present the workout as a structured SessionPlan JSON with the following structur
           workspaceId: req.body.workspaceId,
           trainerId: req.user.id,
           clientId: req.body.clientId,
-          name: `${fitnessLevel} ${sessionType} Workout`,
+          title: `${fitnessLevel} ${sessionType} Workout`,
+          description: `Generated on ${new Date().toLocaleDateString()}`,
           content: plan,
           status: 'active',
           startDate: new Date(),
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-          createdAt: new Date(),
-          updatedAt: new Date(),
         });
         
         return res.status(201).json({ 
