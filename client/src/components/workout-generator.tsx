@@ -1297,8 +1297,19 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
               )}
             </div>
           </CardContent>
+          <CardFooter className="flex justify-end space-x-4">
+            <Button 
+              variant="outline" 
+              onClick={generateSessionPlanTemplate}
+            >
+              Create Session Template
+            </Button>
+          </CardFooter>
         </Card>
       )}
+      
+      {/* Render the session plan template if it's active */}
+      {showNewTemplate && renderSessionPlanTemplate()}
     </div>
   );
 }
