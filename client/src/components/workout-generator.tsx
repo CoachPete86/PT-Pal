@@ -1011,15 +1011,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     }
   };
 
-  // Update equipment when preset changes
-  const handlePresetChange = (presetId: string) => {
-    setSelectedPreset(presetId);
-    const preset = equipmentPresets.find(p => p.id === presetId);
-    if (preset) {
-      form.setValue("equipment", preset.items);
-      form.setValue("useFullGym", presetId === "full-gym");
-    }
-  };
+  // This function is already defined above
 
   // Complete the wizard and apply all recommendations
   const completeWizard = () => {
