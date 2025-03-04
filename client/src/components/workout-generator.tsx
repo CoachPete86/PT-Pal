@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import SessionPlanTemplate, { SessionPlan } from "./session-plan-template";
+import HelpTooltip from "@/components/ui/help-tooltip";
 
 // UI imports
 import {
@@ -556,7 +557,15 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           {/* Class Formats */}
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <Label className="text-sm font-medium">Class Formats</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Class Formats</Label>
+                <HelpTooltip 
+                  character="coach" 
+                  content="Class formats define how your workout will be structured. You can combine multiple formats to create varied and engaging sessions for your clients."
+                >
+                  <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                </HelpTooltip>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
@@ -566,6 +575,13 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 >
                   Load HIIT Template
                 </Button>
+                <HelpTooltip 
+                  character="gym-buddy" 
+                  content="High-Intensity Interval Training (HIIT) involves short bursts of intense exercise alternated with recovery periods. Great for burning calories and improving cardiovascular health."
+                  side="bottom"
+                >
+                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </HelpTooltip>
                 <Button
                   variant="outline"
                   size="sm"
