@@ -305,31 +305,61 @@ The response must be a valid JSON object with this exact structure:
         let notionPageId = null;
 
         try {
-          const notionResponse = await notion.pages.create({
-            parent: { database_id: process.env.NOTION_DATABASE_ID! },
-            properties: {
-              Name: {
-                title: [{ text: { content: notionSummary.title } }],
-              },
-              Content: {
-                rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2) } }],
-              },
-              Type: {
-                select: {
-                  name: "Workout Plan"
-                }
-              },
-              Date: {
-                date: {
-                  start: new Date().toISOString()
-                }
-              },
-              UserId: {
-                rich_text: [{ text: { content: req.user.id.toString() } }]
-              }
+          // Check if NOTION_DATABASE_ID is defined
+          if (!process.env.NOTION_DATABASE_ID) {
+            console.warn("Missing NOTION_DATABASE_ID environment variable");
+            throw new Error("Notion integration not properly configured");
+          }
+          
+          // Get database properties first to understand its schema
+          try {
+            const database = await notion.databases.retrieve({
+              database_id: process.env.NOTION_DATABASE_ID
+            });
+            
+            // Build properties based on the actual database schema
+            const properties: Record<string, any> = {};
+            
+            // Name/Title is required for all Notion databases
+            properties["Name"] = {
+              title: [{ text: { content: notionSummary.title } }]
+            };
+            
+            // Add other properties based on what exists in the database
+            const dbProps = database.properties;
+            
+            if (dbProps["Content"]) {
+              properties["Content"] = {
+                rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2).substring(0, 2000) } }]
+              };
             }
-          });
-          notionPageId = notionResponse.id;
+            
+            if (dbProps["Type"] && dbProps["Type"].type === "select") {
+              properties["Type"] = {
+                select: { name: "Workout Plan" }
+              };
+            }
+            
+            if (dbProps["Date"] && dbProps["Date"].type === "date") {
+              properties["Date"] = {
+                date: { start: new Date().toISOString() }
+              };
+            }
+            
+            if (dbProps["User ID"] && dbProps["User ID"].type === "rich_text") {
+              properties["User ID"] = {
+                rich_text: [{ text: { content: req.user.id.toString() } }]
+              };
+            }
+            
+            const notionResponse = await notion.pages.create({
+              parent: { database_id: process.env.NOTION_DATABASE_ID },
+              properties: properties
+            });
+            notionPageId = notionResponse.id;
+          } catch (error) {
+            console.error("Error retrieving Notion database or creating page:", error);
+          }
         } catch (notionError) {
           console.error("Failed to save to Notion:", notionError);
         }
@@ -339,10 +369,12 @@ The response must be a valid JSON object with this exact structure:
           await storage.createDocument({
             title: notionSummary.title,
             content: JSON.stringify(plan, null, 2),
-            type: "document",
+            type: "workout_plan",
             notionId: notionPageId,
-            userId: req.user.id,
-            parentId: null,
+            trainerId: req.user.id,
+            workspaceId: req.body.workspaceId || 1, // Default to 1 if not provided
+            clientId: req.body.clientId || req.user.id, // Default to the trainer if not provided
+            isTemplate: false,
           });
         } catch (storageError) {
           console.error("Failed to save to local storage:", storageError);

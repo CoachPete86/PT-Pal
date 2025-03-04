@@ -1,0 +1,130 @@
+Detailed Breakdown of the Session Plan Template Layout for AI Replication
+
+The Session Plan Template follows a structured layout with clearly defined sections. Below is a complete breakdown of how elements are positioned in the document, including headings, tables, and placeholders.
+
+Document Structure and Layout
+
+The document is text-based with structured sections, consistent formatting, tables, and bullet points. The layout is designed to be filled out manually or digitally.
+
+1. Header (Title)
+	•	The document starts with a bold header/title at the top:
+	•	🏋️‍♂️ SESSION PLAN TEMPLATE
+	•	This is centrally aligned and visually distinct.
+
+2. SESSION DETAILS (General Information)
+	•	Subheading: 📋 Session Plan Details (bold and slightly larger than normal text)
+	•	Instruction Line: “Complete the following information for your session:”
+	•	Fields for Input (Single-Line Entries):
+	•	🎯 Session Type: (e.g., Strength, HIIT, Cardio, Mobility)
+	•	👤 Client Name: (Enter client name)
+	•	🏋️‍♂️ Coach Name: (Enter coach name)
+	•	⏱ Duration: (e.g., 30, 45, 60 minutes)
+	•	📍 Location: (e.g., Gym, Studio, Outdoor)
+	•	Formatting Notes:
+	•	Each input field is preceded by an emoji.
+	•	Fields are left-aligned with dotted-line placeholders for text entry.
+
+3. EQUIPMENT NEEDED
+	•	Subheading: 🎒 Equipment Needed
+	•	Instruction Line: “List the equipment needed for this session:”
+	•	Blank Lines for Manual Entry
+	•	Multiple empty lines for listing equipment.
+	•	Last line is labelled ‘Other:’ for additional notes.
+
+4. MOBILITY & WARM-UP (10-12 mins)
+	•	Subheading: 🌅 Mobility & Warm-Up (10-12 mins)
+	•	Purpose: A short paragraph explaining why warm-up is important.
+	•	Table Format:
+	•	Columns: Exercise | Duration/Reps | Notes
+	•	Rows (4 exercises) with placeholders for:
+	•	Exercise Name
+	•	Duration (e.g., 60 sec, 10 reps)
+	•	Form Cues/Modifications
+	•	Visual Layout:
+	•	The table is neatly structured with three columns and pre-set exercise placeholders.
+
+5. THE WORKOUT
+	•	Subheading: 💪 The Workout
+	•	Intro Paragraph:
+	•	“Add an explanation of the workout format here. Explain the structure…”
+	•	Example workout styles: Circuit, EMOM, AMRAP
+	•	Mention rounds, total time, and intensity expectations.
+
+Workout Blocks (Main Workout)
+	•	Note: The template includes three workout blocks, but trainers can add or remove as needed.
+
+Each Workout Block Follows the Same Structure:
+	•	Title: Workout Block 1, Workout Block 2, Workout Block 3
+	•	Format Section: Briefly describes the workout style.
+	•	Example: “3 rounds, 40 sec work/20 sec rest, complete all exercises then rest 2 min before next round.”
+	•	Table Format for Exercises:
+	•	Columns: Exercise | Reps/Time | Notes
+	•	Rows (4 exercises per block)
+	•	Placeholders for:
+	•	Exercise Name
+	•	Reps or Time (e.g., 10 reps, 40 sec)
+	•	Form cues, modifications, weight suggestions
+
+6. EXTRA WORK (OPTIONAL)
+	•	Subheading: 🎯 Extra Work (Optional)
+	•	Purpose Statement: “Include additional exercises for specific goals…”
+	•	Table Format:
+	•	Columns: Exercise | Sets | Reps | Notes
+	•	Rows (3 placeholders) for extra exercises.
+
+7. COOL-DOWN & MOBILITY (5-10 mins)
+	•	Subheading: ❄️ Cool-Down & Mobility
+	•	Purpose: A short paragraph explaining why cool-down is important.
+	•	Table Format:
+	•	Columns: Exercise | Duration | Notes
+	•	Rows (3 placeholders) for cool-down exercises.
+
+8. MACHINE SETUP GUIDE
+	•	Subheading: ⚙ Machine Setup Guide
+	•	Table Format:
+	•	Columns: Machine/Equipment | Setup Instructions
+	•	Rows (3 placeholders) for gym machines with detailed setup instructions.
+
+9. CLOSING MESSAGE
+	•	Subheading: 📝 Closing Message
+	•	Instruction Line: “Write a personalized message summarizing the session…”
+	•	Bulleted Notes for:
+	•	Key Achievements
+	•	Recovery Tips
+	•	Homework Exercises (if applicable)
+
+10. PROGRESS NOTES (For Next Session)
+	•	Subheading: 🎯 Progress Notes (For Next Session)
+	•	Checkbox List (Bullet Points):
+	•	e.g., “☑ Increased weight on squat”
+	•	e.g., “☑ Improved form on deadlift”
+	•	e.g., “☑ Needs more work on core stability”
+
+11. NEXT SESSION PREPARATION
+	•	Subheading: 📅 Next Session Preparation
+	•	Checkbox List (Bullet Points):
+	•	e.g., “☑ Prepare assessment for strength progress”
+	•	e.g., “☑ Plan new core exercises”
+	•	e.g., “☑ Schedule session to focus on upper body”
+
+Final Notes on Design & Layout
+	•	Consistent Use of Emojis & Icons:
+	•	Each section begins with an emoji or symbol, making it visually distinct.
+	•	Tables are the primary layout structure:
+	•	Used for warm-ups, workouts, extra work, cool-down, and machine setup.
+	•	Bullet Points & Checkboxes:
+	•	Used in “Progress Notes” and “Next Session Preparation.”
+	•	Instructional Text is Clear & Concise:
+	•	Small introductory explanations are present in each section.
+	•	Blank Spaces for Customisation:
+	•	Large blank spaces are provided in tables and equipment lists.
+
+Replication Instructions for AI
+
+When generating future session plans based on this template, ensure the following structural elements are retained:
+	1.	Keep the same sequence of sections.
+	2.	Use emojis and icons at the beginning of section headings.
+	3.	Maintain table structures for structured input (Workout, Warm-up, Cool-down, Machine Setup).
+	4.	Use bullet points and checkboxes where applicable.
+	5.	Leave blank spaces for user input.
+	6.	Ensure formatting clarity (bold titles, instructional paragraphs, and table spacing).

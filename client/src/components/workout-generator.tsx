@@ -1121,86 +1121,269 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
       ? selectedEquipment 
       : (sessionType === "group" ? equipmentOptions.slice(0, 8) : ["Dumbbells", "Kettlebells", "Resistance Bands"]);
     
-    // Create a plan following the required structure
+    // Create a detailed session plan based on the workout type and selected equipment
+    const workoutType = sessionType === "group" ? "Group Training" : "Personal Training";
+    const workoutFocus = selectedPlan && selectedPlan.introduction && selectedPlan.introduction.objectives 
+      ? selectedPlan.introduction.objectives[0] 
+      : (personalGoal ? personalGoals.find(g => g.value === personalGoal)?.label : "Full Body Workout");
+    
+    // Extract some exercises from the generated workout plan if available
+    let extractedExercises: string[] = [];
+    let exerciseDetails: { [key: string]: { reps?: string, load?: string, technique?: string } } = {};
+    
+    if (selectedPlan && selectedPlan.mainWorkout) {
+      selectedPlan.mainWorkout.forEach(circuit => {
+        circuit.exercises.forEach(ex => {
+          extractedExercises.push(ex.exercise);
+          exerciseDetails[ex.exercise] = {
+            reps: ex.reps || "10-12 reps",
+            load: ex.men || ex.woman || "Moderate",
+            technique: ex.technique || "Focus on proper form"
+          };
+        });
+      });
+    }
+    
+    // Determine appropriate weights based on the workout type
+    const weights = workoutType === "Group Training" 
+      ? ["Light dumbbells (2-5kg)", "Medium dumbbells (6-10kg)", "Heavy dumbbells (12-20kg)"]
+      : ["Client-specific weights", "Adjustable dumbbells", "Weight plates for barbell"];
+    
+    // Generate appropriate machine setup based on location
+    const machines = trainingLocation === "Gym" 
+      ? ["Cable Machine", "Leg Press", "Lat Pulldown", "Chest Press"]
+      : (trainingLocation === "Home" ? ["Adjustable Bench", "Pull-up Bar"] : ["Portable Equipment"]);
+    
+    // Create a plan following the required structure with expanded details
     const sampleSessionPlan: SessionPlan = {
       sessionDetails: {
-        sessionType: sessionType === "group" ? "Group Training" : "Personal Training",
+        sessionType: workoutType,
         clientName: clientData?.fullName || "Client",
         coach: "Coach Pete",
         duration: "45 Minutes",
         location: trainingLocation || "Gym",
         date: new Date().toLocaleDateString(),
+        focus: workoutFocus as string
       },
       equipmentNeeded: {
         equipmentList: usedEquipment,
-        other: "Water bottle and towel"
+        weights: weights,
+        machines: machines.slice(0, 2),
+        other: "Water bottle, towel, training shoes, and comfortable clothes"
       },
       warmup: {
-        explanation: "Start with gentle movements to increase heart rate and prepare your joints for the workout.",
+        explanation: "Begin with these dynamic movements to increase core temperature, enhance joint mobility, and prepare the neuromuscular system for the workout ahead.",
         exercises: [
-          { exercise: "Arm Circles", durationOrReps: "30 seconds", notes: "Both directions" },
-          { exercise: "Bodyweight Squats", durationOrReps: "10 reps", notes: "Focus on form" },
-          { exercise: "Walkouts", durationOrReps: "5 reps", notes: "Slow and controlled" },
-          { exercise: "Shoulder Taps", durationOrReps: "20 seconds", notes: "Engage core" }
+          { exercise: "Arm Circles", durationOrReps: "30 seconds", notes: "Both directions, gradually increasing range of motion" },
+          { exercise: "Bodyweight Squats", durationOrReps: "12 reps", notes: "Focus on keeping chest up, knees tracking with toes" },
+          { exercise: "Walkouts", durationOrReps: "6 reps", notes: "Slow and controlled, engage core throughout movement" },
+          { exercise: "Shoulder Taps in Plank", durationOrReps: "20 seconds", notes: "Maintain stable hips, avoid rotation" }
         ]
       },
       mainWorkout: [
         {
-          blockTitle: "WORKOUT BLOCK 1",
+          blockTitle: "WORKOUT BLOCK 1: POWER & STRENGTH",
           format: "3 rounds, 40 sec work/20 sec rest",
-          explanation: "Complete all exercises in sequence with minimal rest between exercises. Rest 2 minutes between rounds.",
+          explanation: "Complete all exercises in sequence with minimal rest between exercises. Rest 2 minutes between rounds. Focus on quality movement and maintaining form throughout.",
           exercises: [
-            { exercise: "Kettlebell Swings", repsOrTime: "40 seconds", notes: "Medium weight" },
-            { exercise: "Push-ups", repsOrTime: "40 seconds", notes: "Modify on knees if needed" },
-            { exercise: "Goblet Squats", repsOrTime: "40 seconds", notes: "Keep weight in heels" },
-            { exercise: "Plank Hold", repsOrTime: "40 seconds", notes: "Engage core throughout" }
+            { 
+              exercise: extractedExercises[0] || "Kettlebell Swings", 
+              repsOrTime: "40 seconds", 
+              rest: "20 seconds",
+              load: "Medium-heavy weight",
+              notes: "Power through hips, maintain neutral spine", 
+              technique: "Hinge at hips, snap to standing, keep shoulders packed down" 
+            },
+            { 
+              exercise: extractedExercises[1] || "Push-ups", 
+              repsOrTime: "40 seconds", 
+              rest: "20 seconds",
+              load: "Body weight",
+              notes: "Modify on knees if needed for proper form", 
+              technique: "Maintain straight line from head to heels, elbows at 45°" 
+            },
+            { 
+              exercise: extractedExercises[2] || "Goblet Squats", 
+              repsOrTime: "40 seconds", 
+              rest: "20 seconds", 
+              load: "Moderate dumbbell/kettlebell",
+              notes: "Keep weight in heels, chest up throughout", 
+              technique: "Knees track with toes, maintain upright torso" 
+            },
+            { 
+              exercise: extractedExercises[3] || "Plank Hold", 
+              repsOrTime: "40 seconds", 
+              rest: "20 seconds",
+              load: "Body weight",
+              notes: "Engage core throughout, breathe normally", 
+              technique: "Shoulders over elbows, maintain straight line from head to heels" 
+            }
           ]
         },
         {
-          blockTitle: "WORKOUT BLOCK 2",
+          blockTitle: "WORKOUT BLOCK 2: ENDURANCE & CONDITIONING",
           format: "AMRAP in 10 minutes",
-          explanation: "Complete as many rounds as possible in 10 minutes.",
+          explanation: "Complete as many rounds as possible in 10 minutes. Focus on maintaining consistent pace and quality movement. Record total rounds completed for progress tracking.",
           exercises: [
-            { exercise: "Dumbbell Rows", repsOrTime: "8 each side", notes: "Focus on back engagement" },
-            { exercise: "Lunges", repsOrTime: "10 each leg", notes: "Alternating legs" },
-            { exercise: "Mountain Climbers", repsOrTime: "20 total", notes: "Fast pace" }
+            { 
+              exercise: extractedExercises[4] || "Dumbbell Rows", 
+              repsOrTime: "8 each side", 
+              rest: "Minimal",
+              load: "Moderate weight",
+              notes: "Focus on back engagement, avoid shoulder shrugging", 
+              technique: "Pull elbow back, squeeze shoulder blade at top" 
+            },
+            { 
+              exercise: extractedExercises[5] || "Walking Lunges", 
+              repsOrTime: "10 each leg", 
+              rest: "Minimal",
+              load: "Body weight or light dumbbells",
+              notes: "Step length appropriate to client height", 
+              technique: "Front knee tracks over ankle, back knee lowers toward floor" 
+            },
+            { 
+              exercise: extractedExercises[6] || "Mountain Climbers", 
+              repsOrTime: "20 total", 
+              rest: "Minimal",
+              load: "Body weight",
+              notes: "Maintain pace appropriate to fitness level", 
+              technique: "Keep hips stable, alternate knees driving toward chest" 
+            }
+          ]
+        },
+        {
+          blockTitle: "WORKOUT BLOCK 3: TARGETED FOCUS",
+          format: "3 sets, prescribed reps, 45 sec rest between sets",
+          explanation: "Complete all prescribed repetitions with excellent form. Rest 45 seconds between sets and 90 seconds between exercises. Adjust weights as needed to maintain proper technique.",
+          exercises: [
+            { 
+              exercise: extractedExercises[7] || "Dumbbell Shoulder Press", 
+              repsOrTime: "12 repetitions", 
+              rest: "45 seconds between sets",
+              load: "Moderate dumbbells",
+              notes: "Avoid arching lower back", 
+              technique: "Start with dumbbells at shoulder height, press directly overhead" 
+            },
+            { 
+              exercise: extractedExercises[8] || "Dumbbell Romanian Deadlift", 
+              repsOrTime: "10 repetitions", 
+              rest: "45 seconds between sets",
+              load: "Moderate-heavy dumbbells",
+              notes: "Hamstring focus, feel stretch but not strain", 
+              technique: "Hinge at hips, soft knees, weights close to legs throughout" 
+            }
           ]
         }
       ],
       extraWork: {
-        explanation: "If time permits and energy levels are sufficient, complete this additional work.",
+        explanation: "If time permits and energy levels are sufficient, complete these additional exercises to address specific goals. These exercises target areas for improvement identified from previous sessions.",
         exercises: [
-          { exercise: "Tricep Dips", sets: "3", reps: "12", notes: "Use bench or chair" },
-          { exercise: "Bicep Curls", sets: "3", reps: "12", notes: "Light to medium weight" }
+          { 
+            exercise: "Tricep Dips", 
+            sets: "3", 
+            reps: "12", 
+            load: "Body weight",
+            notes: "Use bench or sturdy chair, shoulders down away from ears" 
+          },
+          { 
+            exercise: "Bicep Curls", 
+            sets: "3", 
+            reps: "12", 
+            load: "Light to medium weight",
+            notes: "Control throughout full range of motion, avoid swinging" 
+          },
+          { 
+            exercise: "Core Rotations", 
+            sets: "2", 
+            reps: "15 each side", 
+            load: "Light medicine ball or weight",
+            notes: "Engage core throughout, focus on rotation through torso" 
+          }
         ]
       },
       cooldown: {
-        explanation: "Gradually reduce heart rate and stretch worked muscles to promote recovery.",
+        explanation: "These exercises help gradually reduce heart rate, begin recovery processes, and improve flexibility of worked muscles. Focus on breathing deeply and releasing tension with each exhale.",
         exercises: [
-          { exercise: "Child's Pose", duration: "30 seconds", notes: "Deep breathing" },
-          { exercise: "Hamstring Stretch", duration: "30 seconds each leg", notes: "Gentle stretch" },
-          { exercise: "Chest Stretch", duration: "30 seconds", notes: "Open chest wide" },
-          { exercise: "Deep Breathing", duration: "1 minute", notes: "Inhale 4s, exhale 4s" }
+          { 
+            exercise: "Child's Pose", 
+            duration: "45 seconds", 
+            notes: "Deep breathing, arms extended, gentle stretch through back" 
+          },
+          { 
+            exercise: "Hamstring Stretch", 
+            duration: "30 seconds each leg", 
+            notes: "Gentle tension, avoid bouncing, keep back neutral" 
+          },
+          { 
+            exercise: "Chest Stretch Against Wall", 
+            duration: "30 seconds each arm", 
+            notes: "Place palm on wall, gently rotate away to feel stretch" 
+          },
+          { 
+            exercise: "Quad Stretch", 
+            duration: "30 seconds each leg", 
+            notes: "Use wall or chair for balance if needed" 
+          },
+          { 
+            exercise: "Deep Breathing", 
+            duration: "1 minute", 
+            notes: "Inhale for 4 counts, hold for 2, exhale for 6 counts" 
+          }
         ]
       },
       machineSetupGuide: {
-        explanation: "For proper form and safety, set up machines according to these specifications.",
+        explanation: "For optimal safety and effectiveness, set up machines according to these client-specific guidelines. Proper setup ensures appropriate joint alignment and optimal muscle engagement throughout exercises.",
         machines: [
-          { machine: "Cable Machine", setupInstructions: "Set to hip height for rows, shoulder height for pushes." },
-          { machine: "Adjustable Bench", setupInstructions: "Incline to 45 degrees for incline presses." }
+          { 
+            machine: "Cable Machine", 
+            setupInstructions: "Set to hip height for rows (handle in line with navel), shoulder height for pushes. Adjust pin to appropriate weight based on exercise and client strength level." 
+          },
+          { 
+            machine: "Adjustable Bench", 
+            setupInstructions: "For flat press: ensure bench is completely flat. For incline: set to 30-45 degrees based on client comfort. For seated exercises: set to 90 degrees with back support." 
+          },
+          { 
+            machine: "Leg Press", 
+            setupInstructions: "Adjust seat so knees form 90° angle at bottom position. Feet shoulder-width apart, placed mid-platform. Start with lighter weight to assess proper form." 
+          }
         ]
       },
-      closingMessage: "Great work today! Remember to stay hydrated and get adequate protein within 30 minutes of completing this workout. This session targeted multiple muscle groups with a focus on building both strength and endurance.",
+      closingMessage: "Excellent effort today! This session was specifically designed to target your goals of improving overall strength and endurance. Your form has improved significantly on compound movements, and your work capacity is showing meaningful progress. Remember to stay hydrated throughout the day and aim for protein intake within 30-60 minutes post-workout to support recovery. Your consistency is paying off!",
       progressNotes: [
-        "Client completed all exercises with proper form",
-        "Increased weight on goblet squats from last session",
-        "Need to work on hip mobility for deeper squats",
-        "Core strength improving based on plank hold duration"
+        "Client completed all exercises with proper form and good intensity",
+        "Increased weight on goblet squats from 10kg to 12kg since last session",
+        "Demonstrated improved hip mobility during squats and lunges",
+        "Core stability has improved - maintained plank with good form for full duration",
+        "Successfully completed 4.5 rounds of AMRAP block (up from 4 rounds in previous session)"
       ],
+      clientFeedback: [
+        "Reported slight knee discomfort during lunges - modified to reduce range of motion",
+        "Enjoys the interval training format - feels challenged but not overwhelmed",
+        "Requested more core work in future sessions"
+      ],
+      progressSummary: {
+        improvements: [
+          "Squat mechanics have improved significantly",
+          "Upper body pushing strength increasing steadily",
+          "Overall workout capacity has increased by approximately 15%"
+        ],
+        challenges: [
+          "Still needs attention on shoulder mobility for overhead movements",
+          "Core engagement during compound movements needs reinforcement",
+          "Tendency to rush through repetitions when fatigue sets in"
+        ],
+        nextFocusAreas: [
+          "Introduce more unilateral exercises to address minor imbalances",
+          "Progress to more advanced core exercises",
+          "Focus on eccentric control during lower body exercises"
+        ]
+      },
       nextSessionPreparation: [
-        "Focus on upper body strength next session",
-        "Prepare cardio intervals for metabolic conditioning",
-        "Bring resistance bands for mobility work"
+        "☑ Focus on upper body strength during next session to address imbalances",
+        "☑ Prepare more complex core exercises for progression",
+        "☑ Incorporate targeted mobility work for shoulders",
+        "☑ Plan for cardiovascular conditioning with increased work intervals",
+        "☑ Client should practice hip hinge pattern at home between sessions"
       ]
     };
     

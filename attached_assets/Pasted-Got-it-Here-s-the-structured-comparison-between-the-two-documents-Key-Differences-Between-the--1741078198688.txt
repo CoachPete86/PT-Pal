@@ -1,0 +1,20 @@
+Got it. Here’s the structured comparison between the two documents:
+
+🔍 Key Differences Between the Generated Session Plan & the Correct Layout Plan
+
+Category	Generated Session Plan (Incorrect Layout)	Correct Layout Plan (Ideal Format)
+1. Header & Branding	❌ No title or trainer/client details. ❌ No branding or icons. ❌ Lacks session type or focus area.	✅ Clear Session Plan title. ✅ Trainer & client details included. ✅ Uses icons/emojis for better readability.
+2. Equipment List	❌ No dedicated equipment section. ❌ Equipment must be inferred from exercises.	✅ Clearly listed equipment, including weights and specifics. ✅ Uses icons to separate equipment types.
+3. Structure & Organisation	❌ Sections are not clearly defined. ❌ Workout details are scattered. ❌ No logical flow between warm-up, main workout, and cool-down.	✅ Clearly defined sections (Warm-Up, Workout Blocks, Cool-Down, Extra Work, Notes). ✅ Workout is grouped into blocks for clarity. ✅ Logical progression of the session.
+4. Exercise Formatting	❌ Exercises are listed without tables or structured formatting. ❌ Lacks clear work/rest timings in a readable way. ❌ No details on proper execution or form.	✅ Uses tables for exercises, including sets, reps, rest times, and key notes. ✅ Each workout block is clearly labeled. ✅ Includes execution tips and guidance.
+5. Cool-Down & Recovery	❌ Very basic recovery tips (hydration, stretching). ❌ No structured cool-down plan.	✅ Dedicated Cool-Down & Mobility section with exercises. ✅ Includes foam rolling & stretching recommendations. ✅ Duration & technique clearly outlined.
+6. Progress Tracking & Notes	❌ No client progress tracking. ❌ No trainer notes or feedback. ❌ No next steps for improvement.	✅ Includes a section for progress tracking (e.g., improved form, increased weights). ✅ Trainer provides personalised feedback on strengths & weaknesses. ✅ Future goals and progressions are listed.
+7. Next Session Preparation	❌ No mention of what will be assessed in the next session. ❌ No client homework or follow-up recommendations.	✅ Plans next session improvements (e.g., new exercises, skill focus). ✅ Gives the client homework (mobility, nutrition). ✅ Mentions future session focus (e.g., HIIT, upper body strength).
+
+💡 Final Verdict
+	•	The Generated Session Plan is unstructured, hard to read, and lacks key elements such as progress tracking, equipment lists, and clear workout breakdowns.
+	•	The Correct Layout Plan is well-structured, visually engaging, and easy to follow, making it a more effective session plan template.
+
+🔧 Next Steps
+
+Would you like me to reformat the Generated Session Plan into the Correct Layout Plan structure? 🚀
