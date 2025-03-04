@@ -32,7 +32,7 @@ export const userPreferencesSchema = z.object({
   medications: z.string().optional(),
   allergies: z.string().optional(),
   hasInitialAssessment: z.boolean().optional(),
-  healthConditions: z.string().optional(),
+  healthConditions: z.union([z.string(), z.array(z.string())]).optional(),
 
   // Nutrition Information
   dietaryRestrictions: z.array(z.string()).optional(),
@@ -41,7 +41,7 @@ export const userPreferencesSchema = z.object({
   waterIntake: z.string().optional(),
 
   // Goals & Notes
-  goals: z.string().optional(),
+  goals: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
 export type UserPreferences = z.infer<typeof userPreferencesSchema>;

@@ -14,8 +14,8 @@ async function createTestUser() {
       status: "active", 
       fullName: "Test User",
       preferences: {
-        goals: "Test goals",
-        healthConditions: "None",
+        goals: ["Test goals"],
+        healthConditions: ["None"],
       }
     });
     console.log("Test user created successfully:", user);

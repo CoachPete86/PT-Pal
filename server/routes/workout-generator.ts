@@ -197,16 +197,21 @@ Present the workout as a structured SessionPlan JSON with the following structur
     // Save the generated plan if the user is authenticated
     if (req.isAuthenticated() && req.user) {
       try {
+        // Create a workout plan without the content first
         const workout = await storage.createWorkoutPlan({
-          workspaceId: req.body.workspaceId,
+          workspaceId: req.body.workspaceId || 1, // Default to 1 if not provided
           trainerId: req.user.id,
-          clientId: req.body.clientId,
-          title: `${fitnessLevel} ${sessionType} Workout`,
+          clientId: req.body.clientId || req.user.id, // Default to trainer if not provided
+          title: `${fitnessLevel || 'Custom'} ${sessionType} Workout`,
           description: `Generated on ${new Date().toLocaleDateString()}`,
-          content: plan,
           status: 'active',
           startDate: new Date(),
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        });
+        
+        // Then update the plan with the content
+        await storage.updateWorkoutPlan(workout.id, {
+          content: plan
         });
         
         return res.status(201).json({ 
