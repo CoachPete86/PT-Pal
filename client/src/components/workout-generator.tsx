@@ -814,7 +814,16 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <Label>Description</Label>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label>Description</Label>
+                  <HelpTooltip 
+                    character="nutritionist" 
+                    content="Add a short description to help identify this format block. This is especially useful when you have multiple formats in your workout."
+                    side="top"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
                 <Input
                   type="text"
                   value={localDesc}
@@ -1195,7 +1204,15 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
       {!selectedPlan && !showNewTemplate && (
         <Card>
           <CardHeader>
-            <CardTitle>Session Type</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Session Type</CardTitle>
+              <HelpTooltip 
+                character="coach" 
+                content="Select the type of workout you want to create. Group classes are designed for multiple participants, while personal training is tailored to individual clients."
+              >
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </HelpTooltip>
+            </div>
             <CardDescription>Choose Group or Personal</CardDescription>
           </CardHeader>
           <CardContent>
@@ -1203,14 +1220,35 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
               value={sessionType}
               onValueChange={(val) => setSessionType(val as SessionType)}
             >
-              <FormItem className="flex items-center space-x-2">
-                <RadioGroupItem value="group" />
-                <FormLabel>Group Class</FormLabel>
-              </FormItem>
-              <FormItem className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="personal" />
-                <FormLabel>Personal Training</FormLabel>
-              </FormItem>
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center justify-between px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="group" id="group-option" />
+                    <FormLabel htmlFor="group-option" className="font-medium">Group Class</FormLabel>
+                  </div>
+                  <HelpTooltip 
+                    character="gym-buddy" 
+                    content="Group classes are high-energy workouts designed for multiple participants. Great for creating HIIT, circuit training, and other formats that work well in a group setting."
+                    side="left"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div className="flex items-center justify-between px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="personal" id="personal-option" />
+                    <FormLabel htmlFor="personal-option" className="font-medium">Personal Training</FormLabel>
+                  </div>
+                  <HelpTooltip 
+                    character="physio" 
+                    content="Personal training plans are customized for individual clients. These workouts are tailored to specific goals, limitations, and equipment availability."
+                    side="left"
+                  >
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+              </div>
             </RadioGroup>
           </CardContent>
         </Card>
@@ -1380,12 +1418,21 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end space-x-4">
-            <Button 
-              variant="outline" 
-              onClick={generateSessionPlanTemplate}
-            >
-              Create Session Template
-            </Button>
+            <div className="flex items-center gap-2">
+              <HelpTooltip 
+                character="yoga-instructor" 
+                content="Generate a detailed session template with warmup, main exercise blocks, cooldown, and equipment guidance. Perfect for sharing with clients!"
+                side="top"
+              >
+                <InfoIcon className="h-4 w-4 text-muted-foreground" />
+              </HelpTooltip>
+              <Button 
+                variant="outline" 
+                onClick={generateSessionPlanTemplate}
+              >
+                Create Session Template
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       )}
