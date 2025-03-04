@@ -109,6 +109,9 @@ interface WorkoutPlan {
 }
 
 // Add validation schema with conditional fields based on session type
+// Update schema to include session type
+type SessionType = "group" | "personal";
+
 const workoutFormSchema = z.object({
   sessionType: z.enum(["group", "personal"]),
   planType: z.enum(["oneoff", "program"]),
@@ -261,42 +264,64 @@ const trainingLocations = [
   }
 ];
 
+interface WorkoutGoal {
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  description: string;
+  recommended: string[];
+  forSessionType?: ("personal" | "group")[];
+}
+
 // Workout goals with equipment recommendations
-const workoutGoals = [
+const workoutGoals: WorkoutGoal[] = [
   {
     id: "strength",
-    name: "Strength Building",
+    name: "Strength Building", 
     icon: Weight,
     description: "Heavy resistance training for maximum strength gains",
-    recommended: ["barbell", "dumbbells-heavy", "kettlebells-heavy", "plates", "cables"]
+    recommended: ["barbell", "dumbbells-heavy", "kettlebells-heavy", "plates", "cables"],
+    forSessionType: ["personal"]
   },
   {
     id: "hypertrophy",
     name: "Muscle Building",
     icon: Dumbbell,
     description: "Moderate weights with higher volume for muscle growth",
-    recommended: ["dumbbells-medium", "dumbbells-heavy", "cables", "barbell", "ez-curl"]
+    recommended: ["dumbbells-medium", "dumbbells-heavy", "cables", "barbell", "ez-curl"],
+    forSessionType: ["personal"]
   },
   {
     id: "endurance",
     name: "Muscular Endurance",
     icon: Clock,
     description: "Light to moderate weights with high repetitions",
-    recommended: ["dumbbells-light", "kettlebells-light", "resistance-bands", "bodybar", "rower", "assault-bike"]
+    recommended: ["dumbbells-light", "kettlebells-light", "resistance-bands", "bodybar", "rower", "assault-bike"],
+    forSessionType: ["personal", "group"]
   },
   {
     id: "weight-loss",
     name: "Weight Loss",
     icon: FlameKindling,
     description: "High-intensity workouts with minimal rest",
-    recommended: ["kettlebells-light", "battle-ropes", "rower", "assault-bike", "jump-rope", "medicine-balls"]
+    recommended: ["kettlebells-light", "battle-ropes", "rower", "assault-bike", "jump-rope", "medicine-balls"],
+    forSessionType: ["personal", "group"]
   },
   {
     id: "general-fitness",
-    name: "General Fitness",
+    name: "Group Fitness",
+    icon: Users,
+    description: "Dynamic circuits for group training environments",
+    recommended: ["dumbbells-light", "kettlebells-light", "resistance-bands", "medicine-balls", "cones", "agility-ladder"],
+    forSessionType: ["group"]
+  },
+  {
+    id: "hiit",
+    name: "HIIT Training",
     icon: Zap,
-    description: "Balanced approach for overall health and fitness",
-    recommended: ["dumbbells-medium", "kettlebells-light", "resistance-bands", "trx", "medicine-balls", "yogamat"]
+    description: "High-intensity interval training with varied equipment",
+    recommended: ["kettlebells-light", "battle-ropes", "plyobox", "medicine-balls", "jump-rope", "timer"],
+    forSessionType: ["group"]
   }
 ];
 
@@ -327,6 +352,43 @@ const equipmentAvailability = [
 
 // Preset equipment groups for quick selection
 const equipmentPresets = [
+  // Group class-specific equipment presets
+  {
+    id: "hiit-class",
+    name: "HIIT Class",
+    description: "Equipment for high-intensity interval training",
+    items: [
+      "kettlebells-light", "medicine-balls", "jump-rope", "battle-ropes", 
+      "cones", "timer", "agility-ladder", "plyobox"
+    ]
+  },
+  {
+    id: "circuit-class",
+    name: "Circuit Training",
+    description: "Versatile equipment for circuit stations",
+    items: [
+      "dumbbells-light", "kettlebells-light", "resistance-bands",
+      "medicine-balls", "jump-rope", "cones", "timer", "yogamat"
+    ]
+  },
+  {
+    id: "bootcamp",
+    name: "Bootcamp Class",
+    description: "Dynamic equipment for intense group workouts",
+    items: [
+      "kettlebells-light", "medicine-balls", "battle-ropes",
+      "agility-ladder", "cones", "jump-rope", "plyobox", "timer"
+    ]
+  },
+  {
+    id: "strength-class",
+    name: "Group Strength",
+    description: "Equipment for strength-focused group sessions",
+    items: [
+      "dumbbells-light", "dumbbells-medium", "kettlebells-light",
+      "bodybar", "resistance-bands", "yogamat", "timer"
+    ]
+  },
   {
     id: "minimal",
     name: "Minimal Setup",
@@ -520,6 +582,13 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     }
 
     return filteredEquipment;
+  };
+
+  // Filter workout goals based on session type
+  const getContextualWorkoutGoals = () => {
+    return workoutGoals.filter(goal => 
+      !goal.forSessionType || goal.forSessionType.includes(sessionType)
+    );
   };
 
   // Get circuit types based on context
@@ -915,9 +984,15 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
     return () => subscription.unsubscribe();
   }, [form.watch, selectedPreset]);
 
-  // Get contextual equipment and circuit types
+  // Get contextual equipment, circuit types and workout goals
   const availableEquipment = getContextualEquipment();
   const circuitTypes = getContextualCircuitTypes();
+  const availableWorkoutGoals = getContextualWorkoutGoals();
+
+  // Filter workout goals based on session type
+  const filteredWorkoutGoals = workoutGoals.filter(goal => 
+    !goal.forSessionType || goal.forSessionType.includes(sessionType)
+  );
 
   // Filter equipment presets based on fitness level and session type
   const filteredPresets = equipmentPresets.filter(preset => {
