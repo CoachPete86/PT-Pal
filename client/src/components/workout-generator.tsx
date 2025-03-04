@@ -619,20 +619,28 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
     );
   }
 
+  // Format editor state (moved to component level)
+  const [localType, setLocalType] = useState<ClassFormatType>("tabata");
+  const [localRounds, setLocalRounds] = useState("");
+  const [localWork, setLocalWork] = useState("");
+  const [localRest, setLocalRest] = useState("");
+  const [localDesc, setLocalDesc] = useState("");
+
   // EDITOR for Add/Edit Format
   function renderFormatEditor() {
     if (!showFormatEditor) return null;
 
     // If editing an existing format
-    const existing =
-      editingIndex !== null ? classFormats[editingIndex] : undefined;
-    const [localType, setLocalType] = useState<ClassFormatType>(
-      existing?.type || "tabata",
-    );
-    const [localRounds, setLocalRounds] = useState(existing?.rounds || "");
-    const [localWork, setLocalWork] = useState(existing?.workInterval || "");
-    const [localRest, setLocalRest] = useState(existing?.restInterval || "");
-    const [localDesc, setLocalDesc] = useState(existing?.description || "");
+    useEffect(() => {
+      if (showFormatEditor) {
+        const existing = editingIndex !== null ? classFormats[editingIndex] : undefined;
+        setLocalType(existing?.type || "tabata");
+        setLocalRounds(existing?.rounds || "");
+        setLocalWork(existing?.workInterval || "");
+        setLocalRest(existing?.restInterval || "");
+        setLocalDesc(existing?.description || "");
+      }
+    }, [showFormatEditor, editingIndex, classFormats]);
 
     function handleSave() {
       // keep as strings, parse later
