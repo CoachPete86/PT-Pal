@@ -1985,6 +1985,88 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
 
                   <FormField
                     control={form.control}
+                    name="classType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Class Type</FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            
+                            // Auto-select appropriate equipment preset based on class type
+                            if (value === "HIIT") {
+                              handlePresetChange("hiit-class");
+                            } else if (value === "GLC") {
+                              handlePresetChange("circuit-class");
+                            } else if (value === "BURN") {
+                              handlePresetChange("bootcamp");
+                            } else if (value === "LIFT") {
+                              handlePresetChange("strength-class");
+                            } else if (value === "CORE") {
+                              handlePresetChange("minimal");
+                            } else if (value === "FLEX") {
+                              handlePresetChange("bodyweight");
+                            }
+                            
+                            // Clear current formats and suggest formats based on the class type
+                            setClassFormats([]);
+                            form.setValue('classFormats', []);
+                            
+                            // Suggest format templates based on class type
+                            const templateToSuggest = 
+                              value === "HIIT" ? "hiit-standard" :
+                              value === "BURN" ? "bootcamp-mixed" :
+                              value === "LIFT" ? "strength-circuit" :
+                              value === "GLC" ? "circuit-training" : 
+                              value === "METCON" ? "endurance" : null;
+                            
+                            if (templateToSuggest) {
+                              const template = classFormatTemplates.find(t => t.id === templateToSuggest);
+                              if (template) {
+                                // Auto-apply the first format from the template
+                                const firstFormat = template.formats[0];
+                                if (firstFormat) {
+                                  const formatToAdd = {
+                                    ...firstFormat,
+                                    type: firstFormat.type as ClassFormatType
+                                  };
+                                  setClassFormats([formatToAdd]);
+                                  form.setValue('classFormats', [formatToAdd]);
+                                  
+                                  toast({
+                                    title: "Format Suggested",
+                                    description: `Added a default ${template.name} format for ${value} class`,
+                                  });
+                                }
+                              }
+                            }
+                          }}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select class type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="HIIT">HIIT (High Intensity Interval Training)</SelectItem>
+                            <SelectItem value="GLC">GLC (Group Lifting Circuit)</SelectItem>
+                            <SelectItem value="BURN">BURN (Bootcamp Style Class)</SelectItem>
+                            <SelectItem value="METCON">METCON (Metabolic Conditioning)</SelectItem>
+                            <SelectItem value="LIFT">LIFT (Strength & Power)</SelectItem>
+                            <SelectItem value="CORE">CORE (Core & Stability Focus)</SelectItem>
+                            <SelectItem value="FLEX">FLEX (Mobility & Flexibility)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Selecting a class type will auto-suggest appropriate equipment and formats
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="fitnessLevel"
                     render={({ field }) => (
                       <FormItem>
