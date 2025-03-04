@@ -1409,7 +1409,7 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                               if (circuitMap[classType]) {
                                 form.setValue('circuitPreferences.types', circuitMap[classType]);
                               }
-                            };
+                            }
                             
                             // Apply defaults for the selected class type
                             applyClassTypeDefaults(value);
