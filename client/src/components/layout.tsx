@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
-  const location = useLocation();
+  const { user, logoutMutation } = useAuth();
+  const logout = () => logoutMutation.mutate();
+  const [location] = useLocation();
   
   if (!user) {
     return <>{children}</>;
@@ -42,7 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               key={item.path} 
               to={item.path}
               className={`flex flex-col items-center p-2 min-w-[4rem] ${
-                location.pathname === item.path 
+                location === item.path 
                   ? "text-primary font-medium" 
                   : "text-muted-foreground"
               }`}
@@ -65,7 +66,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               key={item.path} 
               to={item.path}
               className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                location.pathname === item.path 
+                location === item.path 
                   ? "bg-primary/10 text-primary" 
                   : "hover:bg-muted"
               }`}

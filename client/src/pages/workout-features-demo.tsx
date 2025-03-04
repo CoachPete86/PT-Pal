@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { VolumeMute, Volume, Volume2, MicOn } from '@/components/ui/icons';
+import { Volume2 } from 'lucide-react';
 
 export default function WorkoutFeaturesDemo() {
   // Mascot demo states

@@ -125,7 +125,9 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
   // Initialize Speech Recognition
   useEffect(() => {
     // Check if browser supports the Web Speech API
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    // TypeScript doesn't have built-in types for the experimental Web Speech API
+    // so we need to use type assertions here
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
       // Speech recognition not supported
