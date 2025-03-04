@@ -631,22 +631,31 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
   const [localWork, setLocalWork] = useState("");
   const [localRest, setLocalRest] = useState("");
   const [localDesc, setLocalDesc] = useState("");
+  
+  // Effect to update local state when editing begins
+  useEffect(() => {
+    if (showFormatEditor && editingIndex !== null) {
+      const existing = classFormats[editingIndex];
+      if (existing) {
+        setLocalType(existing.type || "tabata");
+        setLocalRounds(existing.rounds || "");
+        setLocalWork(existing.workInterval || "");
+        setLocalRest(existing.restInterval || "");
+        setLocalDesc(existing.description || "");
+      }
+    } else if (showFormatEditor) {
+      // Reset values for new format
+      setLocalType("tabata");
+      setLocalRounds("");
+      setLocalWork("");
+      setLocalRest("");
+      setLocalDesc("");
+    }
+  }, [showFormatEditor, editingIndex, classFormats]);
 
   // EDITOR for Add/Edit Format
   function renderFormatEditor() {
     if (!showFormatEditor) return null;
-
-    // If editing an existing format
-    useEffect(() => {
-      if (showFormatEditor) {
-        const existing = editingIndex !== null ? classFormats[editingIndex] : undefined;
-        setLocalType(existing?.type || "tabata");
-        setLocalRounds(existing?.rounds || "");
-        setLocalWork(existing?.workInterval || "");
-        setLocalRest(existing?.restInterval || "");
-        setLocalDesc(existing?.description || "");
-      }
-    }, [showFormatEditor, editingIndex, classFormats]);
 
     function handleSave() {
       // keep as strings, parse later
