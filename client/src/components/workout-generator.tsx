@@ -1394,25 +1394,6 @@ export default function WorkoutGenerator({ clientId, onComplete }: WorkoutGenera
                             
                             // Apply defaults for the selected class type
                             applyClassTypeDefaults(value);
-                              
-                              // Set circuit preferences based on class type
-                              const circuitMap: Record<string, string[]> = {
-                                "HIIT": ["tabata", "amrap", "intervals"],
-                                "GLC": ["station", "superset", "tri-set"],
-                                "BURN": ["intervals", "emom", "tabata"],
-                                "METCON": ["amrap", "emom", "intervals"],
-                                "LIFT": ["timed", "superset", "resistance-cardio"],
-                                "CORE": ["timed", "superset"],
-                                "FLEX": ["timed", "superset"]
-                              };
-                              
-                              if (circuitMap[classType]) {
-                                form.setValue('circuitPreferences.types', circuitMap[classType]);
-                              }
-                            }
-                            
-                            // Apply defaults for the selected class type
-                            applyClassTypeDefaults(value);
                           }}
                           defaultValue={field.value}
                         >
