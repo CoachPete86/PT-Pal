@@ -8,8 +8,26 @@ import { useQuery } from "@tanstack/react-query";
 import SessionTracker from "./session-tracker";
 import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileIcon, FileText } from "lucide-react";
 import { StaggeredList, AnimatedCard, AnimatedButton, FadeIn } from "@/components/ui/animated-elements";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FileIcon } from "lucide-react"; // Added import for FileIcon
 
 export default function PTpalDashboard() {
@@ -91,7 +109,92 @@ export default function PTpalDashboard() {
                   </div>
                 </FadeIn>
               )}
-              <Button className="mt-4">Create New Plan</Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="mt-4">Create New Plan</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Create Workout Plan</DialogTitle>
+                    <DialogDescription>
+                      Generate a personalized workout plan for your client
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="planType">Plan Type</Label>
+                        <Select defaultValue="oneoff">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select plan type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="oneoff">Single Session</SelectItem>
+                            <SelectItem value="program">Full Program</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="sessionType">Session Type</Label>
+                        <Select defaultValue="personal">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select session type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="personal">Personal Training</SelectItem>
+                            <SelectItem value="group">Group Class</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fitnessLevel">Fitness Level</Label>
+                        <Select defaultValue="intermediate">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select fitness level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="classType">Class Type</Label>
+                        <Select defaultValue="HIIT">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select class type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="HIIT">HIIT</SelectItem>
+                            <SelectItem value="BURN">BURN</SelectItem>
+                            <SelectItem value="GLC">GLC</SelectItem>
+                            <SelectItem value="LIFT">LIFT</SelectItem>
+                            <SelectItem value="METCON">METCON</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="clientDetails">Client Details/Requirements (Optional)</Label>
+                      <Textarea 
+                        id="clientDetails" 
+                        className="min-h-[100px]" 
+                        placeholder="Enter any client-specific details, goals, or limitations..."
+                      />
+                    </div>
+                    
+                    <DialogFooter>
+                      <Button>Cancel</Button>
+                      <Button type="submit">Generate Workout Plan</Button>
+                    </DialogFooter>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         );
