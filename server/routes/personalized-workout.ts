@@ -268,3 +268,223 @@ When reviewing client history, look for:
     });
   }
 }
+import type { Request, Response } from "express";
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "",
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "",
+});
+
+interface ClientDetails {
+  age: string;
+  gender: string;
+  heightCm?: string;
+  weightKg?: string;
+  fitnessLevel: string;
+  goals: string[];
+  limitations?: string[];
+  preferences?: string[];
+}
+
+interface WorkoutParameters {
+  duration: string;
+  frequency: string;
+  intensity: string;
+  equipment: string[];
+  location: string;
+  workoutType: string;
+}
+
+interface AdaptiveSettings {
+  progressionRate: string;
+  adaptToPerformance: boolean;
+  autoAdjustDifficulty: boolean;
+  recoveryDays: string;
+}
+
+interface WorkoutGenerationRequest {
+  clientDetails: ClientDetails;
+  workoutParameters: WorkoutParameters;
+  adaptiveSettings: AdaptiveSettings;
+}
+
+export async function generatePersonalizedWorkout(req: Request, res: Response) {
+  if (!req.user) return res.sendStatus(401);
+
+  try {
+    const {
+      clientDetails,
+      workoutParameters,
+      adaptiveSettings,
+    }: WorkoutGenerationRequest = req.body;
+
+    // Create system prompt for the AI
+    const systemPrompt = `
+You are an expert personal trainer specializing in creating personalized workout plans.
+Your task is to create a detailed, personalized workout plan based on the client's details, goals, and constraints.
+
+IMPORTANT RESPONSE FORMAT:
+Return a valid JSON object that matches this exact structure:
+{
+  "title": string,
+  "description": string,
+  "durationMinutes": number,
+  "difficulty": string,
+  "targetMuscleGroups": string[],
+  "equipment": string[],
+  "warmup": {
+    "duration": string,
+    "exercises": [
+      {
+        "name": string,
+        "instructions": string,
+        "duration": string
+      }
+    ]
+  },
+  "exercises": [
+    {
+      "name": string,
+      "sets": string,
+      "reps": string,
+      "rest": string,
+      "notes": string,
+      "alternatives": string[]
+    }
+  ],
+  "cooldown": {
+    "duration": string,
+    "exercises": [
+      {
+        "name": string,
+        "instructions": string,
+        "duration": string
+      }
+    ]
+  },
+  "progressionTips": string[],
+  "notes": string
+}
+
+Only respond with the JSON object, no other text.
+`;
+
+    // Create user prompt with all the details
+    const userPrompt = `
+Create a personalized workout plan with the following details:
+
+CLIENT INFORMATION:
+- Age: ${clientDetails.age}
+- Gender: ${clientDetails.gender}
+${clientDetails.heightCm ? `- Height: ${clientDetails.heightCm} cm` : ""}
+${clientDetails.weightKg ? `- Weight: ${clientDetails.weightKg} kg` : ""}
+- Fitness Level: ${clientDetails.fitnessLevel}
+- Goals: ${clientDetails.goals.join(", ")}
+${
+  clientDetails.limitations && clientDetails.limitations.length > 0
+    ? `- Physical Limitations: ${clientDetails.limitations.join(", ")}`
+    : "- Physical Limitations: None"
+}
+${
+  clientDetails.preferences && clientDetails.preferences.length > 0
+    ? `- Exercise Preferences: ${clientDetails.preferences.join(", ")}`
+    : ""
+}
+
+WORKOUT PARAMETERS:
+- Duration: ${workoutParameters.duration} minutes
+- Frequency: ${workoutParameters.frequency} times per week
+- Intensity: ${workoutParameters.intensity}
+- Equipment Available: ${
+      workoutParameters.equipment.length > 0
+        ? workoutParameters.equipment.join(", ")
+        : "Bodyweight only"
+    }
+- Location: ${workoutParameters.location}
+- Workout Type: ${workoutParameters.workoutType}
+
+ADAPTIVE SETTINGS:
+- Progression Rate: ${adaptiveSettings.progressionRate}
+- Adapt to Performance: ${adaptiveSettings.adaptToPerformance ? "Yes" : "No"}
+- Auto-Adjust Difficulty: ${
+      adaptiveSettings.autoAdjustDifficulty ? "Yes" : "No"
+    }
+- Recovery Days: ${adaptiveSettings.recoveryDays}
+
+Create a structured workout plan that can be easily followed by the client. Include a warm-up, main exercises with sets, reps, and rest periods, and a cool-down. If the client has any limitations, provide alternative exercises.
+
+If auto-adjust difficulty is enabled, provide alternatives for each exercise to make it easier or harder.
+
+Make sure the workout is appropriately challenging for the client's fitness level and aligns with their goals.
+`;
+
+    // Try with Claude first (better for structured JSON output)
+    try {
+      const message = await anthropic.messages.create({
+        model: "claude-3-opus-20240229",
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+        temperature: 0.7,
+      });
+
+      // Parse the Claude response
+      try {
+        const responseText = message.content[0].text;
+        // Handle possible code block formatting
+        const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) || 
+                          responseText.match(/```\n([\s\S]*?)\n```/) || 
+                          responseText.match(/{[\s\S]*}/);
+        
+        if (jsonMatch) {
+          const planJson = jsonMatch[1] || jsonMatch[0];
+          const plan = JSON.parse(planJson);
+          return res.json({ plan });
+        } else {
+          throw new Error("Failed to parse JSON from Claude response");
+        }
+      } catch (parseError) {
+        console.error("Error parsing Claude response:", parseError);
+        throw new Error("Failed to generate structured workout plan with Claude");
+      }
+    } catch (claudeError) {
+      console.error("Claude API error:", claudeError);
+      
+      // Fallback to OpenAI
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.7,
+          response_format: { type: "json_object" },
+        });
+
+        // Parse the JSON from OpenAI
+        const plan = JSON.parse(response.choices[0].message.content || "{}");
+        return res.json({ plan });
+      } catch (openaiError) {
+        console.error("OpenAI API error:", openaiError);
+        throw new Error("Failed to generate workout plan with both AI services");
+      }
+    }
+  } catch (error: any) {
+    console.error("Personalized workout generation error:", error);
+    return res.status(500).json({
+      error: "Failed to generate personalized workout",
+      message: error.message,
+    });
+  }
+}
