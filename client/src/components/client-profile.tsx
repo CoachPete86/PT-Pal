@@ -316,11 +316,83 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
           <DialogHeader>
             <DialogTitle>Create Workout Plan</DialogTitle>
             <DialogDescription>
-              Generate a personalized workout plan for {client.name}
+              Generate a personalized workout plan for {client?.name || 'Client'}
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4">
-            <WorkoutGenerator clientId={clientId} />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="planType">Plan Type</Label>
+                  <Select defaultValue="oneoff">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select plan type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="oneoff">Single Session</SelectItem>
+                      <SelectItem value="program">Full Program</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="sessionType">Session Type</Label>
+                  <Select defaultValue="personal">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select session type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="personal">Personal Training</SelectItem>
+                      <SelectItem value="group">Group Class</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="fitnessLevel">Fitness Level</Label>
+                  <Select defaultValue="intermediate">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fitness level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="classType">Class Type</Label>
+                  <Select defaultValue="HIIT">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select class type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="HIIT">HIIT</SelectItem>
+                      <SelectItem value="BURN">BURN</SelectItem>
+                      <SelectItem value="GLC">GLC</SelectItem>
+                      <SelectItem value="LIFT">LIFT</SelectItem>
+                      <SelectItem value="METCON">METCON</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="clientDetails">Client Details/Requirements</Label>
+                <Textarea 
+                  id="clientDetails" 
+                  className="min-h-[100px]" 
+                  placeholder="Enter any client-specific details, goals, or limitations..."
+                />
+              </div>
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowWorkoutGenerator(false)}>Cancel</Button>
+                <Button type="submit">Generate Workout Plan</Button>
+              </DialogFooter>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

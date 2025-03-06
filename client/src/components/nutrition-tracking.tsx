@@ -1,360 +1,329 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ResponsiveContainer, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { FoodAnalysis } from "./food-analysis";
-import {
-  BarChart as LucideBarChart,
-  PieChart as LucidePieChart,
-  Calendar,
-  PlusCircle,
-  ArrowLeftRight,
-  CalendarPlus,
-  Loader2,
-  SaveIcon
-} from "lucide-react";
-import { format } from "date-fns";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useAuth } from "@/hooks/use-auth";
-
-interface NutritionEntry {
-  id: number;
-  userId: number;
-  clientId?: number;
-  date: string;
-  mealType: string;
-  calories: number;
-  protein: string;
-  carbs: string;
-  fats: string;
-  notes: string;
-  image?: string;
-  analysis: Record<string, any>;
-}
-
-interface MealPlan {
-  id: number;
-  trainerId: number;
-  clientId: number;
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  meals: MealPlanDay[];
-  status: 'active' | 'completed' | 'draft';
-}
-
-interface MealPlanDay {
-  day: number;
-  meals: {
-    mealType: string;
-    foods: string[];
-    macros: {
-      calories: number;
-      protein: string;
-      carbs: string;
-      fats: string;
-    };
-    notes?: string;
-  }[];
-}
-
-function DropdownNav({ options, activeTab, onSelect }: { options: { id: string; label: string }[], activeTab: string, onSelect: (id: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <Button onClick={() => setIsOpen(!isOpen)}>{options.find(option => option.id === activeTab)?.label || 'Select View'}</Button>
-      {isOpen && (
-        <ul className="absolute bg-white shadow-md mt-2 py-2 rounded-md w-full">
-          {options.map(option => (
-            <li key={option.id} className="cursor-pointer px-4 py-2 hover:bg-gray-100" onClick={() => { onSelect(option.id); setIsOpen(false); }}>
-              {option.label}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 
 export default function NutritionTracking() {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("weekly");
-  const [selectedAnalysis, setSelectedAnalysis] = useState<any>(null);
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: new Date(new Date().setDate(new Date().getDate() - 7)),
-    to: new Date(),
+  const [newEntry, setNewEntry] = useState({
+    name: "",
+    calories: "",
+    protein: "",
+    carbs: "",
+    fat: "",
+    mealType: "breakfast"
   });
 
-  // Sample data - in a real app this would come from API
-  const macroData = [
-    { name: "Protein", value: 90 },
-    { name: "Carbs", value: 150 },
-    { name: "Fat", value: 45 },
-  ];
+  // Simulated food entries that would normally come from an API
+  const [foodEntries, setFoodEntries] = useState([
+    { id: 1, name: "Oatmeal with Berries", calories: 350, protein: 12, carbs: 60, fat: 7, mealType: "breakfast", date: new Date() }
+  ]);
 
-  const weeklyData = [
-    { day: "Mon", calories: 1850, target: 2000 },
-    { day: "Tue", calories: 1920, target: 2000 },
-    { day: "Wed", calories: 2100, target: 2000 },
-    { day: "Thu", calories: 1780, target: 2000 },
-    { day: "Fri", calories: 2200, target: 2000 },
-    { day: "Sat", calories: 2350, target: 2000 },
-    { day: "Sun", calories: 1950, target: 2000 },
-  ];
-
-
-  // Query food diary entries (retained from original, but not used in edited example)
-  const { data: foodDiaryEntries = [], isLoading: isLoadingEntries } = useQuery({
-    queryKey: ['/api/nutrition/entries', dateRange],
-    queryFn: async () => {
-      const res = await apiRequest("GET", `/api/nutrition/entries?from=${dateRange.from.toISOString()}&to=${dateRange.to.toISOString()}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch nutrition entries");
-      }
-      return res.json();
-    }
-  });
-
-  // Query meal plans (retained from original, but not used in edited example)
-  const { data: mealPlans = [], isLoading: isLoadingMealPlans } = useQuery({
-    queryKey: ['/api/nutrition/meal-plans'],
-    queryFn: async () => {
-      const res = await apiRequest("GET", `/api/nutrition/meal-plans`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch meal plans");
-      }
-      return res.json();
-    },
-    enabled: user?.role === 'trainer'
-  });
-
-  // Save analyzed food to diary (retained from original, but not used in edited example)
-  const saveToFoodDiaryMutation = useMutation({
-    mutationFn: async (entry: Partial<NutritionEntry>) => {
-      const res = await apiRequest("POST", "/api/nutrition/entries", entry);
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to save to food diary");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/nutrition/entries'] });
-      toast({
-        title: "Entry Saved",
-        description: "Food has been added to your diary",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Save Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  });
-
-  // Handle saving analysis to food diary (retained from original, but not used in edited example)
-  const handleSaveToFoodDiary = (analysis: any, mealType: string) => {
-    if (!analysis) return;
-
-    saveToFoodDiaryMutation.mutate({
-      date: new Date().toISOString(),
-      mealType,
-      calories: analysis.calories,
-      protein: analysis.macros.protein.total,
-      carbs: analysis.macros.carbs.total,
-      fats: analysis.macros.fats.total,
-      notes: analysis.notes?.join(", ") || "",
-      analysis: analysis,
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewEntry({
+      ...newEntry,
+      [name]: name === "name" ? value : Number(value) || ""
     });
   };
 
-  const mealTypeOptions = ["Breakfast", "Lunch", "Dinner", "Snack"];
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validate form
+    if (!newEntry.name || !newEntry.calories) {
+      toast({
+        title: "Missing information",
+        description: "Please enter at least a food name and calories.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create new entry
+    const entry = {
+      id: Date.now(),
+      ...newEntry,
+      date: new Date()
+    };
+
+    setFoodEntries([entry, ...foodEntries]);
+
+    // Reset form
+    setNewEntry({
+      name: "",
+      calories: "",
+      protein: "",
+      carbs: "",
+      fat: "",
+      mealType: "breakfast"
+    });
+
+    toast({
+      title: "Food logged successfully",
+      description: `Added ${entry.name} to your food journal.`
+    });
+  };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Nutrition Tracking</h2>
-      <div className="mb-6 max-w-[300px]">
-          <DropdownNav 
-            options={[
-              { id: "daily", label: "Daily View" },
-              { id: "weekly", label: "Weekly Progress" },
-              { id: "meals", label: "Meal Plans" }
-            ]}
-            activeTab={activeTab}
-            onSelect={setActiveTab}
-          />
-        </div>
-      {activeTab === "daily" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Today's Nutrition</CardTitle>
-              <CardDescription>Track your daily intake and macros</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Calorie Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-2xl font-bold">1,850</p>
-                        <p className="text-xs text-muted-foreground">of 2,000 daily goal</p>
-                      </div>
-                      <div className="h-16 w-16">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={[
-                                { name: "Consumed", value: 1850 },
-                                { name: "Remaining", value: 150 }
-                              ]}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={25}
-                              outerRadius={35}
-                              fill="#8884d8"
-                              dataKey="value"
-                            />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>Nutrition Tracking</CardTitle>
+        <CardDescription>Track your daily nutrition intake</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="weekly-overview">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="weekly-overview">Weekly Overview</TabsTrigger>
+            <TabsTrigger value="log-food">Log Food</TabsTrigger>
+            <TabsTrigger value="meal-plans">Meal Plans</TabsTrigger>
+          </TabsList>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Macro Nutrients</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[150px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={macroData}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={60}
-                            fill="#8884d8"
-                            dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          />
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="md:col-span-2">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Add Food</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-3">
-                      <div>
-                        <Label htmlFor="food-item">Food Item</Label>
-                        <Input id="food-item" placeholder="e.g., Grilled Chicken" />
-                      </div>
-                      <div>
-                        <Label htmlFor="portion">Portion</Label>
-                        <Input id="portion" placeholder="e.g., 100g" />
-                      </div>
-                      <div className="flex items-end">
-                        <Button className="w-full">Add to Log</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div className="md:col-span-2">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div>
-                        <h3 className="text-sm font-medium">Calorie Sources</h3>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[200px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={[
-                            { name: "Breakfast", calories: 450 },
-                            { name: "Lunch", calories: 650 },
-                            { name: "Dinner", calories: 550 },
-                            { name: "Snacks", calories: 200 }
-                          ]}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="calories" fill="#8884d8" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+          <TabsContent value="weekly-overview" className="space-y-4">
+            <div className="bg-card p-4 rounded-lg border mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-semibold">Weekly Nutrition Summary</h3>
+                <Select defaultValue="current">
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Select period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="current">This Week</SelectItem>
+                    <SelectItem value="previous">Last Week</SelectItem>
+                    <SelectItem value="twoWeeks">2 Weeks Ago</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      {activeTab === "weekly" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Weekly Progress</CardTitle>
-              <CardDescription>Your calorie intake for the past 7 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[200px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={weeklyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                  <BarChart
+                    data={[
+                      { day: 'Mon', calories: 2100, protein: 130, carbs: 190, fat: 70 },
+                      { day: 'Tue', calories: 1950, protein: 125, carbs: 180, fat: 65 },
+                      { day: 'Wed', calories: 2200, protein: 140, carbs: 200, fat: 75 },
+                      { day: 'Thu', calories: 2000, protein: 120, carbs: 185, fat: 70 },
+                      { day: 'Fri', calories: 2250, protein: 145, carbs: 205, fat: 80 },
+                      { day: 'Sat', calories: 1800, protein: 115, carbs: 160, fat: 60 },
+                      { day: 'Sun', calories: 2100, protein: 135, carbs: 195, fat: 70 },
+                    ]}
+                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="calories" fill="#8884d8" name="Calories" />
-                    <Bar dataKey="target" fill="#82ca9d" name="Target" />
+                    <Bar dataKey="calories" fill="#8884d8" name="Calories (kcal)" />
+                    <Bar dataKey="protein" fill="#82ca9d" name="Protein (g)" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      {activeTab === "meals" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Meal Plans</CardTitle>
-              <CardDescription>View and schedule your meal plans</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center p-12">
-                <p className="text-muted-foreground mb-4">No meal plans created yet</p>
-                <Button>Create Meal Plan</Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-    </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">2,050</div>
+                    <p className="text-xs text-muted-foreground">Avg. Daily Calories</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">130g</div>
+                    <p className="text-xs text-muted-foreground">Avg. Daily Protein</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">188g</div>
+                    <p className="text-xs text-muted-foreground">Avg. Daily Carbs</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">70g</div>
+                    <p className="text-xs text-muted-foreground">Avg. Daily Fat</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="log-food">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Add Food Entry</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Food Name</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          value={newEntry.name}
+                          onChange={handleInputChange}
+                          placeholder="e.g., Grilled Chicken Salad"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="mealType">Meal Type</Label>
+                        <Select
+                          value={newEntry.mealType}
+                          onValueChange={(value) => setNewEntry({ ...newEntry, mealType: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select meal type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="breakfast">Breakfast</SelectItem>
+                            <SelectItem value="lunch">Lunch</SelectItem>
+                            <SelectItem value="dinner">Dinner</SelectItem>
+                            <SelectItem value="snack">Snack</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="calories">Calories</Label>
+                        <Input
+                          id="calories"
+                          name="calories"
+                          value={newEntry.calories}
+                          onChange={handleInputChange}
+                          placeholder="kcal"
+                          type="number"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="protein">Protein (g)</Label>
+                        <Input
+                          id="protein"
+                          name="protein"
+                          value={newEntry.protein}
+                          onChange={handleInputChange}
+                          placeholder="g"
+                          type="number"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="carbs">Carbs (g)</Label>
+                        <Input
+                          id="carbs"
+                          name="carbs"
+                          value={newEntry.carbs}
+                          onChange={handleInputChange}
+                          placeholder="g"
+                          type="number"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="fat">Fat (g)</Label>
+                        <Input
+                          id="fat"
+                          name="fat"
+                          value={newEntry.fat}
+                          onChange={handleInputChange}
+                          placeholder="g"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <Button type="submit" className="w-full">Log Food</Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Today's Food Journal</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {foodEntries.length > 0 ? (
+                    <div className="space-y-4">
+                      {foodEntries.map(entry => (
+                        <div key={entry.id} className="flex items-center justify-between border-b pb-2">
+                          <div>
+                            <div className="font-medium">{entry.name}</div>
+                            <div className="text-sm text-muted-foreground capitalize">{entry.mealType}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium">{entry.calories} kcal</div>
+                            <div className="text-sm text-muted-foreground">
+                              P: {entry.protein}g | C: {entry.carbs}g | F: {entry.fat}g
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No food entries today. Start by logging your meals.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="meal-plans">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Meal Plans</CardTitle>
+                <CardDescription>View and create meal plans</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-medium">Available Meal Plans</h3>
+                    <Button variant="outline" size="sm">Create New Plan</Button>
+                  </div>
+
+                  <div className="rounded-lg border divide-y">
+                    <div className="p-4 flex justify-between items-center">
+                      <div>
+                        <div className="font-medium">High Protein Meal Plan</div>
+                        <div className="text-sm text-muted-foreground">7-day plan • 2200 kcal/day</div>
+                      </div>
+                      <Button variant="ghost" size="sm">View</Button>
+                    </div>
+                    <div className="p-4 flex justify-between items-center">
+                      <div>
+                        <div className="font-medium">Weight Loss Plan</div>
+                        <div className="text-sm text-muted-foreground">14-day plan • 1800 kcal/day</div>
+                      </div>
+                      <Button variant="ghost" size="sm">View</Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }
