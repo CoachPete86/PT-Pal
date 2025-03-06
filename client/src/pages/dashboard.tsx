@@ -49,6 +49,11 @@ import { ClientManagement } from "@/components/client-management";
 import { ClientProfile } from "@/components/client-profile";
 import PTpalDashboard from "@/components/ptpal-dashboard";
 import PersonalizedWorkoutGenerator from "@/components/personalized-workout-generator";
+import SmartScheduling from "@/components/smart-scheduling";
+import ClientAssessmentTools from "@/components/client-assessment-tools";
+import WhiteLabelCustomization from "@/components/white-label-customization";
+import ClientEngagementHub from "@/components/client-engagement-hub";
+import BusinessInsightsDashboard from "@/components/business-insights-dashboard";
 
 export default function DashboardPage() {
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -70,6 +75,7 @@ export default function DashboardPage() {
         { id: "client-list", label: "Client List" },
         { id: "add-client", label: "Add New Client" },
         { id: "client-groups", label: "Client Groups" },
+        { id: "client-engagement", label: "Engagement Hub" },
       ],
     },
     {
@@ -80,6 +86,7 @@ export default function DashboardPage() {
         { id: "session-calendar", label: "Calendar" },
         { id: "session-history", label: "Session History" },
         { id: "create-session", label: "Create Session" },
+        { id: "smart-scheduling", label: "Smart Scheduling" },
       ],
     },
     {
@@ -105,12 +112,21 @@ export default function DashboardPage() {
       id: "progress",
       label: "Progress Tracking",
       icon: Trophy,
-      children: [],
+      children: [
+        { id: "client-assessment", label: "Assessment Tools" },
+        { id: "progress-charts", label: "Progress Charts" },
+      ],
     },
     {
       id: "messages",
       label: "Messages",
       icon: MessageSquare,
+      children: [],
+    },
+    {
+      id: "business",
+      label: "Business Insights",
+      icon: BarChart,
       children: [],
     },
     {
@@ -123,7 +139,11 @@ export default function DashboardPage() {
       id: "settings",
       label: "Settings",
       icon: Settings,
-      children: [],
+      children: [
+        { id: "white-label", label: "White Label" },
+        { id: "account-settings", label: "Account" },
+        { id: "integrations", label: "Integrations" },
+      ],
     },
   ];
 
@@ -133,6 +153,16 @@ export default function DashboardPage() {
         return <PTpalDashboard />;
       case "personalized-workout":
         return <PersonalizedWorkoutGenerator />;
+      case "smart-scheduling":
+        return <SmartScheduling />;
+      case "client-assessment":
+        return <ClientAssessmentTools />;
+      case "white-label":
+        return <WhiteLabelCustomization />;
+      case "client-engagement":
+        return <ClientEngagementHub />;
+      case "business":
+        return <BusinessInsightsDashboard />;
       case "clients":
         return selectedClientId ? (
           <ClientProfile
