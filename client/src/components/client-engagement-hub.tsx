@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -436,9 +435,9 @@ export default function ClientEngagementHub() {
 
   const handleSendMessage = async (data: { content: string }) => {
     if (!selectedClient) return;
-    
+
     setIsSending(true);
-    
+
     try {
       // In a real application, this would be an API call
       // await axios.post('/api/messages', {
@@ -446,7 +445,7 @@ export default function ClientEngagementHub() {
       //   content: data.content,
       //   attachments: messageImage ? [messageImage] : []
       // });
-      
+
       // Mock success
       const newMessage: Message = {
         id: `m${Date.now()}`,
@@ -456,16 +455,16 @@ export default function ClientEngagementHub() {
         timestamp: new Date().toISOString(),
         isRead: false,
       };
-      
+
       // Update mock data (would be handled by the backend in a real app)
       if (!mockMessages[selectedClient.id]) {
         mockMessages[selectedClient.id] = [];
       }
       mockMessages[selectedClient.id].push(newMessage);
-      
+
       messageForm.reset();
       setMessageImage(null);
-      
+
       toast({
         title: "Message sent",
         description: "Your message has been delivered.",
@@ -484,14 +483,14 @@ export default function ClientEngagementHub() {
 
   const handleAddMilestone = async (data: { title: string; description: string; targetDate: string }) => {
     if (!selectedClient) return;
-    
+
     try {
       // In a real application, this would be an API call
       // await axios.post('/api/milestones', {
       //   clientId: selectedClient.id,
       //   ...data
       // });
-      
+
       // Mock success
       const newMilestone: Milestone = {
         id: `ms${Date.now()}`,
@@ -500,16 +499,16 @@ export default function ClientEngagementHub() {
         targetDate: data.targetDate,
         status: "pending",
       };
-      
+
       // Update mock data (would be handled by the backend in a real app)
       if (!mockMilestones[selectedClient.id]) {
         mockMilestones[selectedClient.id] = [];
       }
       mockMilestones[selectedClient.id].push(newMilestone);
-      
+
       milestoneForm.reset();
       setActiveMilestoneDialog(null);
-      
+
       toast({
         title: "Milestone added",
         description: "The milestone has been added successfully.",
@@ -526,28 +525,28 @@ export default function ClientEngagementHub() {
 
   const handleUpdateMilestoneStatus = async (milestone: Milestone, newStatus: "pending" | "achieved" | "missed") => {
     if (!selectedClient) return;
-    
+
     try {
       // In a real application, this would be an API call
       // await axios.patch(`/api/milestones/${milestone.id}`, {
       //   status: newStatus,
       //   completedDate: newStatus === 'achieved' ? new Date().toISOString() : undefined
       // });
-      
+
       // Mock success
       const updatedMilestone = {
         ...milestone,
         status: newStatus,
         completedDate: newStatus === 'achieved' ? new Date().toISOString() : undefined,
       };
-      
+
       // Update mock data (would be handled by the backend in a real app)
       const clientMilestones = mockMilestones[selectedClient.id] || [];
-      const updatedMilestones = clientMilestones.map(m => 
+      const updatedMilestones = clientMilestones.map(m =>
         m.id === milestone.id ? updatedMilestone : m
       );
       mockMilestones[selectedClient.id] = updatedMilestones;
-      
+
       toast({
         title: "Milestone updated",
         description: `Milestone marked as ${newStatus}.`,
@@ -564,7 +563,7 @@ export default function ClientEngagementHub() {
 
   const handleSubmitCheckIn = async (data: any) => {
     if (!selectedClient) return;
-    
+
     try {
       // In a real application, this would be an API call
       // await axios.post('/api/check-ins/respond', {
@@ -572,19 +571,19 @@ export default function ClientEngagementHub() {
       //   checkInId: activeCheckIn.id,
       //   responses: data
       // });
-      
+
       // Mock success
       const checkIns = getClientCheckIns(selectedClient.id);
       const currentCheckIn = checkIns.find(ci => ci.status === 'scheduled');
-      
+
       if (currentCheckIn) {
         currentCheckIn.status = 'completed';
         currentCheckIn.responses = data;
       }
-      
+
       setShowCheckInForm(false);
       checkInForm.reset();
-      
+
       toast({
         title: "Check-in completed",
         description: "Your check-in has been submitted successfully.",
@@ -681,7 +680,7 @@ export default function ClientEngagementHub() {
                       </Button>
                     ))}
                   </div>
-                  
+
                   {inactiveClients.length > 0 && (
                     <>
                       <Separator className="my-4" />
@@ -933,7 +932,7 @@ export default function ClientEngagementHub() {
                               )}
                             </Button>
                           </div>
-                          
+
                           <div className="flex justify-between items-center">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -986,7 +985,7 @@ export default function ClientEngagementHub() {
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
-                            
+
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button variant="outline" size="sm">Schedule Message</Button>
@@ -1001,15 +1000,15 @@ export default function ClientEngagementHub() {
                                 <div className="space-y-4 py-4">
                                   <div className="grid gap-4">
                                     <div className="grid gap-2">
-                                      <Label htmlFor="scheduled-date">Date</Label>
-                                      <Input 
-                                        id="scheduled-date" 
-                                        type="date" 
+                                      <FormLabel htmlFor="scheduled-date">Date</FormLabel>
+                                      <Input
+                                        id="scheduled-date"
+                                        type="date"
                                         min={new Date().toISOString().split('T')[0]}
                                       />
                                     </div>
                                     <div className="grid gap-2">
-                                      <Label htmlFor="scheduled-time">Time</Label>
+                                      <FormLabel htmlFor="scheduled-time">Time</FormLabel>
                                       <Input id="scheduled-time" type="time" />
                                     </div>
                                   </div>
@@ -1132,7 +1131,7 @@ export default function ClientEngagementHub() {
 
                     {getClientMilestones(selectedClient.id).length === 0 ? (
                       <div className="text-center py-8">
-                        <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <Award className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <h3 className="text-lg font-medium mb-1">No milestones yet</h3>
                         <p className="text-muted-foreground max-w-sm mx-auto mb-4">
                           Create milestones to help your client track their progress and stay motivated
@@ -1517,7 +1516,7 @@ export default function ClientEngagementHub() {
                                         </Badge>
                                       </div>
                                     </CardHeader>
-                                    
+
                                     {checkIn.responses && (
                                       <CardContent>
                                         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -1534,7 +1533,7 @@ export default function ClientEngagementHub() {
                                               </div>
                                             ))}
                                         </div>
-                                        
+
                                         {checkIn.responses.notes && (
                                           <div className="mt-3 pt-3 border-t text-sm">
                                             <p className="text-xs text-muted-foreground mb-1">
@@ -1570,721 +1569,6 @@ export default function ClientEngagementHub() {
           </Card>
         )}
       </div>
-    </div>
-  );
-}
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  MessageCircle,
-  Image as ImageIcon,
-  Send,
-  CheckCheck,
-  CheckCircle,
-  Trophy,
-  AlertCircle,
-  Calendar,
-  User,
-  Clock,
-  FileText,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-
-// Mock data - replace with actual API calls in production
-const mockClients = [
-  {
-    id: "1",
-    name: "Jane Smith",
-    avatar: "",
-    lastActive: "2 hours ago",
-    status: "active",
-  },
-  {
-    id: "2",
-    name: "John Doe",
-    avatar: "",
-    lastActive: "1 day ago",
-    status: "inactive",
-  },
-  {
-    id: "3",
-    name: "Sarah Williams",
-    avatar: "",
-    lastActive: "Online now",
-    status: "active",
-  },
-  {
-    id: "4",
-    name: "Mike Johnson",
-    avatar: "",
-    lastActive: "3 days ago",
-    status: "inactive",
-  },
-];
-
-const mockMessages = [
-  {
-    id: "1",
-    clientId: "1",
-    messages: [
-      {
-        id: "m1",
-        sender: "client",
-        content: "Hi Coach! How should I prepare for our session tomorrow?",
-        timestamp: "2023-04-10T13:30:00Z",
-        status: "read",
-      },
-      {
-        id: "m2",
-        sender: "coach",
-        content:
-          "Hey Jane! Make sure to hydrate well today and get a good night's sleep. Wear comfortable clothes and bring your resistance bands.",
-        timestamp: "2023-04-10T13:35:00Z",
-        status: "read",
-      },
-      {
-        id: "m3",
-        sender: "client",
-        content: "Got it! Should I eat before our session?",
-        timestamp: "2023-04-10T13:40:00Z",
-        status: "read",
-      },
-      {
-        id: "m4",
-        sender: "coach",
-        content:
-          "Have a light meal about 1.5-2 hours before. Something with carbs and protein would be perfect!",
-        timestamp: "2023-04-10T13:45:00Z",
-        status: "read",
-      },
-    ],
-  },
-];
-
-const mockGoals = [
-  {
-    id: "1",
-    clientId: "1",
-    description: "Lose 10 pounds",
-    deadline: "2023-06-01",
-    progress: 60,
-    milestones: [
-      {
-        id: "m1",
-        description: "Lose first 3 pounds",
-        completed: true,
-        completedDate: "2023-04-05",
-      },
-      {
-        id: "m2",
-        description: "Lose 7 pounds total",
-        completed: true,
-        completedDate: "2023-04-20",
-      },
-      {
-        id: "m3",
-        description: "Final goal - 10 pounds",
-        completed: false,
-      },
-    ],
-  },
-  {
-    id: "2",
-    clientId: "1",
-    description: "Run a 5K race",
-    deadline: "2023-07-15",
-    progress: 40,
-    milestones: [
-      {
-        id: "m1",
-        description: "Run 1K without stopping",
-        completed: true,
-        completedDate: "2023-03-15",
-      },
-      {
-        id: "m2",
-        description: "Run 3K without stopping",
-        completed: false,
-      },
-      {
-        id: "m3",
-        description: "Complete a 5K run",
-        completed: false,
-      },
-    ],
-  },
-];
-
-const mockProgressPhotos = [
-  {
-    id: "1",
-    clientId: "1",
-    date: "2023-03-01",
-    url: "https://via.placeholder.com/150",
-    description: "Front view - starting point",
-  },
-  {
-    id: "2",
-    clientId: "1",
-    date: "2023-04-01",
-    url: "https://via.placeholder.com/150",
-    description: "Front view - 1 month progress",
-  },
-];
-
-// Template messages for quick responses
-const templateMessages = [
-  {
-    id: "t1",
-    title: "Session Reminder",
-    content:
-      "Hi! Just a friendly reminder about our session tomorrow. Looking forward to seeing you!",
-  },
-  {
-    id: "t2",
-    title: "Great Progress",
-    content:
-      "I wanted to reach out and say great job on your progress this week! Keep up the excellent work!",
-  },
-  {
-    id: "t3",
-    title: "Missed Session",
-    content:
-      "Hi there, I noticed you missed our session today. Is everything okay? Let me know if you need to reschedule.",
-  },
-  {
-    id: "t4",
-    title: "Nutrition Check-in",
-    content:
-      "How has your nutrition been this week? Remember to track your meals and stay hydrated!",
-  },
-];
-
-export default function ClientEngagementHub() {
-  const [activeTab, setActiveTab] = useState("messages");
-  const [selectedClientId, setSelectedClientId] = useState(mockClients[0].id);
-  const [messageInput, setMessageInput] = useState("");
-  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
-  const [messageTemplateOpen, setMessageTemplateOpen] = useState(false);
-  const [inactiveClientsDialogOpen, setInactiveClientsDialogOpen] = useState(false);
-
-  // Get selected client messages
-  const selectedClientMessages =
-    mockMessages.find((client) => client.clientId === selectedClientId)
-      ?.messages || [];
-
-  // Get selected client goals
-  const selectedClientGoals =
-    mockGoals.filter((goal) => goal.clientId === selectedClientId) || [];
-
-  // Get selected client progress photos
-  const selectedClientPhotos =
-    mockProgressPhotos.filter(
-      (photo) => photo.clientId === selectedClientId
-    ) || [];
-
-  // Handle sending a message
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-    
-    // In a real app, send to API and update state
-    console.log(`Sending message to client ${selectedClientId}: ${messageInput}`);
-    
-    // Clear input after sending
-    setMessageInput("");
-  };
-
-  // Handle photo upload
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const fileArray = Array.from(e.target.files);
-      setUploadedPhotos([...uploadedPhotos, ...fileArray]);
-    }
-  };
-
-  // Handle using a template message
-  const handleUseTemplate = (template: typeof templateMessages[0]) => {
-    setMessageInput(template.content);
-    setMessageTemplateOpen(false);
-  };
-
-  // Send automated check-in to inactive clients
-  const handleAutomatedCheckIn = () => {
-    // In a real app, send to API
-    console.log("Sending automated check-ins to inactive clients");
-    setInactiveClientsDialogOpen(false);
-  };
-
-  return (
-    <div className="container max-w-6xl mx-auto py-6">
-      <div className="flex flex-col gap-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Client Engagement Hub</h1>
-          <p className="text-muted-foreground">
-            Connect with your clients, track their goals, and celebrate their progress.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Client List */}
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Clients</CardTitle>
-              <CardDescription>Select a client to interact with</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <Input placeholder="Search clients..." />
-                <ScrollArea className="h-[calc(100vh-400px)]">
-                  <div className="space-y-2">
-                    {mockClients.map((client) => (
-                      <div
-                        key={client.id}
-                        className={`p-3 rounded-lg flex items-center gap-3 cursor-pointer transition-colors ${
-                          selectedClientId === client.id
-                            ? "bg-primary/10 border border-primary/20"
-                            : "hover:bg-muted"
-                        }`}
-                        onClick={() => setSelectedClientId(client.id)}
-                      >
-                        <Avatar>
-                          <AvatarImage src={client.avatar} />
-                          <AvatarFallback>
-                            {client.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{client.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {client.lastActive}
-                          </p>
-                        </div>
-                        <div
-                          className={`h-2 w-2 rounded-full ${
-                            client.status === "active"
-                              ? "bg-green-500"
-                              : "bg-muted"
-                          }`}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => setInactiveClientsDialogOpen(true)}
-              >
-                <AlertCircle className="h-4 w-4 mr-2" />
-                <span>Check-in Inactive</span>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Main Interaction Area */}
-          <Card className="md:col-span-3">
-            <CardHeader className="p-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage
-                      src={
-                        mockClients.find(
-                          (client) => client.id === selectedClientId
-                        )?.avatar
-                      }
-                    />
-                    <AvatarFallback>
-                      {mockClients
-                        .find((client) => client.id === selectedClientId)
-                        ?.name.split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <CardTitle>
-                      {
-                        mockClients.find(
-                          (client) => client.id === selectedClientId
-                        )?.name
-                      }
-                    </CardTitle>
-                    <CardDescription>
-                      Last active:{" "}
-                      {
-                        mockClients.find(
-                          (client) => client.id === selectedClientId
-                        )?.lastActive
-                      }
-                    </CardDescription>
-                  </div>
-                </div>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="messages">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Messages</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="goals">
-                      <Trophy className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Goals</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="progress">
-                      <ImageIcon className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Progress</span>
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-            </CardHeader>
-
-            <TabsContent value="messages" className="m-0">
-              <div className="flex flex-col h-[calc(100vh-400px)]">
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-4">
-                    {selectedClientMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          message.sender === "coach" ? "justify-end" : "justify-start"
-                        }`}
-                      >
-                        <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
-                            message.sender === "coach"
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted"
-                          }`}
-                        >
-                          <p>{message.content}</p>
-                          <div
-                            className={`text-xs mt-1 flex items-center justify-end gap-1 ${
-                              message.sender === "coach"
-                                ? "text-primary-foreground/70"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            {new Date(message.timestamp).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                            {message.sender === "coach" && message.status === "read" && (
-                              <CheckCheck className="h-3 w-3" />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <div className="p-4 border-t">
-                  <div className="flex gap-2 mb-2">
-                    <Dialog open={messageTemplateOpen} onOpenChange={setMessageTemplateOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <FileText className="h-4 w-4 mr-2" />
-                          Templates
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Message Templates</DialogTitle>
-                          <DialogDescription>
-                            Select a template to quickly respond to your client.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-2 my-4">
-                          {templateMessages.map((template) => (
-                            <div
-                              key={template.id}
-                              className="p-3 border rounded-lg hover:bg-muted cursor-pointer"
-                              onClick={() => handleUseTemplate(template)}
-                            >
-                              <h4 className="font-medium">{template.title}</h4>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {template.content}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    <Button variant="outline" size="sm">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Schedule
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Textarea
-                      placeholder="Type your message..."
-                      className="flex-1"
-                      value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                    />
-                    <Button onClick={handleSendMessage}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="goals" className="m-0">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-medium">Client Goals</h3>
-                  <Button size="sm">
-                    <span>Add Goal</span>
-                  </Button>
-                </div>
-
-                <div className="space-y-6">
-                  {selectedClientGoals.map((goal) => (
-                    <Card key={goal.id}>
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <CardTitle>{goal.description}</CardTitle>
-                          <Badge variant={goal.progress === 100 ? "default" : "outline"}>
-                            {goal.progress === 100 ? "Completed" : `${goal.progress}%`}
-                          </Badge>
-                        </div>
-                        <CardDescription>
-                          Target Date: {new Date(goal.deadline).toLocaleDateString()}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Progress value={goal.progress} className="h-2 mb-4" />
-                        <div className="space-y-2">
-                          {goal.milestones.map((milestone) => (
-                            <div
-                              key={milestone.id}
-                              className="flex items-start gap-2 p-2 rounded-md bg-muted/50"
-                            >
-                              {milestone.completed ? (
-                                <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                              ) : (
-                                <div className="h-5 w-5 rounded-full border-2 border-muted-foreground shrink-0 mt-0.5" />
-                              )}
-                              <div className="flex-1">
-                                <p className="text-sm">{milestone.description}</p>
-                                {milestone.completed && (
-                                  <p className="text-xs text-muted-foreground">
-                                    Completed on{" "}
-                                    {new Date(
-                                      milestone.completedDate || ""
-                                    ).toLocaleDateString()}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm">
-                          Edit
-                        </Button>
-                        <Button size="sm">Celebrate</Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-
-                  {selectedClientGoals.length === 0 && (
-                    <div className="text-center py-12">
-                      <Trophy className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-1">No Goals Set</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Set goals to help track client progress and motivation.
-                      </p>
-                      <Button>Create First Goal</Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="progress" className="m-0">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-medium">Progress Photos</h3>
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      id="photo-upload"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={handlePhotoUpload}
-                    />
-                    <label htmlFor="photo-upload">
-                      <Button variant="outline" size="sm" asChild>
-                        <span>
-                          <ImageIcon className="h-4 w-4 mr-2" />
-                          Upload Photos
-                        </span>
-                      </Button>
-                    </label>
-                  </div>
-                </div>
-
-                {selectedClientPhotos.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedClientPhotos.map((photo) => (
-                      <div key={photo.id} className="border rounded-lg overflow-hidden">
-                        <img
-                          src={photo.url}
-                          alt={photo.description}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="p-3">
-                          <p className="font-medium text-sm">{photo.description}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(photo.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <ImageIcon className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-1">No Progress Photos</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Upload photos to visually track client progress over time.
-                    </p>
-                    <label htmlFor="photo-upload">
-                      <Button asChild>
-                        <span>Upload First Photo</span>
-                      </Button>
-                    </label>
-                  </div>
-                )}
-
-                {uploadedPhotos.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="font-medium mb-3">Newly Uploaded Photos</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {uploadedPhotos.map((photo, index) => (
-                        <div key={index} className="border rounded-lg overflow-hidden">
-                          <img
-                            src={URL.createObjectURL(photo)}
-                            alt={`Uploaded photo ${index + 1}`}
-                            className="w-full h-48 object-cover"
-                          />
-                          <div className="p-3">
-                            <Input
-                              placeholder="Add a description"
-                              className="mb-2"
-                            />
-                            <div className="flex justify-end">
-                              <Button size="sm">Save</Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Inactive Clients Dialog */}
-      <Dialog open={inactiveClientsDialogOpen} onOpenChange={setInactiveClientsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Inactive Clients</DialogTitle>
-            <DialogDescription>
-              These clients haven't been active in the last 7 days. Send them a check-in message.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 my-4">
-            {mockClients
-              .filter((client) => client.status === "inactive")
-              .map((client) => (
-                <div
-                  key={client.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={client.avatar} />
-                      <AvatarFallback>
-                        {client.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{client.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Last active: {client.lastActive}
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setSelectedClientId(client.id)}>
-                    Message
-                  </Button>
-                </div>
-              ))}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setInactiveClientsDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAutomatedCheckIn}>
-              Send Automated Check-in
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
