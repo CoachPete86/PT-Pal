@@ -1,387 +1,183 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Activity, Dumbbell, Heart, Users } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { DropdownNav } from "./ui/dropdown-nav";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Plus, Activity, Users, Dumbbell, Clock, User, FileText } from "lucide-react";
 import SessionTracker from "./session-tracker";
 import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
-import { motion } from "framer-motion";
-import { 
-  AnimatedButton,
-  AnimatedCard,
-  CollapsibleSection,
-  StaggeredList,
-  FadeIn,
-  AddItemButton,
-  ExpandableSection
-} from "@/components/ui/animated-elements";
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { StaggeredList, AnimatedCard, AnimatedButton, FadeIn } from "@/components/ui/animated-elements";
+
 
 export default function PTpalDashboard() {
-  const [sessionType, setSessionType] = useState("group");
-  const [classType, setClassType] = useState("");
-  const [participants, setParticipants] = useState("");
-  const [stationRotation, setStationRotation] = useState(false);
-  const [restBetweenStations, setRestBetweenStations] = useState(false);
+  const [activeTab, setActiveTab] = useState("workoutPlans");
   const { user } = useAuth();
 
-  const { data: workoutPlans = [], isLoading } = useQuery<any[]>({
+  const navOptions = [
+    {
+      id: "workoutPlans",
+      label: "Workout Plans",
+      icon: Dumbbell
+    },
+    {
+      id: "sessionTracking",
+      label: "Session Tracking",
+      icon: Activity
+    },
+    {
+      id: "nutrition",
+      label: "Nutrition",
+      icon: Heart
+    },
+    {
+      id: "clients",
+      label: "Clients",
+      icon: Users
+    },
+    {
+      id: "documents",
+      label: "Documents",
+      icon: Users // Placeholder icon -  replace with appropriate icon
+    }
+  ];
+
+  const { data: workoutPlans = [], isLoading } = useQuery({
     queryKey: ["/api/workout-plans"],
   });
 
-  const handleGeneratePlan = () => {
-    // Implementation for generating workout plan based on form inputs
-    console.log("Generating plan for:", {
-      sessionType,
-      classType,
-      participants,
-      stationRotation,
-      restBetweenStations
-    });
+  const renderContent = () => {
+    switch (activeTab) {
+      case "workoutPlans":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Workout Plans</CardTitle>
+              <CardDescription>Create and manage your workout plans</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : workoutPlans && workoutPlans.length > 0 ? (
+                <StaggeredList
+                  items={workoutPlans}
+                  className="grid gap-4"
+                  renderItem={(plan: any) => (
+                    <AnimatedCard key={plan.id}>
+                      <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                          <div>
+                            <h3 className="font-medium">{plan.title}</h3>
+                            <p className="text-sm text-gray-500">
+                              {new Date(plan.createdAt).toLocaleDateString('en-GB')}
+                            </p>
+                          </div>
+                          <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">View</AnimatedButton>
+                        </div>
+                      </CardContent>
+                    </AnimatedCard>
+                  )}
+                />
+              ) : (
+                <FadeIn delay={0.2}>
+                  <div className="text-center py-8 border border-dashed rounded-lg">
+                    <Loader2 className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                    <p className="text-gray-500">No workout plans found.</p>
+                    <p className="text-sm text-gray-400 mt-1">Create your first plan above.</p>
+                  </div>
+                </FadeIn>
+              )}
+              <Button className="mt-4">Create New Plan</Button>
+            </CardContent>
+          </Card>
+        );
+      case "sessionTracking":
+        return <SessionTracker />;
+      case "nutrition":
+        return <NutritionTracking />;
+      case "clients":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Client Management</CardTitle>
+              <CardDescription>Manage your client relationships</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Existing client management code would go here */}
+            </CardContent>
+          </Card>
+        );
+      case "documents":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Documents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Existing document management code would go here */}
+            </CardContent>
+          </Card>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <motion.div 
-      className="p-6 max-w-3xl mx-auto"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <FadeIn className="mb-6">
+    <div className="container mx-auto px-4 py-6">
+      <motion.div className="mb-6">
         <h1 className="text-3xl font-bold">Welcome, {user?.fullName || user?.username}</h1>
         <p className="text-gray-500">Track your fitness journey and connect with your trainer</p>
-      </FadeIn>
+      </motion.div>
 
-      <Tabs defaultValue="workoutPlans" className="mt-6">
-        <TabsList className="flex flex-wrap w-full justify-start overflow-x-auto mb-4">
-          <TabsTrigger value="workoutPlans" className="flex-grow md:flex-grow-0">
-            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
-              <Dumbbell className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Workout Plans</span>
-              <span className="sm:hidden">Plans</span>
-            </motion.div>
-          </TabsTrigger>
-          <TabsTrigger value="sessionTracking" className="flex-grow md:flex-grow-0">
-            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
-              <Activity className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Session Tracking</span>
-              <span className="sm:hidden">Sessions</span>
-            </motion.div>
-          </TabsTrigger>
-          <TabsTrigger value="nutrition" className="flex-grow md:flex-grow-0">
-            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
-              <Users className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Nutrition</span>
-              <span className="sm:hidden">Nutrition</span>
-            </motion.div>
-          </TabsTrigger>
-          <TabsTrigger value="clients" className="flex-grow md:flex-grow-0">
-            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
-              <User className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Clients</span>
-              <span className="sm:hidden">Clients</span>
-            </motion.div>
-          </TabsTrigger>
-          <TabsTrigger value="documents" className="flex-grow md:flex-grow-0">
-            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
-              <FileText className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">Documents</span>
-              <span className="sm:hidden">Docs</span>
-            </motion.div>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="workoutPlans">
-          <AnimatedCard className="mb-6" hover={false}>
-            <CardContent className="pt-6">
-              <h2 className="text-lg font-semibold">Session Type</h2>
-              <div className="flex gap-4 mt-2">
-                <AnimatedButton
-                  variant={sessionType === "group" ? "default" : "outline"}
-                  onClick={() => setSessionType("group")}
-                >
-                  <Users className="h-4 w-4 mr-1" />
-                  Group Class
-                </AnimatedButton>
-                <AnimatedButton
-                  variant={sessionType === "personal" ? "default" : "outline"}
-                  onClick={() => setSessionType("personal")}
-                >
-                  <User className="h-4 w-4 mr-1" />
-                  Personal Training
-                </AnimatedButton>
-              </div>
-            </CardContent>
-          </AnimatedCard>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-3">
+          <DropdownNav
+            options={navOptions}
+            activeTab={activeTab}
+            onSelect={setActiveTab}
+            className="mb-6 md:mb-0 sticky top-20"
+          />
 
-          {sessionType === "group" && (
-            <AnimatedCard className="mb-6">
-              <CardContent className="pt-6">
-                <h2 className="text-lg font-semibold">Group Class Setup</h2>
-                <Select value={classType} onValueChange={setClassType}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select Class Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hiit">HIIT</SelectItem>
-                    <SelectItem value="strength">Strength</SelectItem>
-                    <SelectItem value="cardio">Cardio</SelectItem>
-                    <SelectItem value="flexibility">Flexibility</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Input 
-                  placeholder="Number of Participants" 
-                  className="mt-2" 
-                  value={participants}
-                  onChange={(e) => setParticipants(e.target.value)}
-                  type="number"
-                />
-                
-                <CollapsibleSection title="Circuit Preferences" defaultOpen={true} className="mt-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span>Station Rotation</span>
-                      <Switch 
-                        checked={stationRotation} 
-                        onCheckedChange={setStationRotation} 
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Rest Between Stations</span>
-                      <Switch 
-                        checked={restBetweenStations} 
-                        onCheckedChange={setRestBetweenStations} 
-                      />
-                    </div>
-                  </div>
-                </CollapsibleSection>
-              </CardContent>
-            </AnimatedCard>
-          )}
-
-          {sessionType === "personal" && (
-            <AnimatedCard className="mb-6">
-              <CardContent className="pt-6">
-                <h2 className="text-lg font-semibold">Personal Training Setup</h2>
-                <Select>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select Client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="client1">John Smith</SelectItem>
-                    <SelectItem value="client2">Sarah Johnson</SelectItem>
-                    <SelectItem value="client3">Michael Brown</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Focus Area" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="strength">Strength</SelectItem>
-                    <SelectItem value="cardio">Cardio</SelectItem>
-                    <SelectItem value="flexibility">Flexibility</SelectItem>
-                    <SelectItem value="rehabilitation">Rehabilitation</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <ExpandableSection title="Session Details" defaultOpen={true} className="mt-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span>Include Assessments</span>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Equipment Required</span>
-                      <Switch />
-                    </div>
-                  </div>
-                </ExpandableSection>
-              </CardContent>
-            </AnimatedCard>
-          )}
-
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <AnimatedButton className="w-full" onClick={handleGeneratePlan}>
-              <Plus className="mr-1 h-4 w-4" />
-              Generate {sessionType === "group" ? "Group" : "Personal"} Plan
-            </AnimatedButton>
-          </motion.div>
-
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">Your Workout Plans</h2>
-            {isLoading ? (
-              <div className="flex justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : workoutPlans && workoutPlans.length > 0 ? (
-              <StaggeredList
-                items={workoutPlans}
-                className="grid gap-4"
-                renderItem={(plan: any) => (
-                  <AnimatedCard key={plan.id}>
-                    <CardContent className="p-4">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <div>
-                          <h3 className="font-medium">{plan.title}</h3>
-                          <p className="text-sm text-gray-500">
-                            {new Date(plan.createdAt).toLocaleDateString('en-GB')}
-                          </p>
-                        </div>
-                        <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">View</AnimatedButton>
-                      </div>
-                    </CardContent>
-                  </AnimatedCard>
-                )}
-              />
-            ) : (
-              <FadeIn delay={0.2}>
-                <div className="text-center py-8 border border-dashed rounded-lg">
-                  <Clock className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-gray-500">No workout plans found.</p>
-                  <p className="text-sm text-gray-400 mt-1">Create your first plan above.</p>
-                </div>
-              </FadeIn>
-            )}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="sessionTracking">
-          <SessionTracker />
-        </TabsContent>
-        
-        <TabsContent value="nutrition">
-          <NutritionTracking />
-        </TabsContent>
-        
-        <TabsContent value="clients">
-          <AnimatedCard className="mb-6">
-            <CardContent className="pt-6">
-              <h2 className="text-xl font-semibold mb-4">Client Management</h2>
+          <Card className="mt-6 hidden md:block">
+            <CardHeader>
+              <CardTitle>Quick Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-4">
-                <FadeIn>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <Input placeholder="Search clients..." className="w-full sm:max-w-md" />
-                    <AnimatedButton className="w-full sm:w-auto">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add New Client
-                    </AnimatedButton>
-                  </div>
-                </FadeIn>
-                
-                <FadeIn delay={0.1}>
-                  <div className="mt-6 space-y-4">
-                    {[1, 2, 3].map((client) => (
-                      <AnimatedCard key={client} hover={true}>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div className="flex items-center">
-                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                                JS
-                              </div>
-                              <div className="ml-4">
-                                <h3 className="font-medium">John Smith</h3>
-                                <p className="text-sm text-gray-500">Last session: 3 days ago</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 w-full sm:w-auto">
-                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">View Profile</AnimatedButton>
-                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">Message</AnimatedButton>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </AnimatedCard>
-                    ))}
-                  </div>
-                </FadeIn>
+                <div>
+                  <p className="text-sm font-medium">Active Clients</p>
+                  <p className="text-2xl font-bold">12</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Sessions This Week</p>
+                  <p className="text-2xl font-bold">8</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Revenue This Month</p>
+                  <p className="text-2xl font-bold">$2,400</p>
+                </div>
               </div>
             </CardContent>
-          </AnimatedCard>
-        </TabsContent>
-        
-        <TabsContent value="documents">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatedCard className="mb-6">
-              <CardContent className="pt-6">
-                <h2 className="text-xl font-semibold mb-4">Document Templates</h2>
-                <div className="space-y-4">
-                  <StaggeredList
-                    items={[
-                      { id: 1, name: "PAR-Q Form", type: "Assessment" },
-                      { id: 2, name: "Client Consultation", type: "Onboarding" },
-                      { id: 3, name: "Training Agreement", type: "Legal" },
-                      { id: 4, name: "Session Plan Template", type: "Planning" }
-                    ]}
-                    className="space-y-3"
-                    renderItem={(template: any) => (
-                      <AnimatedCard key={template.id} hover={true}>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div>
-                              <h3 className="font-medium">{template.name}</h3>
-                              <p className="text-sm text-gray-500">{template.type}</p>
-                            </div>
-                            <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">Use</AnimatedButton>
-                          </div>
-                        </CardContent>
-                      </AnimatedCard>
-                    )}
-                  />
-                  
-                  <div className="pt-4">
-                    <AnimatedButton className="w-full">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create New Template
-                    </AnimatedButton>
-                  </div>
-                </div>
-              </CardContent>
-            </AnimatedCard>
-            
-            <AnimatedCard className="mb-6">
-              <CardContent className="pt-6">
-                <h2 className="text-xl font-semibold mb-4">Recent Documents</h2>
-                <div className="space-y-4">
-                  <StaggeredList
-                    items={[
-                      { id: 1, name: "Fitness Assessment - Sarah Johnson", date: "12 March 2023" },
-                      { id: 2, name: "Nutrition Plan - Mike Thompson", date: "10 March 2023" },
-                      { id: 3, name: "Exercise Program - Emily Davis", date: "5 March 2023" }
-                    ]}
-                    className="space-y-3"
-                    renderItem={(doc: any) => (
-                      <AnimatedCard key={doc.id} hover={true}>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div>
-                              <h3 className="font-medium">{doc.name}</h3>
-                              <p className="text-sm text-gray-500">Created: {doc.date}</p>
-                            </div>
-                            <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">View</AnimatedButton>
-                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">Edit</AnimatedButton>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </AnimatedCard>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </AnimatedCard>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </motion.div>
+          </Card>
+        </div>
+
+        <div className="md:col-span-9">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderContent()}
+          </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }

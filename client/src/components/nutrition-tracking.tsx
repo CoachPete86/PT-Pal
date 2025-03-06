@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ResponsiveContainer, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { Input } from "@/components/ui/input";
@@ -72,10 +71,30 @@ interface MealPlanDay {
   }[];
 }
 
+function DropdownNav({ options, activeTab, onSelect }: { options: { id: string; label: string }[], activeTab: string, onSelect: (id: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <Button onClick={() => setIsOpen(!isOpen)}>{options.find(option => option.id === activeTab)?.label || 'Select View'}</Button>
+      {isOpen && (
+        <ul className="absolute bg-white shadow-md mt-2 py-2 rounded-md w-full">
+          {options.map(option => (
+            <li key={option.id} className="cursor-pointer px-4 py-2 hover:bg-gray-100" onClick={() => { onSelect(option.id); setIsOpen(false); }}>
+              {option.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+
 export default function NutritionTracking() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("daily");
+  const [activeTab, setActiveTab] = useState("weekly");
   const [selectedAnalysis, setSelectedAnalysis] = useState<any>(null);
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().setDate(new Date().getDate() - 7)),
@@ -172,14 +191,18 @@ export default function NutritionTracking() {
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold tracking-tight">Nutrition Tracking</h2>
-      <Tabs defaultValue="daily" onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="daily">Daily Log</TabsTrigger>
-          <TabsTrigger value="weekly">Weekly Progress</TabsTrigger>
-          <TabsTrigger value="meals">Meal Plans</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="daily">
+      <div className="mb-6 max-w-[300px]">
+          <DropdownNav 
+            options={[
+              { id: "daily", label: "Daily View" },
+              { id: "weekly", label: "Weekly Progress" },
+              { id: "meals", label: "Meal Plans" }
+            ]}
+            activeTab={activeTab}
+            onSelect={setActiveTab}
+          />
+        </div>
+      {activeTab === "daily" && (
           <Card>
             <CardHeader>
               <CardTitle>Today's Nutrition</CardTitle>
@@ -294,9 +317,8 @@ export default function NutritionTracking() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="weekly">
+        )}
+      {activeTab === "weekly" && (
           <Card>
             <CardHeader>
               <CardTitle>Weekly Progress</CardTitle>
@@ -318,9 +340,8 @@ export default function NutritionTracking() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="meals">
+        )}
+      {activeTab === "meals" && (
           <Card>
             <CardHeader>
               <CardTitle>Meal Plans</CardTitle>
@@ -333,8 +354,7 @@ export default function NutritionTracking() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        )}
     </div>
   );
 }

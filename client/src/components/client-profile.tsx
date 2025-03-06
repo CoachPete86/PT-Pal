@@ -141,13 +141,18 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
         </Card>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 md:w-[600px]">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="workout-plans">Workout Plans</TabsTrigger>
-          <TabsTrigger value="progress">Progress</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-        </TabsList>
+      <div className="mb-6">
+        <DropdownNav 
+          options={[
+            { id: "overview", label: "Overview" },
+            { id: "workout-plans", label: "Workout Plans" },
+            { id: "progress", label: "Progress" },
+            { id: "notes", label: "Notes" }
+          ]}
+          activeTab={activeTab}
+          onSelect={setActiveTab}
+          className="max-w-[300px]"
+        />
 
         <TabsContent value="overview" className="space-y-6">
           <Card>
