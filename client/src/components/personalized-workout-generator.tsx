@@ -430,7 +430,7 @@ export default function PersonalizedWorkoutGenerator() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="">No specific client</SelectItem>
+                                <SelectItem value="none">No specific client</SelectItem>
                                 {clients?.map((client: any) => (
                                   <SelectItem key={client.id} value={client.id.toString()}>
                                     {client.fullName}
@@ -1039,7 +1039,7 @@ export default function PersonalizedWorkoutGenerator() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-semibold">Analysis Results</h3>
-                          <Badge variant={analysisResults.score > 8 ? "success" : analysisResults.score > 5 ? "warning" : "destructive"}>
+                          <Badge variant={analysisResults.score > 8 ? "secondary" : analysisResults.score > 5 ? "outline" : "destructive"}>
                             Form Score: {analysisResults.score}/10
                           </Badge>
                         </div>
