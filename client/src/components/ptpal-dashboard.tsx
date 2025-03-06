@@ -1,3 +1,304 @@
+
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  BarChart,
+  Users,
+  Calendar,
+  Dumbbell,
+  Trophy,
+  MessageSquare,
+  TrendingUp,
+  Clock,
+  Calendar as CalendarIcon,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
+
+const StatCard = ({ icon: Icon, title, value, trend, color }) => (
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      <div className={`p-2 rounded-md bg-${color}-100`}>
+        <Icon className={`h-4 w-4 text-${color}-600`} />
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+      <p className={`text-xs ${trend > 0 ? "text-green-600" : "text-red-600"}`}>
+        {trend > 0 ? "+" : ""}{trend}% from last month
+      </p>
+    </CardContent>
+  </Card>
+);
+
+const UpcomingSession = ({ client, time, type, duration }) => (
+  <div className="flex items-center space-x-4 p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+    <Avatar className="h-10 w-10">
+      <AvatarImage src="" />
+      <AvatarFallback className="bg-primary/10 text-primary">{client[0]}</AvatarFallback>
+    </Avatar>
+    <div className="flex-1">
+      <h4 className="text-sm font-medium">{client}</h4>
+      <div className="flex items-center text-xs text-muted-foreground">
+        <Clock className="mr-1 h-3 w-3" /> {time} • {duration}
+      </div>
+    </div>
+    <div className="flex items-center">
+      <span className="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+        {type}
+      </span>
+    </div>
+  </div>
+);
+
+const ClientProgressCard = ({ client, progress, lastSession, nextSession }) => (
+  <div className="flex items-center space-x-4 p-4 rounded-lg border">
+    <Avatar className="h-12 w-12">
+      <AvatarImage src="" />
+      <AvatarFallback className="bg-primary/10 text-primary">{client[0]}</AvatarFallback>
+    </Avatar>
+    <div className="flex-1 space-y-1">
+      <div className="flex justify-between">
+        <h4 className="font-medium">{client}</h4>
+        <span className="text-sm text-muted-foreground">Goal Progress</span>
+      </div>
+      <Progress value={progress} className="h-2" />
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>Last: {lastSession}</span>
+        <span>Next: {nextSession}</span>
+      </div>
+    </div>
+  </div>
+);
+
+export default function PTpalDashboard() {
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+          <p className="text-muted-foreground">Here's what's happening with your coaching business today.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex gap-2">
+            <Calendar className="h-4 w-4" />
+            View Calendar
+          </Button>
+          <Button className="flex gap-2">
+            <Zap className="h-4 w-4" />
+            Quick Actions
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Overview */}
+      <motion.div 
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        initial="initial"
+        animate="animate"
+        variants={{ animate: { transition: { staggerChildren: 0.1 } } }}
+      >
+        <motion.div variants={fadeInUp}>
+          <StatCard 
+            icon={Users} 
+            title="Total Clients" 
+            value="24" 
+            trend={12} 
+            color="blue" 
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard 
+            icon={Calendar} 
+            title="Sessions This Week" 
+            value="18" 
+            trend={5} 
+            color="green" 
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard 
+            icon={TrendingUp} 
+            title="Monthly Revenue" 
+            value="£4,250" 
+            trend={8} 
+            color="indigo" 
+          />
+        </motion.div>
+        <motion.div variants={fadeInUp}>
+          <StatCard 
+            icon={Trophy} 
+            title="Client Milestones" 
+            value="7" 
+            trend={-3} 
+            color="amber" 
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* Today's Sessions */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <motion.div 
+          className="md:col-span-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="h-full">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Today's Sessions</CardTitle>
+                  <CardDescription>
+                    You have 3 upcoming sessions today
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  <span>View All</span>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <UpcomingSession
+                client="Sarah Johnson"
+                time="10:00 AM"
+                type="Strength"
+                duration="60 min"
+              />
+              <UpcomingSession
+                client="Mark Davis"
+                time="1:15 PM"
+                type="HIIT"
+                duration="45 min"
+              />
+              <UpcomingSession
+                client="Emma Wilson"
+                time="5:30 PM"
+                type="Mobility"
+                duration="30 min"
+              />
+            </CardContent>
+            <CardFooter className="border-t p-4">
+              <Button variant="ghost" className="w-full justify-between">
+                <span>Schedule a new session</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Quick Workout Builder</CardTitle>
+              <CardDescription>
+                Create or modify workouts on the go
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center p-2 rounded-md bg-accent/40">
+                  <Dumbbell className="h-4 w-4 mr-2 text-primary" />
+                  <span className="text-sm font-medium">Strength</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md">
+                  <Dumbbell className="h-4 w-4 mr-2" />
+                  <span className="text-sm">Cardio</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md">
+                  <Dumbbell className="h-4 w-4 mr-2" />
+                  <span className="text-sm">Mobility</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md">
+                  <Dumbbell className="h-4 w-4 mr-2" />
+                  <span className="text-sm">Group Class</span>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t p-4">
+              <Button className="w-full">Build New Workout</Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Client Progress */}
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Client Progress Tracking</CardTitle>
+                <CardDescription>
+                  Monitor your clients' progression towards their goals
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm">
+                View All Clients
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <ClientProgressCard
+                client="James Wilson"
+                progress={78}
+                lastSession="Oct 12"
+                nextSession="Oct 19"
+              />
+              <ClientProgressCard
+                client="Lisa Chen"
+                progress={45}
+                lastSession="Oct 10"
+                nextSession="Oct 17"
+              />
+              <ClientProgressCard
+                client="Michael Brown"
+                progress={92}
+                lastSession="Oct 14"
+                nextSession="Oct 21"
+              />
+              <ClientProgressCard
+                client="Emily Davis"
+                progress={34}
+                lastSession="Oct 13"
+                nextSession="Oct 20"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, Dumbbell, Heart, Users } from "lucide-react";

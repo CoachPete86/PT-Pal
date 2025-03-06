@@ -221,8 +221,9 @@ export default function DashboardPage() {
       {/* Mobile Sidebar Toggle */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
+          className="bg-card/80 backdrop-blur-sm border shadow-sm hover:bg-card"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? (
@@ -240,43 +241,45 @@ export default function DashboardPage() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed lg:relative z-40 h-full bg-card border-r shadow-sm overflow-hidden"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed lg:relative z-40 h-full bg-card border-r shadow-md overflow-hidden"
           >
             <ScrollArea className="h-full px-3 py-6">
-              <div className="flex items-center gap-2 px-4 mb-6">
-                <Dumbbell className="h-6 w-6 text-primary" />
-                <h1 className="text-xl font-bold">PTpal</h1>
+              <div className="flex items-center gap-3 px-4 mb-8">
+                <div className="p-1.5 bg-primary/10 rounded-md">
+                  <Dumbbell className="h-6 w-6 text-primary" />
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">PTpal</h1>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {navItems.map((item) =>
                   item.children.length > 0 ? (
                     <Collapsible key={item.id} className="w-full">
                       <CollapsibleTrigger asChild>
                         <Button
                           variant="ghost"
-                          className={`w-full justify-between ${
+                          className={`w-full justify-between hover:bg-accent/50 ${
                             selectedTab === item.id
-                              ? "bg-accent text-accent-foreground"
+                              ? "bg-accent/80 text-accent-foreground font-medium"
                               : ""
                           }`}
                           onClick={() => setSelectedTab(item.id)}
                         >
                           <div className="flex items-center">
-                            <item.icon className="h-4 w-4 mr-2" />
+                            <item.icon className={`h-4 w-4 mr-2 ${selectedTab === item.id ? 'text-primary' : ''}`} />
                             <span>{item.label}</span>
                           </div>
-                          <ChevronRight className="h-4 w-4 transition-transform ui-open:rotate-90" />
+                          <ChevronRight className="h-4 w-4 transition-transform duration-200 ui-open:rotate-90" />
                         </Button>
                       </CollapsibleTrigger>
-                      <CollapsibleContent className="pl-8 space-y-1 mt-1">
+                      <CollapsibleContent className="pl-8 space-y-1 mt-1 animate-accordion-down">
                         {item.children.map((child) => (
                           <Button
                             key={child.id}
                             variant="ghost"
                             size="sm"
-                            className="w-full justify-start"
+                            className="w-full justify-start hover:bg-accent/40 text-muted-foreground hover:text-foreground"
                             onClick={() => setSelectedTab(item.id)}
                           >
                             {child.label}
@@ -288,18 +291,43 @@ export default function DashboardPage() {
                     <Button
                       key={item.id}
                       variant="ghost"
-                      className={`w-full justify-start ${
+                      className={`w-full justify-start hover:bg-accent/50 ${
                         selectedTab === item.id
-                          ? "bg-accent text-accent-foreground"
+                          ? "bg-accent/80 text-accent-foreground font-medium"
                           : ""
                       }`}
                       onClick={() => setSelectedTab(item.id)}
                     >
-                      <item.icon className="h-4 w-4 mr-2" />
+                      <item.icon className={`h-4 w-4 mr-2 ${selectedTab === item.id ? 'text-primary' : ''}`} />
                       <span>{item.label}</span>
                     </Button>
                   ),
                 )}
+              </div>
+              
+              {/* Profile section at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-card/80">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">Coach Account</p>
+                    <p className="text-xs text-muted-foreground truncate">pro@ptpal.app</p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setSelectedTab("settings")}>
+                        Settings
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </ScrollArea>
           </motion.div>
@@ -308,6 +336,11 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 h-full overflow-auto pt-16 lg:pt-0">
+        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 backdrop-blur-md bg-background/80 z-40 border-b flex items-center px-14">
+          <h1 className="text-xl font-semibold">
+            {navItems.find(item => item.id === selectedTab)?.label || 'Dashboard'}
+          </h1>
+        </div>
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedTab}
