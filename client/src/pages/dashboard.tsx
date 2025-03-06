@@ -12,6 +12,7 @@ import WorkoutMascot from "@/components/workout-mascot";
 import AIMotivationCoach from "@/components/ai-motivation-coach";
 import VoiceActivatedWorkout from "@/components/voice-activated-workout";
 import ContentGeneratorPage from "@/pages/content-generator-page";
+import PTpalDashboard from "@/components/ptpal-dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -314,7 +315,7 @@ export default function DashboardPage() {
             </TabsContent>
 
             <TabsContent value="workouts">
-              <WorkoutGenerator />
+              <PTpalDashboard />
             </TabsContent>
 
             <TabsContent value="workout-ai">
