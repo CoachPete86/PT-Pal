@@ -48,6 +48,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClientManagement } from "@/components/client-management";
 import { ClientProfile } from "@/components/client-profile";
 import PTpalDashboard from "@/components/ptpal-dashboard";
+import PersonalizedWorkoutGenerator from "@/components/personalized-workout-generator";
 
 export default function DashboardPage() {
   const [selectedTab, setSelectedTab] = useState("dashboard");
@@ -88,6 +89,7 @@ export default function DashboardPage() {
       children: [
         { id: "workout-templates", label: "Templates" },
         { id: "create-workout", label: "Create Workout" },
+        { id: "personalized-workout", label: "Personalized Generator" },
       ],
     },
     {
@@ -129,6 +131,8 @@ export default function DashboardPage() {
     switch (selectedTab) {
       case "dashboard":
         return <PTpalDashboard />;
+      case "personalized-workout":
+        return <PersonalizedWorkoutGenerator />;
       case "clients":
         return selectedClientId ? (
           <ClientProfile

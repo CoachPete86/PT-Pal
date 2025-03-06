@@ -9,6 +9,7 @@ import { Client } from "@notionhq/client";
 import Anthropic from "@anthropic-ai/sdk";
 import { format } from "date-fns";
 import { generateSocialContent } from "./openai";
+import { generatePersonalizedWorkout } from "./routes/personalized-workout";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -1091,6 +1092,9 @@ Present the meal plan in a structured JSON format.`;
       }
     }
   });
+
+  // Personalized Workout Generator endpoint
+  app.post("/api/generate-personalized-workout", generatePersonalizedWorkout);
 
   // Branding endpoints
   app.get("/api/branding", async (req, res) => {
