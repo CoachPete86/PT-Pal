@@ -6,7 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Plus, Activity, Users, Dumbbell, Clock, User } from "lucide-react";
+import { Loader2, Plus, Activity, Users, Dumbbell, Clock, User, FileText } from "lucide-react";
 import SessionTracker from "./session-tracker";
 import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,7 +58,7 @@ export default function PTpalDashboard() {
       </FadeIn>
 
       <Tabs defaultValue="workoutPlans" className="mt-6">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="workoutPlans">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <Dumbbell className="h-4 w-4 mr-1" />
@@ -75,6 +75,18 @@ export default function PTpalDashboard() {
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <Users className="h-4 w-4 mr-1" />
               Nutrition
+            </motion.div>
+          </TabsTrigger>
+          <TabsTrigger value="clients">
+            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
+              <User className="h-4 w-4 mr-1" />
+              Clients
+            </motion.div>
+          </TabsTrigger>
+          <TabsTrigger value="documents">
+            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
+              <FileText className="h-4 w-4 mr-1" />
+              Documents
             </motion.div>
           </TabsTrigger>
         </TabsList>
@@ -245,6 +257,124 @@ export default function PTpalDashboard() {
         
         <TabsContent value="nutrition">
           <NutritionTracking />
+        </TabsContent>
+        
+        <TabsContent value="clients">
+          <AnimatedCard className="mb-6">
+            <CardContent className="pt-6">
+              <h2 className="text-xl font-semibold mb-4">Client Management</h2>
+              <div className="space-y-4">
+                <FadeIn>
+                  <div className="flex justify-between items-center">
+                    <Input placeholder="Search clients..." className="max-w-md" />
+                    <AnimatedButton>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add New Client
+                    </AnimatedButton>
+                  </div>
+                </FadeIn>
+                
+                <FadeIn delay={0.1}>
+                  <div className="mt-6 space-y-4">
+                    {[1, 2, 3].map((client) => (
+                      <AnimatedCard key={client} hover={true}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                                JS
+                              </div>
+                              <div className="ml-4">
+                                <h3 className="font-medium">John Smith</h3>
+                                <p className="text-sm text-gray-500">Last session: 3 days ago</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <AnimatedButton size="sm" variant="outline">View Profile</AnimatedButton>
+                              <AnimatedButton size="sm" variant="outline">Message</AnimatedButton>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </AnimatedCard>
+                    ))}
+                  </div>
+                </FadeIn>
+              </div>
+            </CardContent>
+          </AnimatedCard>
+        </TabsContent>
+        
+        <TabsContent value="documents">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatedCard className="mb-6">
+              <CardContent className="pt-6">
+                <h2 className="text-xl font-semibold mb-4">Document Templates</h2>
+                <div className="space-y-4">
+                  <StaggeredList
+                    items={[
+                      { id: 1, name: "PAR-Q Form", type: "Assessment" },
+                      { id: 2, name: "Client Consultation", type: "Onboarding" },
+                      { id: 3, name: "Training Agreement", type: "Legal" },
+                      { id: 4, name: "Session Plan Template", type: "Planning" }
+                    ]}
+                    className="space-y-3"
+                    renderItem={(template: any) => (
+                      <AnimatedCard key={template.id} hover={true}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-medium">{template.name}</h3>
+                              <p className="text-sm text-gray-500">{template.type}</p>
+                            </div>
+                            <AnimatedButton size="sm" variant="outline">Use</AnimatedButton>
+                          </div>
+                        </CardContent>
+                      </AnimatedCard>
+                    )}
+                  />
+                  
+                  <div className="pt-4">
+                    <AnimatedButton className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create New Template
+                    </AnimatedButton>
+                  </div>
+                </div>
+              </CardContent>
+            </AnimatedCard>
+            
+            <AnimatedCard className="mb-6">
+              <CardContent className="pt-6">
+                <h2 className="text-xl font-semibold mb-4">Recent Documents</h2>
+                <div className="space-y-4">
+                  <StaggeredList
+                    items={[
+                      { id: 1, name: "Fitness Assessment - Sarah Johnson", date: "12 March 2023" },
+                      { id: 2, name: "Nutrition Plan - Mike Thompson", date: "10 March 2023" },
+                      { id: 3, name: "Exercise Program - Emily Davis", date: "5 March 2023" }
+                    ]}
+                    className="space-y-3"
+                    renderItem={(doc: any) => (
+                      <AnimatedCard key={doc.id} hover={true}>
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-medium">{doc.name}</h3>
+                              <p className="text-sm text-gray-500">Created: {doc.date}</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <AnimatedButton size="sm" variant="outline">View</AnimatedButton>
+                              <AnimatedButton size="sm" variant="outline">Edit</AnimatedButton>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </AnimatedCard>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </AnimatedCard>
+          </div>
         </TabsContent>
       </Tabs>
     </motion.div>

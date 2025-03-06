@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
-import DashboardPage from "@/pages/dashboard";
+import DashboardPage from "@/pages/dashboard-new";
 import ContentGeneratorPage from "@/pages/content-generator-page";
 import SettingsPage from "@/pages/settings-page";
 import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
