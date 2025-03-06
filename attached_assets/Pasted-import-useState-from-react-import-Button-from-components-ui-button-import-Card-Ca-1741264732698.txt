@@ -1,0 +1,67 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectItem } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+export default function PTpalDashboard() {
+  const [sessionType, setSessionType] = useState("group");
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold">Welcome,</h1>
+      <p className="text-gray-500">Track your fitness journey and connect with your trainer</p>
+
+      <Tabs defaultValue="workoutPlans" className="mt-6">
+        <TabsList>
+          <TabsTrigger value="workoutPlans">Workout Plans</TabsTrigger>
+          <TabsTrigger value="sessionTracking">Session Tracking</TabsTrigger>
+          <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      <Card className="mt-6">
+        <CardContent>
+          <h2 className="text-lg font-semibold">Session Type</h2>
+          <div className="flex gap-4 mt-2">
+            <Button
+              variant={sessionType === "group" ? "default" : "outline"}
+              onClick={() => setSessionType("group")}
+            >
+              Group Class
+            </Button>
+            <Button
+              variant={sessionType === "personal" ? "default" : "outline"}
+              onClick={() => setSessionType("personal")}
+            >
+              Personal Training
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardContent>
+          <h2 className="text-lg font-semibold">Group Class Setup</h2>
+          <Select>
+            <SelectItem value="hiit">HIIT</SelectItem>
+            <SelectItem value="strength">Strength</SelectItem>
+          </Select>
+          <Input placeholder="Number of Participants" className="mt-2" />
+          <h3 className="text-md font-semibold mt-4">Circuit Preferences</h3>
+          <div className="flex items-center justify-between mt-2">
+            <span>Station Rotation</span>
+            <Switch />
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <span>Rest Between Stations</span>
+            <Switch />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Button className="w-full mt-6">Generate Group Plan</Button>
+    </div>
+  );
+}
