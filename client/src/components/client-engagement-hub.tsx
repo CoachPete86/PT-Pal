@@ -68,7 +68,7 @@ import {
   ChevronRight,
   Plus,
 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 // Types
 interface Client {

@@ -8,12 +8,26 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Globe, Mail, Palette } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Globe, 
+  Mail, 
+  Palette, 
+  Upload, 
+  Trash2, 
+  Image as ImageIcon,
+  Check,
+  Monitor,
+  Tablet,
+  Smartphone,
+  User,
+  Eye
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const brandingSchema = z.object({
@@ -57,6 +71,63 @@ export default function WhiteLabelCustomization() {
     enableCustomBranding: true,
     enableWhiteLabel: false,
   });
+  
+  const updateBrandSetting = (key: string, value: string | boolean) => {
+    setBrandSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+  
+  const saveBrandSettings = () => {
+    // Here you would send the data to your backend
+    console.log("Saving brand settings:", brandSettings);
+    console.log("Logo file:", logoFile);
+    console.log("Favicon file:", faviconFile);
+
+    toast({
+      title: "Brand settings saved",
+      description: "Your brand customizations have been applied.",
+    });
+  };
+  
+  // Define the preview style function
+  const getPreviewStyle = () => {
+    const style: React.CSSProperties = {
+      backgroundColor: "#ffffff",
+      fontFamily: brandSettings.fontFamily,
+      borderRadius: "0.5rem",
+      overflow: "hidden",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    };
+
+    if (previewDevice === "mobile") {
+      style.width = "320px";
+      style.height = "568px";
+    } else if (previewDevice === "tablet") {
+      style.width = "768px";
+      style.height = "1024px";
+      style.maxHeight = "500px";
+    } else {
+      style.width = "100%";
+      style.height = "400px";
+    }
+
+    return style;
+  };
+  
+  // Cleanup function for URL objects
+  useEffect(() => {
+    return () => {
+      // Clean up object URLs to prevent memory leaks
+      if (logoPreview && logoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+      if (faviconPreview && faviconPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(faviconPreview);
+      }
+    };
+  }, [logoPreview, faviconPreview]);
 
   const form = useForm<BrandingFormValues>({
     resolver: zodResolver(brandingSchema),
@@ -750,53 +821,3 @@ export default function WhiteLabelCustomization() {
     </div>
   );
 }
-
-const getPreviewStyle = () => {
-  const style: React.CSSProperties = {
-    backgroundColor: "#ffffff",
-    fontFamily: brandSettings.fontFamily,
-    borderRadius: "0.5rem",
-    overflow: "hidden",
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-  };
-
-  if (previewDevice === "mobile") {
-    style.width = "320px";
-    style.height = "568px";
-  } else if (previewDevice === "tablet") {
-    style.width = "768px";
-    style.height = "1024px";
-    style.maxHeight = "500px";
-  } else {
-    style.width = "100%";
-    style.height = "400px";
-  }
-
-  return style;
-};
-
-const updateBrandSetting = (key: string, value: any) => {
-  setBrandSettings((prev) => ({
-    ...prev,
-    [key]: value,
-  }));
-};
-
-const saveBrandSettings = () => {
-  // Here you would send the data to your backend
-  console.log("Saving brand settings:", brandSettings);
-  console.log("Logo file:", logoFile);
-  console.log("Favicon file:", faviconFile);
-
-  toast({
-    title: "Brand settings saved",
-    description: "Your brand customizations have been applied.",
-  });
-};
-
-useEffect(() => {
-  return () => {
-    if (logoPreview) URL.revokeObjectURL(logoPreview);
-    if (faviconPreview) URL.revokeObjectURL(faviconPreview);
-  };
-}, [logoPreview, faviconPreview]);
