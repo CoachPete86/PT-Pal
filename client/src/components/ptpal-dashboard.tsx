@@ -6,10 +6,21 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Activity, Users, Dumbbell, Clock, User } from "lucide-react";
 import SessionTracker from "./session-tracker";
 import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
+import { motion } from "framer-motion";
+import { 
+  AnimatedButton,
+  AnimatedCard,
+  CollapsibleSection,
+  StaggeredList,
+  FadeIn,
+  AddItemButton,
+  ExpandableSection
+} from "@/components/ui/animated-elements";
+import { cn } from "@/lib/utils";
 
 export default function PTpalDashboard() {
   const [sessionType, setSessionType] = useState("group");
@@ -35,40 +46,64 @@ export default function PTpalDashboard() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold">Welcome, {user?.fullName || user?.username}</h1>
-      <p className="text-gray-500">Track your fitness journey and connect with your trainer</p>
+    <motion.div 
+      className="p-6 max-w-3xl mx-auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <FadeIn className="mb-6">
+        <h1 className="text-3xl font-bold">Welcome, {user?.fullName || user?.username}</h1>
+        <p className="text-gray-500">Track your fitness journey and connect with your trainer</p>
+      </FadeIn>
 
       <Tabs defaultValue="workoutPlans" className="mt-6">
         <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="workoutPlans">Workout Plans</TabsTrigger>
-          <TabsTrigger value="sessionTracking">Session Tracking</TabsTrigger>
-          <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
+          <TabsTrigger value="workoutPlans">
+            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
+              <Dumbbell className="h-4 w-4 mr-1" />
+              Workout Plans
+            </motion.div>
+          </TabsTrigger>
+          <TabsTrigger value="sessionTracking">
+            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
+              <Activity className="h-4 w-4 mr-1" />
+              Session Tracking
+            </motion.div>
+          </TabsTrigger>
+          <TabsTrigger value="nutrition">
+            <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
+              <Users className="h-4 w-4 mr-1" />
+              Nutrition
+            </motion.div>
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="workoutPlans">
-          <Card className="mb-6">
+          <AnimatedCard className="mb-6" hover={false}>
             <CardContent className="pt-6">
               <h2 className="text-lg font-semibold">Session Type</h2>
               <div className="flex gap-4 mt-2">
-                <Button
+                <AnimatedButton
                   variant={sessionType === "group" ? "default" : "outline"}
                   onClick={() => setSessionType("group")}
                 >
+                  <Users className="h-4 w-4 mr-1" />
                   Group Class
-                </Button>
-                <Button
+                </AnimatedButton>
+                <AnimatedButton
                   variant={sessionType === "personal" ? "default" : "outline"}
                   onClick={() => setSessionType("personal")}
                 >
+                  <User className="h-4 w-4 mr-1" />
                   Personal Training
-                </Button>
+                </AnimatedButton>
               </div>
             </CardContent>
-          </Card>
+          </AnimatedCard>
 
           {sessionType === "group" && (
-            <Card className="mb-6">
+            <AnimatedCard className="mb-6">
               <CardContent className="pt-6">
                 <h2 className="text-lg font-semibold">Group Class Setup</h2>
                 <Select value={classType} onValueChange={setClassType}>
@@ -91,27 +126,30 @@ export default function PTpalDashboard() {
                   type="number"
                 />
                 
-                <h3 className="text-md font-semibold mt-4">Circuit Preferences</h3>
-                <div className="flex items-center justify-between mt-2">
-                  <span>Station Rotation</span>
-                  <Switch 
-                    checked={stationRotation} 
-                    onCheckedChange={setStationRotation} 
-                  />
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span>Rest Between Stations</span>
-                  <Switch 
-                    checked={restBetweenStations} 
-                    onCheckedChange={setRestBetweenStations} 
-                  />
-                </div>
+                <CollapsibleSection title="Circuit Preferences" defaultOpen={true} className="mt-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span>Station Rotation</span>
+                      <Switch 
+                        checked={stationRotation} 
+                        onCheckedChange={setStationRotation} 
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Rest Between Stations</span>
+                      <Switch 
+                        checked={restBetweenStations} 
+                        onCheckedChange={setRestBetweenStations} 
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
               </CardContent>
-            </Card>
+            </AnimatedCard>
           )}
 
           {sessionType === "personal" && (
-            <Card className="mb-6">
+            <AnimatedCard className="mb-6">
               <CardContent className="pt-6">
                 <h2 className="text-lg font-semibold">Personal Training Setup</h2>
                 <Select>
@@ -137,22 +175,31 @@ export default function PTpalDashboard() {
                   </SelectContent>
                 </Select>
                 
-                <h3 className="text-md font-semibold mt-4">Session Details</h3>
-                <div className="flex items-center justify-between mt-2">
-                  <span>Include Assessments</span>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span>Equipment Required</span>
-                  <Switch />
-                </div>
+                <ExpandableSection title="Session Details" defaultOpen={true} className="mt-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span>Include Assessments</span>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Equipment Required</span>
+                      <Switch />
+                    </div>
+                  </div>
+                </ExpandableSection>
               </CardContent>
-            </Card>
+            </AnimatedCard>
           )}
 
-          <Button className="w-full" onClick={handleGeneratePlan}>
-            Generate {sessionType === "group" ? "Group" : "Personal"} Plan
-          </Button>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <AnimatedButton className="w-full" onClick={handleGeneratePlan}>
+              <Plus className="mr-1 h-4 w-4" />
+              Generate {sessionType === "group" ? "Group" : "Personal"} Plan
+            </AnimatedButton>
+          </motion.div>
 
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Your Workout Plans</h2>
@@ -161,9 +208,11 @@ export default function PTpalDashboard() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : workoutPlans && workoutPlans.length > 0 ? (
-              <div className="grid gap-4">
-                {workoutPlans.map((plan: any) => (
-                  <Card key={plan.id}>
+              <StaggeredList
+                items={workoutPlans}
+                className="grid gap-4"
+                renderItem={(plan: any) => (
+                  <AnimatedCard key={plan.id}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
@@ -172,14 +221,20 @@ export default function PTpalDashboard() {
                             {new Date(plan.createdAt).toLocaleDateString('en-GB')}
                           </p>
                         </div>
-                        <Button size="sm" variant="outline">View</Button>
+                        <AnimatedButton size="sm" variant="outline">View</AnimatedButton>
                       </div>
                     </CardContent>
-                  </Card>
-                ))}
-              </div>
+                  </AnimatedCard>
+                )}
+              />
             ) : (
-              <p className="text-center text-gray-500">No workout plans found. Create your first plan above.</p>
+              <FadeIn delay={0.2}>
+                <div className="text-center py-8 border border-dashed rounded-lg">
+                  <Clock className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-gray-500">No workout plans found.</p>
+                  <p className="text-sm text-gray-400 mt-1">Create your first plan above.</p>
+                </div>
+              </FadeIn>
             )}
           </div>
         </TabsContent>
@@ -192,6 +247,6 @@ export default function PTpalDashboard() {
           <NutritionTracking />
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   );
 }
