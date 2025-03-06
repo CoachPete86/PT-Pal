@@ -253,7 +253,9 @@ export default function DashboardPage() {
                 <div className="p-1.5 bg-primary/10 rounded-md">
                   <Dumbbell className="h-6 w-6 text-primary" />
                 </div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">PTpal</h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  PTpal
+                </h1>
               </div>
 
               <div className="space-y-2">
@@ -271,7 +273,9 @@ export default function DashboardPage() {
                           onClick={() => setSelectedTab(item.id)}
                         >
                           <div className="flex items-center">
-                            <item.icon className={`h-4 w-4 mr-2 ${selectedTab === item.id ? 'text-primary' : ''}`} />
+                            <item.icon
+                              className={`h-4 w-4 mr-2 ${selectedTab === item.id ? "text-primary" : ""}`}
+                            />
                             <span>{item.label}</span>
                           </div>
                           <ChevronRight className="h-4 w-4 transition-transform duration-200 ui-open:rotate-90" />
@@ -302,13 +306,15 @@ export default function DashboardPage() {
                       }`}
                       onClick={() => setSelectedTab(item.id)}
                     >
-                      <item.icon className={`h-4 w-4 mr-2 ${selectedTab === item.id ? 'text-primary' : ''}`} />
+                      <item.icon
+                        className={`h-4 w-4 mr-2 ${selectedTab === item.id ? "text-primary" : ""}`}
+                      />
                       <span>{item.label}</span>
                     </Button>
                   ),
                 )}
               </div>
-              
+
               {/* Profile section at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-card/80">
                 <div className="flex items-center gap-3">
@@ -316,17 +322,27 @@ export default function DashboardPage() {
                     <User className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">Coach Account</p>
-                    <p className="text-xs text-muted-foreground truncate">pro@ptpal.app</p>
+                    <p className="text-sm font-medium truncate">
+                      Coach Account
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      pro@ptpal.app
+                    </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full h-8 w-8"
+                      >
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setSelectedTab("settings")}>
+                      <DropdownMenuItem
+                        onClick={() => setSelectedTab("settings")}
+                      >
                         Settings
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -342,7 +358,8 @@ export default function DashboardPage() {
       <div className="flex-1 h-full overflow-auto pt-16 lg:pt-0">
         <div className="lg:hidden fixed top-0 left-0 right-0 h-16 backdrop-blur-md bg-background/80 z-40 border-b flex items-center px-14">
           <h1 className="text-xl font-semibold">
-            {navItems.find(item => item.id === selectedTab)?.label || 'Dashboard'}
+            {navItems.find((item) => item.id === selectedTab)?.label ||
+              "Dashboard"}
           </h1>
         </div>
         <AnimatePresence mode="wait">
