@@ -392,7 +392,6 @@ export default function WhiteLabelCustomization() {
     </Card>
   );
 }
-import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
