@@ -1,23 +1,44 @@
-
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
+import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
-import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { documents, users, progressMetrics, clientGoals, workoutPlans } from "@shared/schema";
+import { db } from "../db";
+import { users, workoutPlans, clientGoals, progressMetrics } from "../../shared/schema";
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error("ANTHROPIC_API_KEY environment variable is not set");
+interface ClientDetails {
+  id?: string;
+  fitnessLevel: string;
+  goals: string[];
+  restrictions: string[];
+  preferences: string[];
+  history?: any[];
 }
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+interface WorkoutParameters {
+  type: string;
+  duration: number;
+  focusAreas: string[];
+  equipment: string[];
+  intensityLevel: number;
+  includeWarmup: boolean;
+  includeCooldown: boolean;
+}
+
+interface AdaptiveSettings {
+  personalizedFeedback?: boolean;
+  progressionRate?: string;
+  difficultyAdjustment?: string;
+  alternativeExercises?: boolean;
+}
 
 export async function generatePersonalizedWorkout(req: Request, res: Response) {
   if (!req.user) return res.sendStatus(401);
 
   try {
     const {
+      clientDetails,
+      workoutParameters,
+      adaptiveSettings,
       clientId,
       sessionType,
       fitnessLevel,
@@ -76,7 +97,7 @@ Session Type: ${sessionType === "personal" ? "Personal Training" : "Group Class"
 Fitness Level: ${fitnessLevel}
 Duration: ${workoutDuration} minutes
 Intensity Level: ${intensityLevel}/10
-Focus Areas: ${focusAreas.join(", ")}`,
+Focus Areas: ${focusAreas?.join(", ") || "General fitness"}`,
     ];
 
     if (preferredEquipment && preferredEquipment.length > 0) {
@@ -93,383 +114,191 @@ Focus Areas: ${focusAreas.join(", ")}`,
 
     // Add client context if available
     if (clientData) {
-      promptParts.push(`
-Client Context:
-${clientData.client ? `Name: ${clientData.client.fullName}` : ""}
-${clientData.client && clientData.client.preferences?.age ? `Age: ${clientData.client.preferences.age}` : ""}
-${clientData.client && clientData.client.preferences?.gender ? `Gender: ${clientData.client.preferences.gender}` : ""}
-${clientData.client && clientData.client.preferences?.weight ? `Weight: ${clientData.client.preferences.weight}` : ""}`);
+      promptParts.push("\nClient Context:");
 
-      // Add goals if available
+      if (clientData.client) {
+        promptParts.push(`Name: ${clientData.client.name || "Unknown"}`);
+        promptParts.push(`Age: ${clientData.client.age || "Unknown"}`);
+        promptParts.push(`Gender: ${clientData.client.gender || "Unknown"}`);
+      }
+
       if (clientData.goals && clientData.goals.length > 0) {
-        promptParts.push(`
-Client Goals:
-${clientData.goals.map((goal: any) => `- ${goal.title}: ${goal.description || ""} (Status: ${goal.status})`).join("\n")}`);
-      }
-
-      // Add metrics if available
-      if (clientData.metrics && clientData.metrics.length > 0) {
-        promptParts.push(`
-Recent Progress Metrics:
-${clientData.metrics.map((metric: any) => `- ${metric.category}: ${metric.value} ${metric.unit} (${new Date(metric.date).toLocaleDateString()})`).join("\n")}`);
-      }
-
-      // Add workout history if available and influence is significant
-      if (clientData.history && clientData.history.length > 0 && pastWorkoutInfluence > 20) {
-        promptParts.push(`
-Recent Workout History (${pastWorkoutInfluence}% influence on this workout):
-${clientData.history.map((workout: any, index: number) => {
-          // Extract key information from the workout plan
-          const content = typeof workout.content === 'string' ? JSON.parse(workout.content) : workout.content;
-          const exercises = content.mainWorkout
-            ? content.mainWorkout.flatMap((circuit: any) => 
-                circuit.exercises.map((ex: any) => `${ex.exercise} (${ex.sets} × ${ex.reps})`)
-              ).join(", ")
-            : "No exercises recorded";
-            
-          return `- Workout ${index + 1}: ${workout.title} (${new Date(workout.createdAt).toLocaleDateString()})
-  Focus: ${content.sessionDetails?.focusArea || "General"}
-  Exercises: ${exercises}`;
-        }).join("\n")}`);
-      }
-    }
-
-    // Add specific instructions for warmup and cooldown
-    if (!includeWarmup) {
-      promptParts.push("Do NOT include a warm-up section in this workout.");
-    }
-    
-    if (!includeCooldown) {
-      promptParts.push("Do NOT include a cool-down section in this workout.");
-    }
-
-    // Add instructions for the output format
-    promptParts.push(`
-The response must be a valid JSON object with this exact structure:
-{
-  "sessionDetails": {
-    "type": string, // "Group Class" or "Personal Training"
-    "name": string, // Name of the workout
-    "coach": "Coach Pete Ryan",
-    "duration": number, // Duration in minutes
-    "fitnessLevel": string,
-    "focusArea": string
-  },
-  "introduction": {
-    "overview": string, // Brief overview of the session
-    "intensity": string, // Expected intensity level
-    "objectives": string[], // Key objectives for the session
-    "preparation": string // Pre-workout preparation advice
-  },
-  "equipmentNeeded": string[],
-  "description": string,
-  ${includeWarmup ? `"warmup": Array<{
-    "exercise": string,
-    "duration": string,
-    "notes"?: string
-  }>,` : ""}
-  "mainWorkout": Array<{
-    "circuitNumber": number,
-    "explanation": string,
-    "objective": string,
-    "setupInstructions": string,
-    "exercises": Array<{
-      "exercise": string,
-      "reps": string,
-      "sets": string,
-      "weight"?: string,
-      "technique": string,
-      "notes"?: string
-    }>
-  }>,
-  ${includeCooldown ? `"cooldown": Array<{
-    "exercise": string,
-    "duration": string,
-    "technique": string,
-    "notes"?: string
-  }>,` : ""}
-  "recovery": {
-    "immediateSteps": string[],
-    "nutritionTips": string[],
-    "restRecommendations": string,
-    "nextDayGuidance": string
-  }
-}`);
-
-    // Create the system prompt for the AI
-    const systemPrompt = `You are an expert personal trainer with extensive knowledge of exercise science, biomechanics, and programming methodologies. You create highly personalized workout plans based on client information, preferences, and history.
-
-Rules to follow:
-1. Always create a workout plan that addresses the specific focus areas requested
-2. Adapt exercise selection based on preferred equipment and avoid listed exercises
-3. Scale the workout appropriately to the fitness level (beginner, intermediate, advanced)
-4. If client history is provided, create a workout that builds upon previous sessions
-5. Ensure the workout fits within the specified duration
-6. Provide clear, specific instructions for each exercise
-7. Always respond in valid JSON format exactly matching the specified schema
-
-When reviewing client history, look for:
-- Exercise progressions that can be continued
-- Injury patterns or limitations to work around
-- Types of workouts the client responds well to
-- Gaps in recent programming that should be addressed`;
-
-    // Call the Anthropic API to generate the workout plan
-    const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      system: systemPrompt,
-      messages: [{ role: "user", content: promptParts.join("\n\n") }],
-      temperature: 0.7,
-      max_tokens: 4000,
-    });
-
-    // Extract and parse the JSON content from the response
-    const content = response.content[0].text;
-    try {
-      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || 
-                         content.match(/```\n([\s\S]*?)\n```/) || 
-                         content.match(/{[\s\S]*}/);
-      
-      if (!jsonMatch) {
-        throw new Error("No valid JSON found in the response");
-      }
-      
-      const plan = JSON.parse(jsonMatch[1] || jsonMatch[0]);
-      
-      // Save to database if clientId was provided
-      if (clientId) {
-        await db.insert(workoutPlans).values({
-          trainerId: req.user.id,
-          clientId: parseInt(clientId),
-          workspaceId: req.user.workspaceId || 1,
-          title: `${plan.sessionDetails.name || "Personalized Workout"}`,
-          description: plan.introduction.overview || "",
-          content: plan,
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // One week from now
-          status: "active",
+        promptParts.push("\nClient Goals:");
+        clientData.goals.forEach((goal: any) => {
+          promptParts.push(`- ${goal.description}`);
         });
       }
-      
-      res.json({ success: true, plan });
-    } catch (error) {
-      console.error("Failed to parse AI response:", error);
-      res.status(500).json({ 
-        error: "Failed to parse workout plan",
-        details: "The AI generated an invalid response format",
-        rawResponse: content
-      });
+
+      if (clientData.history && clientData.history.length > 0) {
+        promptParts.push("\nRecent Workout History:");
+        clientData.history.forEach((workout: any, index: number) => {
+          promptParts.push(`${index + 1}. ${workout.title || "Workout"} (${new Date(workout.createdAt).toLocaleDateString()})`);
+          if (workout.content && workout.content.exercises) {
+            const exercises = workout.content.exercises.map((ex: any) => ex.name).join(", ");
+            promptParts.push(`   Exercises: ${exercises}`);
+          }
+        });
+      }
+
+      if (clientData.metrics && clientData.metrics.length > 0) {
+        promptParts.push("\nRecent Metrics:");
+        clientData.metrics.forEach((metric: any) => {
+          promptParts.push(`- ${metric.name}: ${metric.value} ${metric.unit} (${new Date(metric.date).toLocaleDateString()})`);
+        });
+      }
     }
-  } catch (error: any) {
-    console.error("Error generating personalized workout:", error);
-    res.status(500).json({
-      error: "Failed to generate personalized workout",
-      details: error.message,
-    });
-  }
-}
-import type { Request, Response } from "express";
-import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+    promptParts.push(`
+Previous Workout Impact: ${pastWorkoutInfluence || 50}% (how much previous workouts should influence this one)
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
-});
-
-interface ClientDetails {
-  age: string;
-  gender: string;
-  heightCm?: string;
-  weightKg?: string;
-  fitnessLevel: string;
-  goals: string[];
-  limitations?: string[];
-  preferences?: string[];
-}
-
-interface WorkoutParameters {
-  duration: string;
-  frequency: string;
-  intensity: string;
-  equipment: string[];
-  location: string;
-  workoutType: string;
-}
-
-interface AdaptiveSettings {
-  progressionRate: string;
-  adaptToPerformance: boolean;
-  autoAdjustDifficulty: boolean;
-  recoveryDays: string;
-}
-
-interface WorkoutGenerationRequest {
-  clientDetails: ClientDetails;
-  workoutParameters: WorkoutParameters;
-  adaptiveSettings: AdaptiveSettings;
-}
-
-export async function generatePersonalizedWorkout(req: Request, res: Response) {
-  if (!req.user) return res.sendStatus(401);
-
-  try {
-    const {
-      clientDetails,
-      workoutParameters,
-      adaptiveSettings,
-    }: WorkoutGenerationRequest = req.body;
-
-    // Create system prompt for the AI
-    const systemPrompt = `
-You are an expert personal trainer specializing in creating personalized workout plans.
-Your task is to create a detailed, personalized workout plan based on the client's details, goals, and constraints.
-
-IMPORTANT RESPONSE FORMAT:
-Return a valid JSON object that matches this exact structure:
+RESPONSE FORMAT:
+Return your response as a JSON object with the following structure:
 {
-  "title": string,
-  "description": string,
-  "durationMinutes": number,
-  "difficulty": string,
-  "targetMuscleGroups": string[],
-  "equipment": string[],
+  "introduction": {
+    "overview": "Brief overview of the workout plan",
+    "fitnessLevel": "Identified fitness level",
+    "focusAreas": ["Primary focus area", "Secondary focus area"]
+  },
+  "sessionDetails": {
+    "name": "Descriptive name for the workout",
+    "type": "Personal or Group",
+    "duration": "Total minutes",
+    "intensity": "1-10 scale",
+    "equipment": ["List of equipment needed"]
+  },
   "warmup": {
-    "duration": string,
+    "duration": "Minutes",
     "exercises": [
       {
-        "name": string,
-        "instructions": string,
-        "duration": string
+        "name": "Exercise name",
+        "description": "Brief description",
+        "duration": "Time or reps",
+        "notes": "Any special instructions"
       }
     ]
   },
-  "exercises": [
-    {
-      "name": string,
-      "sets": string,
-      "reps": string,
-      "rest": string,
-      "notes": string,
-      "alternatives": string[]
-    }
-  ],
+  "mainWorkout": {
+    "circuits": [
+      {
+        "name": "Circuit name",
+        "rounds": "Number of rounds",
+        "restBetweenExercises": "Rest time",
+        "restBetweenRounds": "Rest time",
+        "exercises": [
+          {
+            "name": "Exercise name",
+            "targetMuscles": ["Muscle groups"],
+            "sets": "Number of sets",
+            "reps": "Reps per set or time",
+            "rest": "Rest period",
+            "intensity": "1-10 or percentage",
+            "description": "How to perform",
+            "modifications": {
+              "easier": "Easier version",
+              "harder": "More challenging version"
+            },
+            "alternatives": ["Alternative exercises"]
+          }
+        ]
+      }
+    ]
+  },
   "cooldown": {
-    "duration": string,
+    "duration": "Minutes",
     "exercises": [
       {
-        "name": string,
-        "instructions": string,
-        "duration": string
+        "name": "Exercise name",
+        "description": "Brief description",
+        "duration": "Time or reps"
       }
     ]
   },
-  "progressionTips": string[],
-  "notes": string
-}
+  "progressionPlan": {
+    "nextSteps": "Suggestions for progression",
+    "adaptations": "Potential modifications for future sessions"
+  },
+  "notes": "Any additional notes or instructions"
+}`);
 
-Only respond with the JSON object, no other text.
-`;
+    // Combine all prompt parts
+    const fullPrompt = promptParts.join("\n");
 
-    // Create user prompt with all the details
-    const userPrompt = `
-Create a personalized workout plan with the following details:
-
-CLIENT INFORMATION:
-- Age: ${clientDetails.age}
-- Gender: ${clientDetails.gender}
-${clientDetails.heightCm ? `- Height: ${clientDetails.heightCm} cm` : ""}
-${clientDetails.weightKg ? `- Weight: ${clientDetails.weightKg} kg` : ""}
-- Fitness Level: ${clientDetails.fitnessLevel}
-- Goals: ${clientDetails.goals.join(", ")}
-${
-  clientDetails.limitations && clientDetails.limitations.length > 0
-    ? `- Physical Limitations: ${clientDetails.limitations.join(", ")}`
-    : "- Physical Limitations: None"
-}
-${
-  clientDetails.preferences && clientDetails.preferences.length > 0
-    ? `- Exercise Preferences: ${clientDetails.preferences.join(", ")}`
-    : ""
-}
-
-WORKOUT PARAMETERS:
-- Duration: ${workoutParameters.duration} minutes
-- Frequency: ${workoutParameters.frequency} times per week
-- Intensity: ${workoutParameters.intensity}
-- Equipment Available: ${
-      workoutParameters.equipment.length > 0
-        ? workoutParameters.equipment.join(", ")
-        : "Bodyweight only"
-    }
-- Location: ${workoutParameters.location}
-- Workout Type: ${workoutParameters.workoutType}
-
-ADAPTIVE SETTINGS:
-- Progression Rate: ${adaptiveSettings.progressionRate}
-- Adapt to Performance: ${adaptiveSettings.adaptToPerformance ? "Yes" : "No"}
-- Auto-Adjust Difficulty: ${
-      adaptiveSettings.autoAdjustDifficulty ? "Yes" : "No"
-    }
-- Recovery Days: ${adaptiveSettings.recoveryDays}
-
-Create a structured workout plan that can be easily followed by the client. Include a warm-up, main exercises with sets, reps, and rest periods, and a cool-down. If the client has any limitations, provide alternative exercises.
-
-If auto-adjust difficulty is enabled, provide alternatives for each exercise to make it easier or harder.
-
-Make sure the workout is appropriately challenging for the client's fitness level and aligns with their goals.
-`;
-
-    // Try with Claude first (better for structured JSON output)
+    // Try with Anthropic's Claude first
     try {
-      const message = await anthropic.messages.create({
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+
+      const response = await anthropic.messages.create({
         model: "claude-3-opus-20240229",
         max_tokens: 4000,
-        system: systemPrompt,
+        temperature: 0.7,
+        system: "You are an expert personal trainer and coach specializing in creating personalized workout plans. Create detailed, evidence-based workout plans tailored to the client's needs, goals, and constraints.",
         messages: [
           {
             role: "user",
-            content: userPrompt,
+            content: fullPrompt,
           },
         ],
-        temperature: 0.7,
       });
 
-      // Parse the Claude response
+      // Extract and parse the JSON content from the response
+      const content = response.content[0].text;
       try {
-        const responseText = message.content[0].text;
-        // Handle possible code block formatting
-        const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) || 
-                          responseText.match(/```\n([\s\S]*?)\n```/) || 
-                          responseText.match(/{[\s\S]*}/);
-        
-        if (jsonMatch) {
-          const planJson = jsonMatch[1] || jsonMatch[0];
-          const plan = JSON.parse(planJson);
-          return res.json({ plan });
-        } else {
-          throw new Error("Failed to parse JSON from Claude response");
+        const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || 
+                           content.match(/```\n([\s\S]*?)\n```/) || 
+                           content.match(/{[\s\S]*}/);
+
+        if (!jsonMatch) {
+          throw new Error("No valid JSON found in the response");
         }
-      } catch (parseError) {
-        console.error("Error parsing Claude response:", parseError);
-        throw new Error("Failed to generate structured workout plan with Claude");
+
+        const plan = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+
+        // Save to database if clientId was provided
+        if (clientId) {
+          await db.insert(workoutPlans).values({
+            trainerId: req.user.id,
+            clientId: parseInt(clientId),
+            workspaceId: req.user.workspaceId || 1,
+            title: `${plan.sessionDetails.name || "Personalized Workout"}`,
+            description: plan.introduction.overview || "",
+            content: plan,
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // One week from now
+            status: "active",
+          });
+        }
+
+        res.json({ success: true, plan });
+      } catch (error) {
+        console.error("Failed to parse Claude AI response:", error);
+        // Fallback to OpenAI
+        throw new Error("Failed to parse Claude response");
       }
     } catch (claudeError) {
-      console.error("Claude API error:", claudeError);
-      
+      console.error("Claude API error, falling back to OpenAI:", claudeError);
+
       // Fallback to OpenAI
       try {
+        const openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        });
+
         const response = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-4",
           messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
+            {
+              role: "system",
+              content: "You are an expert personal trainer and coach specializing in creating personalized workout plans. Create detailed, evidence-based workout plans tailored to the client's needs, goals, and constraints.",
+            },
+            {
+              role: "user",
+              content: fullPrompt,
+            },
           ],
           temperature: 0.7,
-          response_format: { type: "json_object" },
+          max_tokens: 3000,
         });
 
         // Parse the JSON from OpenAI
@@ -484,7 +313,7 @@ Make sure the workout is appropriately challenging for the client's fitness leve
     console.error("Personalized workout generation error:", error);
     return res.status(500).json({
       error: "Failed to generate personalized workout",
-      message: error.message,
+      details: error.message,
     });
   }
 }
