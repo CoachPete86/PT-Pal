@@ -448,62 +448,84 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
     return (
       <Card className="animate-in fade-in duration-500">
         <CardHeader>
-          <CardTitle>Group Class Setup</CardTitle>
+          <CardTitle>Group Class Workout Plan</CardTitle>
           <CardDescription>
-            Choose your class type, participants, and define formats.
+            Design a complete group class session with exercises, equipment, and timing
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Class Type */}
-          <div>
-            <Label className="text-sm font-medium">Class Type</Label>
-            <Select
-              value={groupClassType}
-              onValueChange={(val) => setGroupClassType(val)}
-            >
-              <SelectTrigger className="mt-1.5">
-                <SelectValue placeholder="Select Class Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {groupClassTypes.map((ct) => (
-                  <SelectItem key={ct.value} value={ct.value}>
-                    {ct.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Basic Information */}
+          <div className="bg-muted/20 p-4 rounded-lg space-y-4">
+            <h3 className="font-medium text-lg">Class Information</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Class Type */}
+              <div>
+                <Label className="text-sm font-medium">Class Type</Label>
+                <Select
+                  value={groupClassType}
+                  onValueChange={(val) => setGroupClassType(val)}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Select Class Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {groupClassTypes.map((ct) => (
+                      <SelectItem key={ct.value} value={ct.value}>
+                        {ct.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">The primary focus of your class</p>
+              </div>
 
-          {/* Fitness Level */}
-          <div>
-            <Label className="text-sm font-medium">Group Fitness Level</Label>
-            <Select
-              value={groupFitnessLevel}
-              onValueChange={(val) => setGroupFitnessLevel(val as any)}
-            >
-              <SelectTrigger className="mt-1.5">
-                <SelectValue placeholder="Select Level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="beginner">Beginner</SelectItem>
-                <SelectItem value="intermediate">Intermediate</SelectItem>
-                <SelectItem value="advanced">Advanced</SelectItem>
-              </SelectContent>
-            </Select>
+              {/* Fitness Level */}
+              <div>
+                <Label className="text-sm font-medium">Group Fitness Level</Label>
+                <Select
+                  value={groupFitnessLevel}
+                  onValueChange={(val) => setGroupFitnessLevel(val as any)}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Select Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="mixed">Mixed Levels</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">Affects exercise selection and intensity</p>
+              </div>
+            </div>
           </div>
 
           {/* Participants Section */}
           <div className="space-y-4 rounded-lg bg-secondary/10 p-4">
-            <h3 className="font-medium">Participants</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Participant Setup</h3>
+              <HelpTooltip 
+                character="coach" 
+                content="Configure how your participants will be organized during the class. This affects station setup, equipment requirements, and exercise selection."
+              >
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </HelpTooltip>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm">Number of Participants</Label>
+                <Label className="text-sm">Expected Participants</Label>
                 <Input
                   type="number"
                   value={participantCount}
                   onChange={(e) => setParticipantCount(+e.target.value)}
                   className="mt-1.5"
+                  min={1}
+                  max={50}
                 />
+                <p className="text-xs text-muted-foreground mt-1">Total number of people in class</p>
               </div>
               <div>
                 <Label className="text-sm">Workout Format</Label>
@@ -515,13 +537,15 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     <SelectValue placeholder="Select Format" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="individual">Individual</SelectItem>
-                    <SelectItem value="partner">Partner</SelectItem>
-                    <SelectItem value="groups">Groups (3-5)</SelectItem>
+                    <SelectItem value="individual">Individual Stations</SelectItem>
+                    <SelectItem value="partner">Partner Workouts</SelectItem>
+                    <SelectItem value="groups">Small Groups (3-5)</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground mt-1">How participants will work together</p>
               </div>
             </div>
+            
             {participantFormat === "groups" && (
               <div>
                 <Label className="text-sm">Group Size</Label>
@@ -530,51 +554,104 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                   value={groupSize}
                   onChange={(e) => setGroupSize(+e.target.value)}
                   className="mt-1.5 w-full md:w-1/3"
+                  min={2}
+                  max={8}
                 />
+                <p className="text-xs text-muted-foreground mt-1">Number of participants per group</p>
               </div>
             )}
-          </div>
-
-          {/* Circuit Preferences */}
-          <div className="border p-4 rounded-md space-y-3 bg-muted/30">
-            <h3 className="font-medium mb-2">Circuit Preferences</h3>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={stationRotation}
-                onCheckedChange={(val) => setStationRotation(!!val)}
-                id="station-rotation"
-              />
-              <Label htmlFor="station-rotation" className="cursor-pointer">Station Rotation</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={restBetweenStations}
-                onCheckedChange={(val) => setRestBetweenStations(!!val)}
-                id="rest-between"
-              />
-              <Label htmlFor="rest-between" className="cursor-pointer">Rest Between Stations</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={mixedEquipmentStations}
-                onCheckedChange={(val) => setMixedEquipmentStations(!!val)}
-                id="mixed-equipment"
-              />
-              <Label htmlFor="mixed-equipment" className="cursor-pointer">Mixed Equipment Stations</Label>
+            
+            <div className="mt-4 pt-3 border-t border-muted">
+              <h4 className="text-sm font-medium mb-2">Class Dynamics</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={stationRotation}
+                    onCheckedChange={(val) => setStationRotation(!!val)}
+                    id="station-rotation"
+                  />
+                  <div>
+                    <Label htmlFor="station-rotation" className="cursor-pointer">Station Rotation</Label>
+                    <p className="text-xs text-muted-foreground">Participants move between stations</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={restBetweenStations}
+                    onCheckedChange={(val) => setRestBetweenStations(!!val)}
+                    id="rest-between"
+                  />
+                  <div>
+                    <Label htmlFor="rest-between" className="cursor-pointer">Rest Between Stations</Label>
+                    <p className="text-xs text-muted-foreground">Include transition/rest periods</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={mixedEquipmentStations}
+                    onCheckedChange={(val) => setMixedEquipmentStations(!!val)}
+                    id="mixed-equipment"
+                  />
+                  <div>
+                    <Label htmlFor="mixed-equipment" className="cursor-pointer">Mixed Equipment Stations</Label>
+                    <p className="text-xs text-muted-foreground">Use different equipment at each station</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
           {/* Equipment Selection */}
-          <div className="border p-4 rounded-md space-y-3">
+          <div className="border p-4 rounded-lg space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium">Available Equipment</h3>
+              <h3 className="font-medium">Gym Equipment Available</h3>
               <HelpTooltip 
                 character="gym-buddy" 
-                content="Select the equipment available for this workout. The workout plan will be customized based on your equipment selection."
+                content="Select the equipment available in your commercial gym for this workout. The workout plan will be customized based on your equipment selection."
               >
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </HelpTooltip>
             </div>
+            
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSelectedEquipment(equipmentOptions.filter(e => 
+                  ["Dumbbells", "Kettlebells", "Resistance Bands", "Plyo Boxes", "Yoga Matt"].includes(e)
+                ))}
+              >
+                Basic Equipment
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSelectedEquipment(equipmentOptions.filter(e => 
+                  ["Dumbbells", "Kettlebells", "Battle Ropes", "Medicine Balls", "TRX Straps"].includes(e)
+                ))}
+              >
+                HIIT Setup
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSelectedEquipment(equipmentOptions.filter(e => 
+                  ["Barbell & Plates", "Dumbbells", "Smith Machine", "Cable Machine"].includes(e)
+                ))}
+              >
+                Strength Focus
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSelectedEquipment(equipmentOptions.filter(e => 
+                  ["Concept 2 Rowers", "Spin Bike", "Ski Erg Machines", "Medicine Balls"].includes(e)
+                ))}
+              >
+                Cardio Equipment
+              </Button>
+            </div>
+            
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
               {equipmentOptions.map((item) => (
                 <div key={item} className="flex items-center space-x-2">
@@ -600,20 +677,25 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 </div>
               ))}
             </div>
+            
+            <div className="mt-2 pt-2 border-t border-dashed">
+              <p className="text-xs text-muted-foreground">Selected: {selectedEquipment.length} items</p>
+            </div>
           </div>
 
           {/* Class Formats */}
-          <div className="space-y-4">
+          <div className="space-y-4 border p-4 rounded-lg">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Class Formats</Label>
+                <h3 className="font-medium">Workout Structure</h3>
                 <HelpTooltip 
                   character="coach" 
-                  content="Class formats define how your workout will be structured. You can combine multiple formats to create varied and engaging sessions for your clients."
+                  content="Define how your workout will be structured with work/rest intervals. This creates the framework for your entire class."
                 >
                   <HelpCircle className="h-4 w-4 text-muted-foreground" />
                 </HelpTooltip>
               </div>
+              
               <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="outline"
@@ -621,49 +703,29 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                   onClick={() => loadFormatTemplate("hiit-standard")}
                   className="flex-grow sm:flex-grow-0"
                 >
-                  Load HIIT Template
+                  <span>HIIT Format</span>
                 </Button>
-                <HelpTooltip 
-                  character="gym-buddy" 
-                  content="High-Intensity Interval Training (HIIT) involves short bursts of intense exercise alternated with recovery periods. Great for burning calories and improving cardiovascular health."
-                  side="bottom"
-                >
-                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                </HelpTooltip>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => loadFormatTemplate("strength-circuit")}
                   className="flex-grow sm:flex-grow-0"
                 >
-                  Load Strength Template
+                  <span>Strength Format</span>
                 </Button>
-                <HelpTooltip 
-                  character="physio" 
-                  content="Strength circuits focus on building muscle and improving overall strength through resistance exercises. These circuits typically use weights and compound movements."
-                  side="bottom"
-                >
-                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                </HelpTooltip>
                 <Button 
                   size="sm" 
                   onClick={addFormat}
                   className="flex-grow sm:flex-grow-0"
                 >
-                  Add Format
+                  <span>Add Custom Format</span>
                 </Button>
-                <HelpTooltip 
-                  character="yoga-instructor" 
-                  content="Create a custom workout format with your own work/rest intervals. Mix and match multiple formats to create varied and engaging sessions."
-                  side="bottom"
-                >
-                  <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                </HelpTooltip>
               </div>
             </div>
+            
             {classFormats.length === 0 ? (
               <div className="text-center text-sm text-muted-foreground p-6 border border-dashed rounded-md">
-                No formats yet. Add or load a template.
+                No workout structures defined yet. Add a custom format or select a template.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -709,15 +771,18 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             )}
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col space-y-3">
+          <div className="text-sm text-muted-foreground w-full text-center pb-2">
+            This will generate a complete group workout plan with warmup, main exercises, and cooldown
+          </div>
           <Button className="w-full" onClick={handleSubmitGroupPlan}>
             {generateMutation.isPending ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Generating...
+                Generating Group Workout Plan...
               </>
             ) : (
-              "Generate Group Plan"
+              "Generate Group Workout Plan"
             )}
           </Button>
         </CardFooter>
@@ -906,182 +971,476 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Personal Training Wizard</CardTitle>
-          <CardDescription>Step {personalStep} of 4</CardDescription>
+          <CardTitle>Personal Training Session Plan</CardTitle>
+          <CardDescription>Step {personalStep} of 4 - Complete client details and training requirements</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {personalStep === 1 && (
             <div className="space-y-4">
-              <div>
-                <Label>Plan Type</Label>
-                <RadioGroup
-                  value={planType}
-                  onValueChange={(val) => setPlanType(val as PlanType)}
-                >
-                  <FormItem className="flex items-center space-x-2">
-                    <RadioGroupItem value="oneoff" />
-                    <FormLabel>Single Session</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2 mt-2">
-                    <RadioGroupItem value="program" />
-                    <FormLabel>12-Week Program</FormLabel>
-                  </FormItem>
-                </RadioGroup>
+              <div className="bg-muted/20 p-4 rounded-lg space-y-4">
+                <h3 className="font-medium text-lg">Session Format</h3>
+                <div>
+                  <Label>Plan Type</Label>
+                  <RadioGroup
+                    value={planType}
+                    onValueChange={(val) => setPlanType(val as PlanType)}
+                    className="flex flex-col space-y-2 mt-2"
+                  >
+                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colors">
+                      <RadioGroupItem value="oneoff" id="oneoff" className="mt-1" />
+                      <div>
+                        <FormLabel htmlFor="oneoff" className="font-medium">Single Training Session</FormLabel>
+                        <p className="text-sm text-muted-foreground">Create a plan for a one-time personal training session</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colors">
+                      <RadioGroupItem value="program" id="program" className="mt-1" />
+                      <div>
+                        <FormLabel htmlFor="program" className="font-medium">Progressive Training Program</FormLabel>
+                        <p className="text-sm text-muted-foreground">Design a structured program spanning multiple weeks</p>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                {planType === "program" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-3 border-t">
+                    <div>
+                      <Label>Program Duration (weeks)</Label>
+                      <Input
+                        type="number"
+                        value={programWeeks}
+                        onChange={(e) => setProgramWeeks(+e.target.value)}
+                        min={4}
+                        max={24}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Length of the full program</p>
+                    </div>
+                    <div>
+                      <Label>Sessions Per Week</Label>
+                      <Input
+                        type="number"
+                        value={sessionsPerWeek}
+                        onChange={(e) => setSessionsPerWeek(+e.target.value)}
+                        min={1}
+                        max={7}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Training frequency per week</p>
+                    </div>
+                  </div>
+                )}
               </div>
-              {planType === "program" && (
-                <div className="grid grid-cols-2 gap-4">
+              
+              <div className="border p-4 rounded-lg space-y-4">
+                <h3 className="font-medium text-lg">Client Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Program Duration (weeks)</Label>
+                    <Label>Age</Label>
                     <Input
-                      type="number"
-                      value={programWeeks}
-                      onChange={(e) => setProgramWeeks(+e.target.value)}
-                      min={4}
-                      max={24}
+                      value={clientAge}
+                      onChange={(e) => setClientAge(e.target.value)}
+                      className="mt-1"
+                      placeholder="e.g. 32"
                     />
                   </div>
                   <div>
-                    <Label>Sessions Per Week</Label>
-                    <Input
-                      type="number"
-                      value={sessionsPerWeek}
-                      onChange={(e) => setSessionsPerWeek(+e.target.value)}
-                      min={1}
-                      max={7}
-                    />
+                    <Label>Gender</Label>
+                    <Select
+                      value={clientGender}
+                      onValueChange={(val) => setClientGender(val as any)}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
                 <div>
-                  <Label>Age</Label>
+                  <div className="flex items-center gap-2">
+                    <Label>Client Goals</Label>
+                    <HelpTooltip 
+                      character="coach" 
+                      content="Be specific about what the client wants to achieve with this session/program. The plan will be tailored to these objectives."
+                    >
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </HelpTooltip>
+                  </div>
                   <Input
-                    value={clientAge}
-                    onChange={(e) => setClientAge(e.target.value)}
+                    placeholder="e.g. Fat loss, muscle gain, sports performance..."
+                    value={clientGoals}
+                    onChange={(e) => setClientGoals(e.target.value)}
+                    className="mt-1"
                   />
                 </div>
+                
                 <div>
-                  <Label>Gender</Label>
+                  <div className="flex items-center gap-2">
+                    <Label>Exercise Experience</Label>
+                    <HelpTooltip 
+                      character="coach" 
+                      content="The client's training history and experience level. This helps determine exercise complexity and intensity."
+                    >
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </HelpTooltip>
+                  </div>
                   <Select
-                    value={clientGender}
-                    onValueChange={(val) => setClientGender(val as any)}
+                    value={clientExperience}
+                    onValueChange={(val) => setClientExperience(val)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Gender" />
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select experience level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="beginner">Beginner (0-6 months)</SelectItem>
+                      <SelectItem value="novice">Novice (6-12 months)</SelectItem>
+                      <SelectItem value="intermediate">Intermediate (1-3 years)</SelectItem>
+                      <SelectItem value="advanced">Advanced (3+ years)</SelectItem>
+                      <SelectItem value="athlete">Competitive Athlete</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div>
-                <Label>Goals</Label>
-                <Input
-                  placeholder="Fat loss, muscle gain..."
-                  value={clientGoals}
-                  onChange={(e) => setClientGoals(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Limitations/Injuries</Label>
-                <Input
-                  placeholder="E.g. knee pain"
-                  value={clientLimitations}
-                  onChange={(e) => setClientLimitations(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Exercise Experience</Label>
-                <Input
-                  placeholder="Beginner? Some sports?"
-                  value={clientExperience}
-                  onChange={(e) => setClientExperience(e.target.value)}
-                />
+                
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Label>Health Considerations</Label>
+                    <HelpTooltip 
+                      character="physiotherapist" 
+                      content="Any injuries, medical conditions or physical limitations that should be considered when designing the workout."
+                    >
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </HelpTooltip>
+                  </div>
+                  <Input
+                    placeholder="e.g. Knee pain, lower back issues, pregnancy, heart condition..."
+                    value={clientLimitations}
+                    onChange={(e) => setClientLimitations(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
               </div>
             </div>
           )}
+          
           {personalStep === 2 && (
             <div className="space-y-4">
-              <div>
-                <Label>Training Location</Label>
-                <Select
-                  value={trainingLocation}
-                  onValueChange={(val) => setTrainingLocation(val)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locationOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="bg-muted/20 p-4 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-lg">Training Environment</h3>
+                  <HelpTooltip 
+                    character="coach" 
+                    content="The training location and available equipment significantly impact the exercise selection and workout structure."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div>
+                  <Label>Facility Type</Label>
+                  <Select
+                    value={trainingLocation}
+                    onValueChange={(val) => setTrainingLocation(val)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select Location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locationOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">Where the training will take place</p>
+                </div>
               </div>
-              <div>
-                <Label>Equipment</Label>
-                <Input
-                  placeholder="Comma-separated list: dumbbells, barbell..."
-                  value={personalEquipment}
-                  onChange={(e) => setPersonalEquipment(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  We'll parse by commas
-                </p>
+              
+              <div className="border p-4 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Available Equipment</h3>
+                  <HelpTooltip 
+                    character="gym-buddy" 
+                    content="Select the equipment available for this session. Be specific about what the client can access."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPersonalEquipment("Dumbbells, Kettlebells, Resistance Bands, Stability Ball, Bench")}
+                  >
+                    Standard Gym
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPersonalEquipment("Dumbbells, Barbell, Squat Rack, Bench, Cable Machine, Leg Press")}
+                  >
+                    Full Commercial Gym
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPersonalEquipment("Dumbbells (Light), Resistance Bands, Exercise Mat, Stability Ball")}
+                  >
+                    Home Gym
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPersonalEquipment("Bodyweight only")}
+                  >
+                    Bodyweight Only
+                  </Button>
+                </div>
+                
+                <div>
+                  <Label>Equipment List</Label>
+                  <Input
+                    placeholder="Comma-separated list: e.g. dumbbells, barbell, bench, pull-up bar..."
+                    value={personalEquipment}
+                    onChange={(e) => setPersonalEquipment(e.target.value)}
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    List all equipment available, separated by commas
+                  </p>
+                </div>
               </div>
             </div>
           )}
+          
           {personalStep === 3 && (
             <div className="space-y-4">
-              <Label>Primary Goal</Label>
-              <Select
-                value={personalGoal}
-                onValueChange={(val) => setPersonalGoal(val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a goal" />
-                </SelectTrigger>
-                <SelectContent>
-                  {personalGoals.map((g) => (
-                    <SelectItem key={g.value} value={g.value}>
-                      {g.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          {personalStep === 4 && (
-            <div className="space-y-4">
-              <Label>Preferred Circuit Types</Label>
-              <div className="space-y-2">
-                {["strength", "hypertrophy", "endurance", "superset"].map(
-                  (ct) => {
-                    const checked = personalCircuitTypes.includes(ct);
-                    return (
-                      <div key={ct} className="flex items-center space-x-2">
+              <div className="bg-muted/20 p-4 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-lg">Session Focus</h3>
+                  <HelpTooltip 
+                    character="coach" 
+                    content="Define the primary goals and focal points for this training session or program."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div>
+                  <Label>Primary Goal</Label>
+                  <Select
+                    value={personalGoal}
+                    onValueChange={(val) => setPersonalGoal(val)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select primary goal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {personalGoals.map((g) => (
+                        <SelectItem key={g.value} value={g.value}>
+                          {g.label}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="functional">Functional Fitness</SelectItem>
+                      <SelectItem value="flexibility">Flexibility & Mobility</SelectItem>
+                      <SelectItem value="power">Power & Explosiveness</SelectItem>
+                      <SelectItem value="rehabilitation">Rehabilitation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">Main focus of the workout</p>
+                </div>
+                
+                <div className="mt-4 space-y-2">
+                  <Label>Body Focus Areas</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {[
+                      "Full Body", "Upper Body", "Lower Body", "Core", "Back", "Chest", 
+                      "Shoulders", "Arms", "Legs", "Glutes", "Cardio", "Mobility"
+                    ].map((area) => (
+                      <div key={area} className="flex items-center space-x-2">
                         <Checkbox
-                          checked={checked}
-                          onCheckedChange={(val) => {
-                            if (val) {
-                              setPersonalCircuitTypes((prev) => [...prev, ct]);
-                            } else {
-                              setPersonalCircuitTypes((prev) =>
-                                prev.filter((x) => x !== ct),
-                              );
-                            }
+                          id={`area-${area.toLowerCase().replace(/\s+/g, '-')}`}
+                          onCheckedChange={(checked) => {
+                            // You'd need to add state for these focus areas
+                            // For now, this is just UI without the state management
                           }}
                         />
-                        <Label>{ct}</Label>
+                        <Label 
+                          htmlFor={`area-${area.toLowerCase().replace(/\s+/g, '-')}`}
+                          className="cursor-pointer text-sm"
+                        >
+                          {area}
+                        </Label>
                       </div>
-                    );
-                  },
-                )}
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border p-4 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Session Structure</h3>
+                  <HelpTooltip 
+                    character="coach" 
+                    content="Determine how long the session will be and what components to include."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Session Duration</Label>
+                    <Select defaultValue="60">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="45">45 minutes</SelectItem>
+                        <SelectItem value="60">60 minutes (standard)</SelectItem>
+                        <SelectItem value="90">90 minutes</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Intensity Level</Label>
+                    <Select defaultValue="moderate">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select intensity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">Light (Recovery/Introduction)</SelectItem>
+                        <SelectItem value="moderate">Moderate (Standard)</SelectItem>
+                        <SelectItem value="challenging">Challenging (Advanced)</SelectItem>
+                        <SelectItem value="intense">Very Intense (Elite)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Include Components</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {[
+                      {id: "warmup", label: "Warmup Section"}, 
+                      {id: "mobility", label: "Mobility Work"},
+                      {id: "activation", label: "Activation Exercises"}, 
+                      {id: "main", label: "Main Workout"},
+                      {id: "cooldown", label: "Cooldown"}, 
+                      {id: "stretching", label: "Stretching Routine"}
+                    ].map((component) => (
+                      <div key={component.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`component-${component.id}`}
+                          defaultChecked={component.id === "warmup" || component.id === "main" || component.id === "cooldown"}
+                        />
+                        <Label 
+                          htmlFor={`component-${component.id}`}
+                          className="cursor-pointer text-sm"
+                        >
+                          {component.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {personalStep === 4 && (
+            <div className="space-y-4">
+              <div className="bg-muted/20 p-4 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-lg">Training Methodology</h3>
+                  <HelpTooltip 
+                    character="scientist" 
+                    content="Select the training methods and approaches you want to incorporate in this workout plan."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <div>
+                  <Label>Preferred Circuit Types</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                    {[
+                      {id: "strength", label: "Strength Focus", desc: "Heavy weights, lower reps, longer rest periods"},
+                      {id: "hypertrophy", label: "Hypertrophy", desc: "Moderate weights, moderate reps, focus on muscle growth"},
+                      {id: "endurance", label: "Muscular Endurance", desc: "Higher reps, shorter rest, continuous tension"},
+                      {id: "superset", label: "Supersets", desc: "Pairs of exercises performed back-to-back"},
+                      {id: "circuit", label: "Circuit Training", desc: "Multiple exercises performed in sequence"},
+                      {id: "hiit", label: "HIIT", desc: "High-intensity intervals with brief rest periods"},
+                      {id: "emom", label: "EMOM", desc: "Every Minute On the Minute timing format"},
+                      {id: "power", label: "Power Training", desc: "Explosive movements with sufficient recovery"}
+                    ].map((ct) => {
+                      const checked = personalCircuitTypes.includes(ct.id);
+                      return (
+                        <div key={ct.id} className="flex items-start space-x-2 p-2 border rounded hover:bg-secondary/5 transition-colors">
+                          <Checkbox
+                            id={`circuit-${ct.id}`}
+                            checked={checked}
+                            onCheckedChange={(val) => {
+                              if (val) {
+                                setPersonalCircuitTypes((prev) => [...prev, ct.id]);
+                              } else {
+                                setPersonalCircuitTypes((prev) =>
+                                  prev.filter((x) => x !== ct.id),
+                                );
+                              }
+                            }}
+                            className="mt-1"
+                          />
+                          <div>
+                            <Label htmlFor={`circuit-${ct.id}`} className="cursor-pointer font-medium">{ct.label}</Label>
+                            <p className="text-xs text-muted-foreground">{ct.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Additional Notes</h3>
+                  <HelpTooltip 
+                    character="coach" 
+                    content="Any special considerations or requirements for this session that haven't been covered elsewhere."
+                  >
+                    <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                  </HelpTooltip>
+                </div>
+                
+                <textarea
+                  className="w-full p-3 border rounded-md mt-2"
+                  rows={3}
+                  placeholder="Add any additional notes or requirements for this training session..."
+                ></textarea>
+              </div>
+              
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h3 className="font-medium">Review Summary</h3>
+                <div className="mt-2 space-y-2 text-sm">
+                  <p><strong>Plan Type:</strong> {planType === "oneoff" ? "Single Session" : `${programWeeks}-Week Program (${sessionsPerWeek} sessions/week)`}</p>
+                  <p><strong>Client:</strong> {clientAge ? `${clientAge} year old ` : ""}{clientGender} with {clientExperience || "unspecified"} experience</p>
+                  <p><strong>Goals:</strong> {clientGoals || "Not specified"}</p>
+                  <p><strong>Training Environment:</strong> {locationOptions.find(l => l.value === trainingLocation)?.label || "Not specified"}</p>
+                  <p><strong>Equipment:</strong> {personalEquipment || "Not specified"}</p>
+                  <p><strong>Focus:</strong> {personalGoals.find(g => g.value === personalGoal)?.label || "Not specified"}</p>
+                  <p><strong>Training Methods:</strong> {personalCircuitTypes.length ? personalCircuitTypes.join(", ") : "Not specified"}</p>
+                </div>
               </div>
             </div>
           )}
@@ -1089,22 +1448,23 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         <CardFooter className="flex justify-between">
           {personalStep > 1 && (
             <Button variant="outline" onClick={prevStep}>
+              <ChevronRight className="mr-2 h-4 w-4 rotate-180" />
               Previous
             </Button>
           )}
           {personalStep < 4 ? (
-            <Button onClick={nextStep}>
+            <Button onClick={nextStep} className="ml-auto">
               Next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleSubmitPersonalPlan}>
+            <Button onClick={handleSubmitPersonalPlan} className="ml-auto">
               {generateMutation.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Generating Personal Training Plan...
                 </>
               ) : (
-                "Generate Plan"
+                "Generate Personal Training Plan"
               )}
             </Button>
           )}
@@ -1442,7 +1802,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle>Session Type</CardTitle>
+              <CardTitle>Workout Plan Type</CardTitle>
               <HelpTooltip 
                 character="coach" 
                 content="Select the type of workout you want to create. Group classes are designed for multiple participants, while personal training is tailored to individual clients."
@@ -1450,43 +1810,240 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </HelpTooltip>
             </div>
-            <CardDescription>Choose Group or Personal</CardDescription>
+            <CardDescription>Choose your session format and details</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup
-              value={sessionType}
-              onValueChange={(val) => setSessionType(val as SessionType)}
-            >
-              <div className="space-y-4 pt-2">
-                <div className="flex items-center justify-between px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="group" id="group-option" />
-                    <FormLabel htmlFor="group-option" className="font-medium">Group Class</FormLabel>
+            <div className="space-y-6">
+              {/* Session Type Selection */}
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Session Format</Label>
+                <RadioGroup
+                  value={sessionType}
+                  onValueChange={(val) => setSessionType(val as SessionType)}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="personal" id="personal-option" />
+                        <FormLabel htmlFor="personal-option" className="font-medium">Personal Training</FormLabel>
+                      </div>
+                      <HelpTooltip 
+                        character="physio" 
+                        content="Personal training plans are customized for individual clients. These workouts are tailored to specific goals, limitations, and equipment availability."
+                        side="top"
+                      >
+                        <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                      </HelpTooltip>
+                    </div>
+                    <p className="text-xs text-muted-foreground pl-6">One-on-one training sessions tailored to client's specific needs and goals</p>
                   </div>
-                  <HelpTooltip 
-                    character="gym-buddy" 
-                    content="Group classes are high-energy workouts designed for multiple participants. Great for creating HIIT, circuit training, and other formats that work well in a group setting."
-                    side="left"
-                  >
-                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                  </HelpTooltip>
-                </div>
-                
-                <div className="flex items-center justify-between px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="personal" id="personal-option" />
-                    <FormLabel htmlFor="personal-option" className="font-medium">Personal Training</FormLabel>
+                  
+                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="group" id="group-option" />
+                        <FormLabel htmlFor="group-option" className="font-medium">Group Class</FormLabel>
+                      </div>
+                      <HelpTooltip 
+                        character="gym-buddy" 
+                        content="Group classes are high-energy workouts designed for multiple participants. Great for creating HIIT, circuit training, and other formats that work well in a group setting."
+                        side="top"
+                      >
+                        <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                      </HelpTooltip>
+                    </div>
+                    <p className="text-xs text-muted-foreground pl-6">Group sessions for multiple participants with shared fitness objectives</p>
                   </div>
-                  <HelpTooltip 
-                    character="physio" 
-                    content="Personal training plans are customized for individual clients. These workouts are tailored to specific goals, limitations, and equipment availability."
-                    side="left"
-                  >
-                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
-                  </HelpTooltip>
-                </div>
+                </RadioGroup>
               </div>
-            </RadioGroup>
+
+              {/* Plan Type */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Plan Duration</Label>
+                <Select
+                  value={planType}
+                  onValueChange={(val) => setPlanType(val as PlanType)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select plan duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="oneoff">Single Session</SelectItem>
+                    <SelectItem value="program">Structured Program</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {planType === "oneoff" 
+                    ? "Create a detailed plan for a single workout session" 
+                    : "Design a progressive program with multiple sessions"}
+                </p>
+              </div>
+
+              {/* Fitness Level - Common to both types */}
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Fitness Level</Label>
+                <Select
+                  value={groupFitnessLevel}
+                  onValueChange={(val) => setGroupFitnessLevel(val as any)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select fitness level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Session Type Specific Options */}
+              {sessionType === "group" ? (
+                <div className="space-y-4 p-4 border rounded-lg">
+                  <h3 className="font-medium">Group Class Details</h3>
+                  
+                  <div className="space-y-2">
+                    <Label>Class Type</Label>
+                    <Select
+                      value={groupClassType}
+                      onValueChange={(val) => setGroupClassType(val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select class type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groupClassTypes.map((ct) => (
+                          <SelectItem key={ct.value} value={ct.value}>
+                            {ct.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">The focus and style of your group class</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Participant Count</Label>
+                      <Input
+                        type="number"
+                        value={participantCount}
+                        onChange={(e) => setParticipantCount(+e.target.value)}
+                        min={2}
+                        max={30}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Workout Format</Label>
+                      <Select
+                        value={participantFormat}
+                        onValueChange={(val) => setParticipantFormat(val as any)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="individual">Individual</SelectItem>
+                          <SelectItem value="partner">Partner</SelectItem>
+                          <SelectItem value="groups">Groups</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => {
+                      if (sessionType === "group") {
+                        // Continue to next step
+                        // For now just render the group flow directly
+                      }
+                    }}
+                    className="w-full mt-2"
+                  >
+                    Continue to Group Setup
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4 p-4 border rounded-lg">
+                  <h3 className="font-medium">Personal Training Details</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Client Age</Label>
+                      <Input
+                        type="text"
+                        value={clientAge}
+                        onChange={(e) => setClientAge(e.target.value)}
+                        placeholder="e.g. 35"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Client Gender</Label>
+                      <Select
+                        value={clientGender}
+                        onValueChange={(val) => setClientGender(val as any)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Client Goals</Label>
+                    <Input
+                      placeholder="e.g. Weight loss, muscle gain, etc."
+                      value={clientGoals}
+                      onChange={(e) => setClientGoals(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Limitations/Injuries</Label>
+                    <Input
+                      placeholder="e.g. Knee pain, lower back issues, etc."
+                      value={clientLimitations}
+                      onChange={(e) => setClientLimitations(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Training Location</Label>
+                    <Select
+                      value={trainingLocation}
+                      onValueChange={(val) => setTrainingLocation(val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locationOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => setPersonalStep(1)}
+                    className="w-full mt-2"
+                  >
+                    Continue to Personal Training Setup
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
