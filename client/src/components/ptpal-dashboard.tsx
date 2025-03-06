@@ -58,35 +58,40 @@ export default function PTpalDashboard() {
       </FadeIn>
 
       <Tabs defaultValue="workoutPlans" className="mt-6">
-        <TabsList className="grid grid-cols-5 mb-4">
-          <TabsTrigger value="workoutPlans">
+        <TabsList className="flex flex-wrap w-full justify-start overflow-x-auto mb-4">
+          <TabsTrigger value="workoutPlans" className="flex-grow md:flex-grow-0">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <Dumbbell className="h-4 w-4 mr-1" />
-              Workout Plans
+              <span className="hidden sm:inline">Workout Plans</span>
+              <span className="sm:hidden">Plans</span>
             </motion.div>
           </TabsTrigger>
-          <TabsTrigger value="sessionTracking">
+          <TabsTrigger value="sessionTracking" className="flex-grow md:flex-grow-0">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <Activity className="h-4 w-4 mr-1" />
-              Session Tracking
+              <span className="hidden sm:inline">Session Tracking</span>
+              <span className="sm:hidden">Sessions</span>
             </motion.div>
           </TabsTrigger>
-          <TabsTrigger value="nutrition">
+          <TabsTrigger value="nutrition" className="flex-grow md:flex-grow-0">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <Users className="h-4 w-4 mr-1" />
-              Nutrition
+              <span className="hidden sm:inline">Nutrition</span>
+              <span className="sm:hidden">Nutrition</span>
             </motion.div>
           </TabsTrigger>
-          <TabsTrigger value="clients">
+          <TabsTrigger value="clients" className="flex-grow md:flex-grow-0">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <User className="h-4 w-4 mr-1" />
-              Clients
+              <span className="hidden sm:inline">Clients</span>
+              <span className="sm:hidden">Clients</span>
             </motion.div>
           </TabsTrigger>
-          <TabsTrigger value="documents">
+          <TabsTrigger value="documents" className="flex-grow md:flex-grow-0">
             <motion.div className="flex items-center gap-1" whileHover={{ scale: 1.03 }}>
               <FileText className="h-4 w-4 mr-1" />
-              Documents
+              <span className="hidden sm:inline">Documents</span>
+              <span className="sm:hidden">Docs</span>
             </motion.div>
           </TabsTrigger>
         </TabsList>
@@ -226,14 +231,14 @@ export default function PTpalDashboard() {
                 renderItem={(plan: any) => (
                   <AnimatedCard key={plan.id}>
                     <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <div>
                           <h3 className="font-medium">{plan.title}</h3>
                           <p className="text-sm text-gray-500">
                             {new Date(plan.createdAt).toLocaleDateString('en-GB')}
                           </p>
                         </div>
-                        <AnimatedButton size="sm" variant="outline">View</AnimatedButton>
+                        <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">View</AnimatedButton>
                       </div>
                     </CardContent>
                   </AnimatedCard>
@@ -265,9 +270,9 @@ export default function PTpalDashboard() {
               <h2 className="text-xl font-semibold mb-4">Client Management</h2>
               <div className="space-y-4">
                 <FadeIn>
-                  <div className="flex justify-between items-center">
-                    <Input placeholder="Search clients..." className="max-w-md" />
-                    <AnimatedButton>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <Input placeholder="Search clients..." className="w-full sm:max-w-md" />
+                    <AnimatedButton className="w-full sm:w-auto">
                       <Plus className="h-4 w-4 mr-2" />
                       Add New Client
                     </AnimatedButton>
@@ -279,7 +284,7 @@ export default function PTpalDashboard() {
                     {[1, 2, 3].map((client) => (
                       <AnimatedCard key={client} hover={true}>
                         <CardContent className="p-4">
-                          <div className="flex justify-between items-center">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div className="flex items-center">
                               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                                 JS
@@ -289,9 +294,9 @@ export default function PTpalDashboard() {
                                 <p className="text-sm text-gray-500">Last session: 3 days ago</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <AnimatedButton size="sm" variant="outline">View Profile</AnimatedButton>
-                              <AnimatedButton size="sm" variant="outline">Message</AnimatedButton>
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">View Profile</AnimatedButton>
+                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">Message</AnimatedButton>
                             </div>
                           </div>
                         </CardContent>
@@ -321,12 +326,12 @@ export default function PTpalDashboard() {
                     renderItem={(template: any) => (
                       <AnimatedCard key={template.id} hover={true}>
                         <CardContent className="p-4">
-                          <div className="flex justify-between items-center">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div>
                               <h3 className="font-medium">{template.name}</h3>
                               <p className="text-sm text-gray-500">{template.type}</p>
                             </div>
-                            <AnimatedButton size="sm" variant="outline">Use</AnimatedButton>
+                            <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">Use</AnimatedButton>
                           </div>
                         </CardContent>
                       </AnimatedCard>
@@ -357,14 +362,14 @@ export default function PTpalDashboard() {
                     renderItem={(doc: any) => (
                       <AnimatedCard key={doc.id} hover={true}>
                         <CardContent className="p-4">
-                          <div className="flex justify-between items-center">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div>
                               <h3 className="font-medium">{doc.name}</h3>
                               <p className="text-sm text-gray-500">Created: {doc.date}</p>
                             </div>
-                            <div className="flex gap-2">
-                              <AnimatedButton size="sm" variant="outline">View</AnimatedButton>
-                              <AnimatedButton size="sm" variant="outline">Edit</AnimatedButton>
+                            <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">View</AnimatedButton>
+                              <AnimatedButton size="sm" variant="outline" className="flex-1 sm:flex-initial">Edit</AnimatedButton>
                             </div>
                           </div>
                         </CardContent>
