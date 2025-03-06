@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileIcon } from "lucide-react"; // Added import for FileIcon
+// FileIcon is likely already imported elsewhere in this file
 
 export default function PTpalDashboard() {
   const [activeTab, setActiveTab] = useState("workoutPlans");
