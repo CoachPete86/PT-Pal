@@ -10,7 +10,7 @@ import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { StaggeredList, AnimatedCard, AnimatedButton, FadeIn } from "@/components/ui/animated-elements";
-
+import { FileIcon } from "lucide-react"; // Added import for FileIcon
 
 export default function PTpalDashboard() {
   const [activeTab, setActiveTab] = useState("workoutPlans");
