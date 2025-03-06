@@ -62,7 +62,11 @@ export default function AddFitnessEntry() {
         ...data,
         date: new Date(data.date), // Convert to Date object if it isn't already
       };
-      const res = await apiRequest("POST", "/api/fitness-journey", formattedData);
+      const res = await apiRequest(
+        "POST",
+        "/api/fitness-journey",
+        formattedData,
+      );
       return res.json();
     },
     onSuccess: () => {
@@ -133,7 +137,7 @@ export default function AddFitnessEntry() {
                         variant="outline"
                         className={cn(
                           "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -224,10 +228,7 @@ export default function AddFitnessEntry() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a status" />

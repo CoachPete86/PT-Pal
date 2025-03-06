@@ -1,23 +1,26 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import cors from 'cors';
+import cors from "cors";
 
 const app = express();
 
 // Configure CORS early in the middleware chain
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://YOUR_PRODUCTION_DOMAIN' // This will be replaced with actual domain
-    : 'http://localhost:5000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://YOUR_PRODUCTION_DOMAIN" // This will be replaced with actual domain
+        : "http://localhost:5000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 // Increase limit for base64 encoded images
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -56,7 +59,7 @@ const startServer = async () => {
 
     // Set up error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      console.error('Error:', err);
+      console.error("Error:", err);
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
       res.status(status).json({ error: message });
@@ -72,11 +75,13 @@ const startServer = async () => {
     // Function to try binding to a port
     const tryPort = async (port: number): Promise<number> => {
       return new Promise((resolve, reject) => {
-        server.once('error', (err: NodeJS.ErrnoException) => {
-          if (err.code === 'EADDRINUSE') {
+        server.once("error", (err: NodeJS.ErrnoException) => {
+          if (err.code === "EADDRINUSE") {
             log(`Port ${port} is in use, trying next port...`);
             if (port >= 5010) {
-              reject(new Error('No available ports found between 5000 and 5010'));
+              reject(
+                new Error("No available ports found between 5000 and 5010"),
+              );
             } else {
               resolve(tryPort(port + 1));
             }
@@ -97,11 +102,11 @@ const startServer = async () => {
       const port = await tryPort(5000);
       log(`Server is running at http://0.0.0.0:${port}`);
     } catch (error) {
-      console.error('Failed to start server:', error);
+      console.error("Failed to start server:", error);
       process.exit(1);
     }
   } catch (error) {
-    console.error('Server initialization failed:', error);
+    console.error("Server initialization failed:", error);
     process.exit(1);
   }
 };
@@ -110,18 +115,18 @@ const startServer = async () => {
 startServer();
 
 // Handle graceful shutdown
-process.on('SIGTERM', () => {
-  log('SIGTERM signal received: closing HTTP server');
+process.on("SIGTERM", () => {
+  log("SIGTERM signal received: closing HTTP server");
   let server;
-  try{
+  try {
     server = registerRoutes(app);
-  } catch(error){
+  } catch (error) {
     console.error("Error getting server instance during shutdown:", error);
     process.exit(1);
   }
   if (server) {
     server.close(() => {
-      log('HTTP server closed');
+      log("HTTP server closed");
       process.exit(0);
     });
   } else {

@@ -1,4 +1,3 @@
-
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,7 +28,7 @@ export function UniversalSearch() {
   }, []);
 
   const { data: searchResults } = useQuery({
-    queryKey: ['/api/search'],
+    queryKey: ["/api/search"],
     enabled: open,
   });
 

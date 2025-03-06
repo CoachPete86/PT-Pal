@@ -49,16 +49,19 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [, setLocation] = useLocation();
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('/#')) {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (href.startsWith("/#")) {
       e.preventDefault();
       const id = href.substring(2);
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
       // Set the URL without triggering navigation
-      window.history.pushState(null, '', href);
+      window.history.pushState(null, "", href);
     } else {
       setLocation(href);
     }
@@ -77,9 +80,7 @@ export default function Navbar() {
               <div className="flex items-center space-x-2 cursor-pointer">
                 {/* We use the default icon since branding is not directly available in User type */}
                 <BarChart className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">
-                  {"PTpal"}
-                </span>
+                <span className="text-xl font-bold">{"PTpal"}</span>
               </div>
             </Link>
           </div>
@@ -88,7 +89,7 @@ export default function Navbar() {
             <NavigationMenuList className="gap-6">
               {mainNavItems.map((item) => (
                 <NavigationMenuItem key={item.href}>
-                  <a 
+                  <a
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
                     className="text-sm font-medium transition-colors hover:text-primary"
@@ -113,13 +114,11 @@ export default function Navbar() {
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-2"
-                      >
+                      <Button variant="ghost" size="sm" className="gap-2">
                         <User className="h-4 w-4" />
-                        <span className="hidden sm:inline">{user.username}</span>
+                        <span className="hidden sm:inline">
+                          {user.username}
+                        </span>
                         <ChevronDown className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

@@ -2,7 +2,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/navbar";
 import WorkspaceSettings from "@/components/workspace-settings";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,27 +27,27 @@ export default function SettingsPage() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: typeof profile) => {
-      const res = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      const res = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Failed to update profile');
+      if (!res.ok) throw new Error("Failed to update profile");
       return res.json();
     },
     onSuccess: () => {
       toast({
         title: "Profile updated",
-        description: "Your profile has been updated successfully."
+        description: "Your profile has been updated successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   if (!user) return null;
@@ -91,7 +97,12 @@ export default function SettingsPage() {
                   <Label>Business Name</Label>
                   <Input
                     value={profile.businessName}
-                    onChange={(e) => setProfile(p => ({ ...p, businessName: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((p) => ({
+                        ...p,
+                        businessName: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -99,7 +110,9 @@ export default function SettingsPage() {
                   <Input
                     type="email"
                     value={profile.email}
-                    onChange={(e) => setProfile(p => ({ ...p, email: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((p) => ({ ...p, email: e.target.value }))
+                    }
                   />
                 </div>
                 <Button

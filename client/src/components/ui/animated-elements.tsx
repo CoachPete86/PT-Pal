@@ -3,17 +3,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./button";
 import { Card, CardContent } from "./card";
 import { cn } from "@/lib/utils";
-import { Check, ChevronDown, ChevronUp, ChevronRight, Plus, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  Plus,
+  X,
+} from "lucide-react";
 
 type AnimatedButtonProps = React.ComponentProps<typeof Button> & {
   animateOnClick?: boolean;
 };
 
-export function AnimatedButton({ 
-  children, 
-  className, 
+export function AnimatedButton({
+  children,
+  className,
   animateOnClick = true,
-  ...props 
+  ...props
 }: AnimatedButtonProps) {
   return (
     <motion.div
@@ -43,7 +50,11 @@ export function AnimatedCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={hover ? { y: -5, boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)" } : undefined}
+      whileHover={
+        hover
+          ? { y: -5, boxShadow: "0 10px 20px rgba(0, 0, 0, 0.1)" }
+          : undefined
+      }
     >
       <Card className={className} {...props}>
         {children}
@@ -93,9 +104,7 @@ export function CollapsibleSection({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className={cn("p-4", contentClassName)}>
-              {children}
-            </div>
+            <div className={cn("p-4", contentClassName)}>{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -166,11 +175,11 @@ type FadeInProps = {
   className?: string;
 };
 
-export function FadeIn({ 
-  children, 
-  delay = 0, 
+export function FadeIn({
+  children,
+  delay = 0,
   duration = 0.3,
-  className 
+  className,
 }: FadeInProps) {
   return (
     <motion.div
@@ -184,14 +193,14 @@ export function FadeIn({
   );
 }
 
-export function AnimatedToggleIcon({ 
-  isActive, 
-  activeIcon: ActiveIcon, 
+export function AnimatedToggleIcon({
+  isActive,
+  activeIcon: ActiveIcon,
   inactiveIcon: InactiveIcon,
-  className
-}: { 
-  isActive: boolean; 
-  activeIcon: React.ComponentType<any>; 
+  className,
+}: {
+  isActive: boolean;
+  activeIcon: React.ComponentType<any>;
   inactiveIcon: React.ComponentType<any>;
   className?: string;
 }) {
@@ -206,7 +215,11 @@ export function AnimatedToggleIcon({
           transition={{ duration: 0.2 }}
           className="absolute inset-0"
         >
-          {isActive ? <ActiveIcon className="h-5 w-5" /> : <InactiveIcon className="h-5 w-5" />}
+          {isActive ? (
+            <ActiveIcon className="h-5 w-5" />
+          ) : (
+            <InactiveIcon className="h-5 w-5" />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -216,13 +229,16 @@ export function AnimatedToggleIcon({
 export function SuccessAnimation({ className }: { className?: string }) {
   return (
     <motion.div
-      className={cn("rounded-full bg-green-100 p-2 flex items-center justify-center", className)}
+      className={cn(
+        "rounded-full bg-green-100 p-2 flex items-center justify-center",
+        className,
+      )}
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{
         type: "spring",
         stiffness: 400,
-        damping: 10
+        damping: 10,
       }}
     >
       <Check className="h-4 w-4 text-green-600" />
@@ -246,17 +262,22 @@ export function ExpandableSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className={cn("border border-border rounded-md overflow-hidden", className)}>
+    <div
+      className={cn(
+        "border border-border rounded-md overflow-hidden",
+        className,
+      )}
+    >
       <motion.div
         className="flex items-center justify-between p-4 cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
       >
         <div className="font-medium">{title}</div>
-        <AnimatedToggleIcon 
-          isActive={isOpen} 
-          activeIcon={ChevronUp} 
-          inactiveIcon={ChevronRight} 
+        <AnimatedToggleIcon
+          isActive={isOpen}
+          activeIcon={ChevronUp}
+          inactiveIcon={ChevronRight}
         />
       </motion.div>
       <AnimatePresence initial={false}>
@@ -276,12 +297,12 @@ export function ExpandableSection({
   );
 }
 
-export function AddItemButton({ 
-  onClick, 
+export function AddItemButton({
+  onClick,
   label = "Add Item",
-  className
-}: { 
-  onClick: () => void; 
+  className,
+}: {
+  onClick: () => void;
   label?: string;
   className?: string;
 }) {
@@ -289,7 +310,7 @@ export function AddItemButton({
     <motion.button
       className={cn(
         "w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed rounded-md text-muted-foreground hover:text-foreground transition-colors",
-        className
+        className,
       )}
       onClick={onClick}
       whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}

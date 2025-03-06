@@ -45,12 +45,7 @@ export function LoadingState({
             strokeLinecap="round"
             strokeDasharray="1, 7"
           />
-          <circle
-            cx="25"
-            cy="25"
-            r="8"
-            fill="currentColor"
-          />
+          <circle cx="25" cy="25" r="8" fill="currentColor" />
         </motion.svg>
       </motion.div>
     );
@@ -64,10 +59,7 @@ export function LoadingState({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        <motion.svg
-          viewBox="0 0 60 30"
-          className="w-full h-full text-primary"
-        >
+        <motion.svg viewBox="0 0 60 30" className="w-full h-full text-primary">
           <motion.g
             animate={{
               y: [-2, 2, -2],
@@ -78,8 +70,22 @@ export function LoadingState({
               repeat: Infinity,
             }}
           >
-            <rect x="5" y="12" width="10" height="6" rx="2" fill="currentColor" />
-            <rect x="45" y="12" width="10" height="6" rx="2" fill="currentColor" />
+            <rect
+              x="5"
+              y="12"
+              width="10"
+              height="6"
+              rx="2"
+              fill="currentColor"
+            />
+            <rect
+              x="45"
+              y="12"
+              width="10"
+              height="6"
+              rx="2"
+              fill="currentColor"
+            />
             <rect x="15" y="14" width="30" height="2" fill="currentColor" />
           </motion.g>
         </motion.svg>

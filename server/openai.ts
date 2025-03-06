@@ -37,7 +37,7 @@ ${prompt.keywords?.length ? `incorporating these keywords: ${prompt.keywords.joi
     model: "gpt-4",
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
+      { role: "user", content: userPrompt },
     ],
     temperature: 0.7,
     max_tokens: 500,

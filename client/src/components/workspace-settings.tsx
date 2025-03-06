@@ -35,7 +35,9 @@ import { Loader2, Building2, CreditCard, Brush } from "lucide-react";
 
 const workspaceFormSchema = z.object({
   name: z.string().min(2, "Workspace name must be at least 2 characters"),
-  businessName: z.string().min(2, "Business name must be at least 2 characters"),
+  businessName: z
+    .string()
+    .min(2, "Business name must be at least 2 characters"),
   theme: z.object({
     primary: z.string(),
     variant: z.enum(["professional", "tint", "vibrant"]),
@@ -243,8 +245,8 @@ export default function WorkspaceSettings() {
                   {workspace?.subscriptionTier === "free"
                     ? "Free Tier"
                     : workspace?.subscriptionTier === "premium"
-                    ? "Premium"
-                    : "Enterprise"}
+                      ? "Premium"
+                      : "Enterprise"}
                 </p>
               </div>
               {workspace?.subscriptionTier === "free" && (
@@ -265,7 +267,9 @@ export default function WorkspaceSettings() {
               <div className="text-sm text-muted-foreground">
                 <p>
                   Status:{" "}
-                  <span className="capitalize">{workspace?.subscriptionStatus}</span>
+                  <span className="capitalize">
+                    {workspace?.subscriptionStatus}
+                  </span>
                 </p>
                 {workspace?.trialEndsAt && (
                   <p>

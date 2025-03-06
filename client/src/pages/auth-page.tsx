@@ -31,9 +31,9 @@ export default function AuthPage() {
 
   // Initialize login form
   const loginForm = useForm({
-    defaultValues: { 
-      email: "", 
-      password: "" 
+    defaultValues: {
+      email: "",
+      password: "",
     },
   });
 
@@ -56,8 +56,10 @@ export default function AuthPage() {
       console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description: error.response?.data?.error || "Failed to login. Please check your credentials.",
-        variant: "destructive"
+        description:
+          error.response?.data?.error ||
+          "Failed to login. Please check your credentials.",
+        variant: "destructive",
       });
     }
   };
@@ -107,10 +109,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input 
-                              type="email" 
+                            <Input
+                              type="email"
                               placeholder="Enter your email"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -124,10 +126,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                               type="password"
-                              placeholder="Enter your password" 
-                              {...field} 
+                              placeholder="Enter your password"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -158,9 +160,9 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                               placeholder="Enter your full name"
-                              {...field} 
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -174,10 +176,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                               type="email"
-                              placeholder="Enter your email" 
-                              {...field} 
+                              placeholder="Enter your email"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -191,10 +193,10 @@ export default function AuthPage() {
                         <FormItem>
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input 
+                            <Input
                               type="password"
-                              placeholder="Choose a strong password" 
-                              {...field} 
+                              placeholder="Choose a strong password"
+                              {...field}
                             />
                           </FormControl>
                           <FormMessage />
@@ -206,7 +208,9 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={registerMutation.isPending}
                     >
-                      {registerMutation.isPending ? "Creating Account..." : "Create Account"}
+                      {registerMutation.isPending
+                        ? "Creating Account..."
+                        : "Create Account"}
                     </Button>
                   </form>
                 </Form>
@@ -226,8 +230,9 @@ export default function AuthPage() {
           <div className="text-white">
             <h2 className="text-3xl font-bold mb-4">Grow Your PT Business</h2>
             <p className="text-lg">
-              Join hundreds of successful personal trainers using PTpal to manage
-              their clients, create workout plans, and scale their coaching business.
+              Join hundreds of successful personal trainers using PTpal to
+              manage their clients, create workout plans, and scale their
+              coaching business.
             </p>
           </div>
         </div>

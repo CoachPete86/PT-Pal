@@ -56,8 +56,9 @@ export default function FitnessTimeline() {
   return (
     <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary before:to-muted-foreground">
       {milestones?.map((milestone, index) => {
-        const Icon = categoryIcons[milestone.category as keyof typeof categoryIcons];
-        
+        const Icon =
+          categoryIcons[milestone.category as keyof typeof categoryIcons];
+
         return (
           <motion.div
             key={milestone.id}
@@ -85,10 +86,15 @@ export default function FitnessTimeline() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{milestone.title}</CardTitle>
-                    <Badge variant={
-                      milestone.status === "achieved" ? "default" :
-                      milestone.status === "in_progress" ? "secondary" : "outline"
-                    }>
+                    <Badge
+                      variant={
+                        milestone.status === "achieved"
+                          ? "default"
+                          : milestone.status === "in_progress"
+                            ? "secondary"
+                            : "outline"
+                      }
+                    >
                       {milestone.status.replace("_", " ")}
                     </Badge>
                   </div>

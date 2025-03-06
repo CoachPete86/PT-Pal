@@ -1,16 +1,48 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { User } from "@shared/schema";
-import { Loader2, UserPlus, Search, AlertCircle, Clock, ArrowUpDown, MoreHorizontal, User as UserIcon, Plus, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  UserPlus,
+  Search,
+  AlertCircle,
+  Clock,
+  ArrowUpDown,
+  MoreHorizontal,
+  User as UserIcon,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import {
   Table,
@@ -91,7 +123,7 @@ export default function ClientManagement() {
     ? clients.filter(
         (client) =>
           client.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          client.email?.toLowerCase().includes(searchQuery.toLowerCase())
+          client.email?.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : [];
 
@@ -211,7 +243,7 @@ export default function ClientManagement() {
                             {client.lastSessionDate
                               ? format(
                                   new Date(client.lastSessionDate),
-                                  "MMM d, yyyy"
+                                  "MMM d, yyyy",
                                 )
                               : "Never"}
                           </TableCell>
@@ -294,7 +326,7 @@ export default function ClientManagement() {
                               {client.lastSessionDate
                                 ? format(
                                     new Date(client.lastSessionDate),
-                                    "MMM d, yyyy"
+                                    "MMM d, yyyy",
                                   )
                                 : "Never"}
                             </TableCell>
@@ -337,9 +369,7 @@ export default function ClientManagement() {
                           (client) =>
                             client.lastSessionDate &&
                             new Date(client.lastSessionDate) <
-                              new Date(
-                                Date.now() - 30 * 24 * 60 * 60 * 1000
-                              )
+                              new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
                         ).length || 0}
                       </h3>
                     </div>
@@ -356,9 +386,7 @@ export default function ClientManagement() {
                           (client) =>
                             client.lastSessionDate &&
                             new Date(client.lastSessionDate) <
-                              new Date(
-                                Date.now() - 90 * 24 * 60 * 60 * 1000
-                              )
+                              new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
                         ).length || 0}
                       </h3>
                     </div>
@@ -371,10 +399,7 @@ export default function ClientManagement() {
       </Tabs>
 
       {/* Add Client Dialog */}
-      <Dialog
-        open={showAddClientDialog}
-        onOpenChange={setShowAddClientDialog}
-      >
+      <Dialog open={showAddClientDialog} onOpenChange={setShowAddClientDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Client</DialogTitle>
@@ -465,10 +490,7 @@ export default function ClientManagement() {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={addClientMutation.isLoading}
-              >
+              <Button type="submit" disabled={addClientMutation.isLoading}>
                 {addClientMutation.isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

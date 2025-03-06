@@ -11,7 +11,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export async function createSubscription(
   email: string,
   paymentMethodId: string,
-  priceId: string
+  priceId: string,
 ): Promise<{ subscriptionId: string; clientSecret: string }> {
   // Create a customer
   const customer = await stripe.customers.create({

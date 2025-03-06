@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  BarChart, Users, Calendar, Dumbbell, Trophy, 
-  MessageSquare, Heart, FileText, Settings, 
-  Menu, X, ChevronDown, ChevronRight, Home, User
+import {
+  BarChart,
+  Users,
+  Calendar,
+  Dumbbell,
+  Trophy,
+  MessageSquare,
+  Heart,
+  FileText,
+  Settings,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Home,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClientManagement } from "@/components/client-management";
 import { ClientProfile } from "@/components/client-profile";
@@ -21,74 +55,74 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navItems = [
-    { 
-      id: "dashboard", 
-      label: "Dashboard", 
+    {
+      id: "dashboard",
+      label: "Dashboard",
       icon: Home,
-      children: [] 
+      children: [],
     },
-    { 
-      id: "clients", 
-      label: "Client Management", 
+    {
+      id: "clients",
+      label: "Client Management",
       icon: Users,
       children: [
         { id: "client-list", label: "Client List" },
         { id: "add-client", label: "Add New Client" },
-        { id: "client-groups", label: "Client Groups" }
-      ]
+        { id: "client-groups", label: "Client Groups" },
+      ],
     },
-    { 
-      id: "sessions", 
-      label: "Session Tracking", 
+    {
+      id: "sessions",
+      label: "Session Tracking",
       icon: Calendar,
       children: [
         { id: "session-calendar", label: "Calendar" },
         { id: "session-history", label: "Session History" },
-        { id: "create-session", label: "Create Session" }
-      ]
+        { id: "create-session", label: "Create Session" },
+      ],
     },
-    { 
-      id: "workouts", 
-      label: "Workout Plans", 
+    {
+      id: "workouts",
+      label: "Workout Plans",
       icon: Dumbbell,
       children: [
         { id: "workout-templates", label: "Templates" },
-        { id: "create-workout", label: "Create Workout" }
-      ]
+        { id: "create-workout", label: "Create Workout" },
+      ],
     },
-    { 
-      id: "nutrition", 
-      label: "Nutrition", 
+    {
+      id: "nutrition",
+      label: "Nutrition",
       icon: Heart,
       children: [
         { id: "meal-plans", label: "Meal Plans" },
-        { id: "nutrition-tracking", label: "Tracking" }
-      ]
+        { id: "nutrition-tracking", label: "Tracking" },
+      ],
     },
-    { 
-      id: "progress", 
-      label: "Progress Tracking", 
+    {
+      id: "progress",
+      label: "Progress Tracking",
       icon: Trophy,
-      children: [] 
+      children: [],
     },
-    { 
-      id: "messages", 
-      label: "Messages", 
+    {
+      id: "messages",
+      label: "Messages",
       icon: MessageSquare,
-      children: [] 
+      children: [],
     },
-    { 
-      id: "documents", 
-      label: "Documents", 
+    {
+      id: "documents",
+      label: "Documents",
       icon: FileText,
-      children: [] 
+      children: [],
     },
-    { 
-      id: "settings", 
-      label: "Settings", 
+    {
+      id: "settings",
+      label: "Settings",
       icon: Settings,
-      children: [] 
-    }
+      children: [],
+    },
   ];
 
   const renderContent = () => {
@@ -96,64 +130,64 @@ export default function DashboardPage() {
       case "dashboard":
         return <PTpalDashboard />;
       case "clients":
-        return (
-          selectedClientId ? (
-            <ClientProfile
-              clientId={selectedClientId}
-              onClose={() => setSelectedClientId(null)}
-            />
-          ) : (
-            <div className="grid gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>Client Management</CardTitle>
-                    <CardDescription>
-                      Manage your client relationships and track their progress
-                    </CardDescription>
-                  </div>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Add New Client
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Client</DialogTitle>
-                        <DialogDescription>
-                          Enter the client's details below
-                        </DialogDescription>
-                      </DialogHeader>
-                      <ClientManagement />
-                    </DialogContent>
-                  </Dialog>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {["1", "2", "3"].map((id) => (
-                      <div
-                        key={id}
-                        className="flex items-center justify-between p-4 rounded-lg border"
-                      >
-                        <div>
-                          <h3 className="font-medium">Client {id}</h3>
-                          <p className="text-sm text-muted-foreground">client{id}@example.com</p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedClientId(id)}
-                        >
-                          View Profile
-                        </Button>
+        return selectedClientId ? (
+          <ClientProfile
+            clientId={selectedClientId}
+            onClose={() => setSelectedClientId(null)}
+          />
+        ) : (
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Client Management</CardTitle>
+                  <CardDescription>
+                    Manage your client relationships and track their progress
+                  </CardDescription>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Add New Client
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Client</DialogTitle>
+                      <DialogDescription>
+                        Enter the client's details below
+                      </DialogDescription>
+                    </DialogHeader>
+                    <ClientManagement />
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {["1", "2", "3"].map((id) => (
+                    <div
+                      key={id}
+                      className="flex items-center justify-between p-4 rounded-lg border"
+                    >
+                      <div>
+                        <h3 className="font-medium">Client {id}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          client{id}@example.com
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedClientId(id)}
+                      >
+                        View Profile
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         );
       default:
         return (
@@ -166,8 +200,13 @@ export default function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center mb-4">We're working hard to bring you this functionality soon.</p>
-                <Button className="w-full" onClick={() => setSelectedTab("dashboard")}>
+                <p className="text-center mb-4">
+                  We're working hard to bring you this functionality soon.
+                </p>
+                <Button
+                  className="w-full"
+                  onClick={() => setSelectedTab("dashboard")}
+                >
                   Return to Dashboard
                 </Button>
               </CardContent>
@@ -186,7 +225,11 @@ export default function DashboardPage() {
           size="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {sidebarOpen ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <Menu className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
@@ -207,14 +250,16 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-1">
-                {navItems.map((item) => (
+                {navItems.map((item) =>
                   item.children.length > 0 ? (
                     <Collapsible key={item.id} className="w-full">
                       <CollapsibleTrigger asChild>
                         <Button
                           variant="ghost"
                           className={`w-full justify-between ${
-                            selectedTab === item.id ? "bg-accent text-accent-foreground" : ""
+                            selectedTab === item.id
+                              ? "bg-accent text-accent-foreground"
+                              : ""
                           }`}
                           onClick={() => setSelectedTab(item.id)}
                         >
@@ -244,15 +289,17 @@ export default function DashboardPage() {
                       key={item.id}
                       variant="ghost"
                       className={`w-full justify-start ${
-                        selectedTab === item.id ? "bg-accent text-accent-foreground" : ""
+                        selectedTab === item.id
+                          ? "bg-accent text-accent-foreground"
+                          : ""
                       }`}
                       onClick={() => setSelectedTab(item.id)}
                     >
                       <item.icon className="h-4 w-4 mr-2" />
                       <span>{item.label}</span>
                     </Button>
-                  )
-                ))}
+                  ),
+                )}
               </div>
             </ScrollArea>
           </motion.div>

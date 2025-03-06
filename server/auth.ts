@@ -31,7 +31,8 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   // Generate a random session secret if one doesn't exist
-  const sessionSecret = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
+  const sessionSecret =
+    process.env.SESSION_SECRET || randomBytes(32).toString("hex");
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
@@ -41,9 +42,9 @@ export function setupAuth(app: Express) {
     cookie: {
       secure: app.get("env") === "production",
       httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
   };
 
   // Trust first proxy if in production
@@ -58,16 +59,18 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(
       {
-        usernameField: 'email',
-        passwordField: 'password'
+        usernameField: "email",
+        passwordField: "password",
       },
       async (email, password, done) => {
         try {
           console.log(`Attempting login for email: ${email}`);
           const user = await storage.getUserByEmail(email);
           if (!user) {
-            console.log('User not found during login attempt');
-            return done(null, false, { message: "Invalid credentials - no user found with this email" });
+            console.log("User not found during login attempt");
+            return done(null, false, {
+              message: "Invalid credentials - no user found with this email",
+            });
           }
           const isValid = await comparePasswords(password, user.password);
           console.log(`Password validation result: ${isValid}`);
@@ -78,44 +81,44 @@ export function setupAuth(app: Express) {
           // Ensure the user has all required fields
           const userWithDefaults = {
             ...user,
-            status: user.status || 'active',
-            preferences: user.preferences || {}
+            status: user.status || "active",
+            preferences: user.preferences || {},
           };
 
           return done(null, userWithDefaults);
         } catch (error) {
-          console.error('Login error:', error);
+          console.error("Login error:", error);
           return done(error);
         }
-      }
-    )
+      },
+    ),
   );
 
   passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user.id);
+    console.log("Serializing user:", user.id);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: number, done) => {
     try {
-      console.log('Deserializing user:', id);
+      console.log("Deserializing user:", id);
       const user = await storage.getUser(id);
       if (!user) {
-        console.log('User not found during deserialization');
+        console.log("User not found during deserialization");
         return done(null, false);
       }
-      console.log('User deserialized successfully');
+      console.log("User deserialized successfully");
 
       // Ensure user has all required fields
       const userWithDefaults = {
         ...user,
-        status: user.status || 'active',
-        preferences: user.preferences || {}
+        status: user.status || "active",
+        preferences: user.preferences || {},
       };
 
       done(null, userWithDefaults);
     } catch (error) {
-      console.error('Deserialization error:', error);
+      console.error("Deserialization error:", error);
       done(error);
     }
   });
@@ -129,20 +132,21 @@ export function setupAuth(app: Express) {
       if (existingUser) {
         return res.status(400).json({
           error: "Email already registered",
-          message: "This email is already registered. Please try logging in instead."
+          message:
+            "This email is already registered. Please try logging in instead.",
         });
       }
 
       const hashedPassword = await hashPassword(password);
       const user = await storage.createUser({
         email,
-        username: email.split('@')[0],
+        username: email.split("@")[0],
         password: hashedPassword,
         fullName,
         role: "trainer",
         subscriptionTier: "free",
         subscriptionStatus: "active",
-        status: "active" // Added status field here
+        status: "active", // Added status field here
       });
 
       req.login(user, (err) => {
@@ -157,30 +161,35 @@ export function setupAuth(app: Express) {
       console.error("Registration error:", error);
       res.status(500).json({
         error: "Failed to register user",
-        message: error.message
+        message: error.message,
       });
     }
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
-      if (err) {
-        console.error("Login error:", err);
-        return res.status(500).json({ error: "Internal server error" });
-      }
-      if (!user) {
-        return res.status(401).json({ error: info?.message || "Invalid credentials" });
-      }
-      req.login(user, (err) => {
+    passport.authenticate(
+      "local",
+      (err: any, user: Express.User | false, info: any) => {
         if (err) {
-          console.error("Session error:", err);
-          return res.status(500).json({ error: "Failed to create session" });
+          console.error("Login error:", err);
+          return res.status(500).json({ error: "Internal server error" });
         }
-        // Remove password from response
-        const { password, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
-      });
-    })(req, res, next);
+        if (!user) {
+          return res
+            .status(401)
+            .json({ error: info?.message || "Invalid credentials" });
+        }
+        req.login(user, (err) => {
+          if (err) {
+            console.error("Session error:", err);
+            return res.status(500).json({ error: "Failed to create session" });
+          }
+          // Remove password from response
+          const { password, ...userWithoutPassword } = user;
+          res.status(200).json(userWithoutPassword);
+        });
+      },
+    )(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -197,16 +206,16 @@ export function setupAuth(app: Express) {
           console.error("Session destruction error:", err);
           return next(err);
         }
-        res.clearCookie('connect.sid');
+        res.clearCookie("connect.sid");
         res.sendStatus(200);
       });
     });
   });
 
   app.get("/api/user", (req, res) => {
-    console.log('GET /api/user - isAuthenticated:', req.isAuthenticated());
-    console.log('Session:', req.session);
-    console.log('User:', req.user);
+    console.log("GET /api/user - isAuthenticated:", req.isAuthenticated());
+    console.log("Session:", req.session);
+    console.log("User:", req.user);
 
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });

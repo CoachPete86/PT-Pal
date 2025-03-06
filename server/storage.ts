@@ -1,14 +1,51 @@
-import { 
-  users, workspaces, messages, bookings, fitnessJourney, documents, workoutPlans, sessionPackages, completedSessions,
-  onboardingForms, formResponses, clientGoals, documentTemplates, generatedDocuments,
-  type User, type InsertUser, type Workspace, type InsertWorkspace,
-  type Message, type Booking, type FitnessJourney, type InsertFitnessJourney,
-  type Document, type InsertDocument, type WorkoutPlan, type InsertWorkoutPlan,
-  type SessionPackage, type CompletedSession, type OnboardingForm, type InsertOnboardingForm,
-  type FormResponse, type InsertFormResponse, type ClientGoal, type InsertClientGoal,
-  type DocumentTemplate, type InsertDocumentTemplate, type GeneratedDocument, type InsertGeneratedDocument,
-  branding, type Branding, type InsertBranding,
-  type PaymentReminder, type InsertPaymentReminder, type ClientAnalytics, type InsertClientAnalytics, type ProgressMetrics, type InsertProgressMetrics,
+import {
+  users,
+  workspaces,
+  messages,
+  bookings,
+  fitnessJourney,
+  documents,
+  workoutPlans,
+  sessionPackages,
+  completedSessions,
+  onboardingForms,
+  formResponses,
+  clientGoals,
+  documentTemplates,
+  generatedDocuments,
+  type User,
+  type InsertUser,
+  type Workspace,
+  type InsertWorkspace,
+  type Message,
+  type Booking,
+  type FitnessJourney,
+  type InsertFitnessJourney,
+  type Document,
+  type InsertDocument,
+  type WorkoutPlan,
+  type InsertWorkoutPlan,
+  type SessionPackage,
+  type CompletedSession,
+  type OnboardingForm,
+  type InsertOnboardingForm,
+  type FormResponse,
+  type InsertFormResponse,
+  type ClientGoal,
+  type InsertClientGoal,
+  type DocumentTemplate,
+  type InsertDocumentTemplate,
+  type GeneratedDocument,
+  type InsertGeneratedDocument,
+  branding,
+  type Branding,
+  type InsertBranding,
+  type PaymentReminder,
+  type InsertPaymentReminder,
+  type ClientAnalytics,
+  type InsertClientAnalytics,
+  type ProgressMetrics,
+  type InsertProgressMetrics,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, sql } from "drizzle-orm";
@@ -35,7 +72,10 @@ export interface IStorage {
     remainingSessions: number;
     expiryDate?: Date;
   }): Promise<SessionPackage>;
-  updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage>;
+  updateSessionPackage(
+    id: number,
+    data: Partial<SessionPackage>,
+  ): Promise<SessionPackage>;
   completeSession(data: {
     packageId: number;
     date: Date;
@@ -51,9 +91,15 @@ export interface IStorage {
   updateWorkspace(id: number, data: Partial<Workspace>): Promise<Workspace>;
 
   // Workout Plans
-  getWorkoutPlans(workspaceId: number, clientId?: number): Promise<WorkoutPlan[]>;
+  getWorkoutPlans(
+    workspaceId: number,
+    clientId?: number,
+  ): Promise<WorkoutPlan[]>;
   createWorkoutPlan(plan: InsertWorkoutPlan): Promise<WorkoutPlan>;
-  updateWorkoutPlan(id: number, data: Partial<WorkoutPlan>): Promise<WorkoutPlan>;
+  updateWorkoutPlan(
+    id: number,
+    data: Partial<WorkoutPlan>,
+  ): Promise<WorkoutPlan>;
 
   // Messages
   getMessages(workspaceId: number, userId: number): Promise<Message[]>;
@@ -65,8 +111,13 @@ export interface IStorage {
   updateBooking(id: number, data: Partial<Booking>): Promise<Booking>;
 
   // Fitness Journey
-  getFitnessJourney(workspaceId: number, clientId: number): Promise<FitnessJourney[]>;
-  createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney>;
+  getFitnessJourney(
+    workspaceId: number,
+    clientId: number,
+  ): Promise<FitnessJourney[]>;
+  createFitnessJourneyEntry(
+    entry: InsertFitnessJourney,
+  ): Promise<FitnessJourney>;
 
   // Documents
   getDocuments(workspaceId: number, clientId?: number): Promise<Document[]>;
@@ -79,14 +130,20 @@ export interface IStorage {
   // Onboarding Form Management
   getOnboardingForms(workspaceId: number): Promise<OnboardingForm[]>;
   createOnboardingForm(form: InsertOnboardingForm): Promise<OnboardingForm>;
-  updateOnboardingForm(id: number, data: Partial<OnboardingForm>): Promise<OnboardingForm>;
+  updateOnboardingForm(
+    id: number,
+    data: Partial<OnboardingForm>,
+  ): Promise<OnboardingForm>;
   deleteOnboardingForm(id: number): Promise<void>;
 
   // Form Responses
   getFormResponses(formId: number): Promise<FormResponse[]>;
   getClientFormResponses(clientId: number): Promise<FormResponse[]>;
   createFormResponse(response: InsertFormResponse): Promise<FormResponse>;
-  updateFormResponse(id: number, data: Partial<FormResponse>): Promise<FormResponse>;
+  updateFormResponse(
+    id: number,
+    data: Partial<FormResponse>,
+  ): Promise<FormResponse>;
 
   // Client Goals
   getClientGoals(clientId: number): Promise<ClientGoal[]>;
@@ -95,14 +152,28 @@ export interface IStorage {
 
   // Document Templates
   getDocumentTemplates(workspaceId: number): Promise<DocumentTemplate[]>;
-  createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate>;
-  updateDocumentTemplate(id: number, data: Partial<DocumentTemplate>): Promise<DocumentTemplate>;
+  createDocumentTemplate(
+    template: InsertDocumentTemplate,
+  ): Promise<DocumentTemplate>;
+  updateDocumentTemplate(
+    id: number,
+    data: Partial<DocumentTemplate>,
+  ): Promise<DocumentTemplate>;
 
   // Generated Documents
   getGeneratedDocuments(clientId: number): Promise<GeneratedDocument[]>;
-  createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument>;
-  updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument>;
-  signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument>;
+  createGeneratedDocument(
+    document: InsertGeneratedDocument,
+  ): Promise<GeneratedDocument>;
+  updateGeneratedDocument(
+    id: number,
+    data: Partial<GeneratedDocument>,
+  ): Promise<GeneratedDocument>;
+  signDocument(
+    id: number,
+    signature: string,
+    role: "client" | "trainer",
+  ): Promise<GeneratedDocument>;
 }
 
 const PostgresSessionStore = connectPg(session);
@@ -113,25 +184,28 @@ export class DatabaseStorage implements IStorage {
   constructor() {
     this.sessionStore = new PostgresSessionStore({
       pool,
-      tableName: 'session',
-      createTableIfMissing: true
+      tableName: "session",
+      createTableIfMissing: true,
     });
   }
 
   // User Management
   async getUser(id: number): Promise<User | undefined> {
     const results = await db.select().from(users).where(eq(users.id, id));
-    return results.length > 0 ? results[0] as User : undefined;
+    return results.length > 0 ? (results[0] as User) : undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const results = await db.select().from(users).where(eq(users.username, username));
-    return results.length > 0 ? results[0] as User : undefined;
+    const results = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+    return results.length > 0 ? (results[0] as User) : undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const results = await db.select().from(users).where(eq(users.email, email));
-    return results.length > 0 ? results[0] as User : undefined;
+    return results.length > 0 ? (results[0] as User) : undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -152,10 +226,7 @@ export class DatabaseStorage implements IStorage {
     const results = await db
       .select()
       .from(users)
-      .where(and(
-        eq(users.role, "client"),
-        eq(users.trainerId, trainerId)
-      ))
+      .where(and(eq(users.role, "client"), eq(users.trainerId, trainerId)))
       .orderBy(desc(users.id));
     return results as User[];
   }
@@ -174,7 +245,7 @@ export class DatabaseStorage implements IStorage {
     const results = await db
       .insert(users)
       .values({
-        username: data.email.split('@')[0],
+        username: data.email.split("@")[0],
         email: data.email,
         fullName: data.fullName,
         role: "client" as const,
@@ -185,8 +256,8 @@ export class DatabaseStorage implements IStorage {
         status: "active" as const,
         preferences: {
           goals: data.goals,
-          healthConditions: data.healthConditions
-        }
+          healthConditions: data.healthConditions,
+        },
       })
       .returning();
     return results[0] as User;
@@ -198,26 +269,28 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(workspaces)
       .where(eq(workspaces.id, id));
-    return results.length > 0 ? results[0] as Workspace : undefined;
+    return results.length > 0 ? (results[0] as Workspace) : undefined;
   }
 
-  async getWorkspaceByTrainer(trainerId: number): Promise<Workspace | undefined> {
+  async getWorkspaceByTrainer(
+    trainerId: number,
+  ): Promise<Workspace | undefined> {
     const results = await db
       .select()
       .from(workspaces)
       .where(eq(workspaces.trainerId, trainerId));
-    return results.length > 0 ? results[0] as Workspace : undefined;
+    return results.length > 0 ? (results[0] as Workspace) : undefined;
   }
 
   async createWorkspace(workspace: InsertWorkspace): Promise<Workspace> {
-    const results = await db
-      .insert(workspaces)
-      .values(workspace)
-      .returning();
+    const results = await db.insert(workspaces).values(workspace).returning();
     return results[0] as Workspace;
   }
 
-  async updateWorkspace(id: number, data: Partial<Workspace>): Promise<Workspace> {
+  async updateWorkspace(
+    id: number,
+    data: Partial<Workspace>,
+  ): Promise<Workspace> {
     const results = await db
       .update(workspaces)
       .set(data)
@@ -227,7 +300,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Workout Plans
-  async getWorkoutPlans(workspaceId: number, clientId?: number): Promise<WorkoutPlan[]> {
+  async getWorkoutPlans(
+    workspaceId: number,
+    clientId?: number,
+  ): Promise<WorkoutPlan[]> {
     let query = db
       .select()
       .from(workoutPlans)
@@ -252,7 +328,10 @@ export class DatabaseStorage implements IStorage {
     return newPlan;
   }
 
-  async updateWorkoutPlan(id: number, data: Partial<WorkoutPlan>): Promise<WorkoutPlan> {
+  async updateWorkoutPlan(
+    id: number,
+    data: Partial<WorkoutPlan>,
+  ): Promise<WorkoutPlan> {
     const [plan] = await db
       .update(workoutPlans)
       .set(data)
@@ -269,17 +348,19 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(messages.workspaceId, workspaceId),
-          or(
-            eq(messages.senderId, userId),
-            eq(messages.recipientId, userId)
-          )
-        )
+          or(eq(messages.senderId, userId), eq(messages.recipientId, userId)),
+        ),
       )
       .orderBy(desc(messages.timestamp));
   }
 
   async createMessage(message: Partial<Message>): Promise<Message> {
-    if (!message.content || !message.senderId || !message.recipientId || !message.workspaceId) {
+    if (
+      !message.content ||
+      !message.senderId ||
+      !message.recipientId ||
+      !message.workspaceId
+    ) {
       throw new Error("Missing required message fields");
     }
 
@@ -291,14 +372,17 @@ export class DatabaseStorage implements IStorage {
         recipientId: message.recipientId,
         workspaceId: message.workspaceId,
         timestamp: new Date(),
-        isRead: false
+        isRead: false,
       })
       .returning();
     return newMessage;
   }
 
   // Bookings
-  async getBookings(workspaceId: number, clientId?: number): Promise<Booking[]> {
+  async getBookings(
+    workspaceId: number,
+    clientId?: number,
+  ): Promise<Booking[]> {
     let query = db
       .select()
       .from(bookings)
@@ -312,10 +396,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(booking: Partial<Booking>): Promise<Booking> {
-    const [newBooking] = await db
-      .insert(bookings)
-      .values(booking)
-      .returning();
+    const [newBooking] = await db.insert(bookings).values(booking).returning();
     return newBooking;
   }
 
@@ -329,25 +410,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Fitness Journey
-  async getFitnessJourney(workspaceId: number, clientId: number): Promise<FitnessJourney[]> {
+  async getFitnessJourney(
+    workspaceId: number,
+    clientId: number,
+  ): Promise<FitnessJourney[]> {
     return db
       .select()
       .from(fitnessJourney)
       .where(
         and(
           eq(fitnessJourney.workspaceId, workspaceId),
-          eq(fitnessJourney.clientId, clientId)
-        )
+          eq(fitnessJourney.clientId, clientId),
+        ),
       )
       .orderBy(desc(fitnessJourney.date));
   }
 
-  async createFitnessJourneyEntry(entry: InsertFitnessJourney): Promise<FitnessJourney> {
+  async createFitnessJourneyEntry(
+    entry: InsertFitnessJourney,
+  ): Promise<FitnessJourney> {
     const [newEntry] = await db
       .insert(fitnessJourney)
       .values({
         ...entry,
-        date: new Date(entry.date)
+        date: new Date(entry.date),
       })
       .returning();
     return newEntry;
@@ -380,7 +466,10 @@ export class DatabaseStorage implements IStorage {
     return pkg;
   }
 
-  async updateSessionPackage(id: number, data: Partial<SessionPackage>): Promise<SessionPackage> {
+  async updateSessionPackage(
+    id: number,
+    data: Partial<SessionPackage>,
+  ): Promise<SessionPackage> {
     const [pkg] = await db
       .update(sessionPackages)
       .set(data)
@@ -403,7 +492,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(sessionPackages.id, data.packageId));
 
     if (!pkg || pkg.remainingSessions <= 0) {
-      throw new Error('No remaining sessions available');
+      throw new Error("No remaining sessions available");
     }
 
     await this.updateSessionPackage(data.packageId, {
@@ -419,7 +508,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Documents
-  async getDocuments(workspaceId: number, clientId?: number): Promise<Document[]> {
+  async getDocuments(
+    workspaceId: number,
+    clientId?: number,
+  ): Promise<Document[]> {
     let query = db
       .select()
       .from(documents)
@@ -468,7 +560,6 @@ export class DatabaseStorage implements IStorage {
     return doc;
   }
 
-
   //Onboarding Forms
   async getOnboardingForms(workspaceId: number): Promise<OnboardingForm[]> {
     return db
@@ -478,15 +569,17 @@ export class DatabaseStorage implements IStorage {
       .orderBy(onboardingForms.order);
   }
 
-  async createOnboardingForm(form: InsertOnboardingForm): Promise<OnboardingForm> {
-    const [newForm] = await db
-      .insert(onboardingForms)
-      .values(form)
-      .returning();
+  async createOnboardingForm(
+    form: InsertOnboardingForm,
+  ): Promise<OnboardingForm> {
+    const [newForm] = await db.insert(onboardingForms).values(form).returning();
     return newForm;
   }
 
-  async updateOnboardingForm(id: number, data: Partial<OnboardingForm>): Promise<OnboardingForm> {
+  async updateOnboardingForm(
+    id: number,
+    data: Partial<OnboardingForm>,
+  ): Promise<OnboardingForm> {
     const [form] = await db
       .update(onboardingForms)
       .set({ ...data, updatedAt: new Date() })
@@ -496,9 +589,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteOnboardingForm(id: number): Promise<void> {
-    await db
-      .delete(onboardingForms)
-      .where(eq(onboardingForms.id, id));
+    await db.delete(onboardingForms).where(eq(onboardingForms.id, id));
   }
 
   //Form Responses
@@ -518,7 +609,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(formResponses.submittedAt));
   }
 
-  async createFormResponse(response: InsertFormResponse): Promise<FormResponse> {
+  async createFormResponse(
+    response: InsertFormResponse,
+  ): Promise<FormResponse> {
     const [newResponse] = await db
       .insert(formResponses)
       .values(response)
@@ -526,7 +619,10 @@ export class DatabaseStorage implements IStorage {
     return newResponse;
   }
 
-  async updateFormResponse(id: number, data: Partial<FormResponse>): Promise<FormResponse> {
+  async updateFormResponse(
+    id: number,
+    data: Partial<FormResponse>,
+  ): Promise<FormResponse> {
     const [response] = await db
       .update(formResponses)
       .set(data)
@@ -549,19 +645,22 @@ export class DatabaseStorage implements IStorage {
       .insert(clientGoals)
       .values({
         ...goal,
-        targetDate: new Date(goal.targetDate)
+        targetDate: new Date(goal.targetDate),
       })
       .returning();
     return newGoal;
   }
 
-  async updateClientGoal(id: number, data: Partial<ClientGoal>): Promise<ClientGoal> {
+  async updateClientGoal(
+    id: number,
+    data: Partial<ClientGoal>,
+  ): Promise<ClientGoal> {
     const [goal] = await db
       .update(clientGoals)
       .set({
         ...data,
         updatedAt: new Date(),
-        targetDate: data.targetDate ? new Date(data.targetDate) : undefined
+        targetDate: data.targetDate ? new Date(data.targetDate) : undefined,
       })
       .where(eq(clientGoals.id, id))
       .returning();
@@ -577,7 +676,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(documentTemplates.updatedAt));
   }
 
-  async createDocumentTemplate(template: InsertDocumentTemplate): Promise<DocumentTemplate> {
+  async createDocumentTemplate(
+    template: InsertDocumentTemplate,
+  ): Promise<DocumentTemplate> {
     const [newTemplate] = await db
       .insert(documentTemplates)
       .values(template)
@@ -585,12 +686,15 @@ export class DatabaseStorage implements IStorage {
     return newTemplate;
   }
 
-  async updateDocumentTemplate(id: number, data: Partial<DocumentTemplate>): Promise<DocumentTemplate> {
+  async updateDocumentTemplate(
+    id: number,
+    data: Partial<DocumentTemplate>,
+  ): Promise<DocumentTemplate> {
     const [template] = await db
       .update(documentTemplates)
       .set({
         ...data,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(eq(documentTemplates.id, id))
       .returning();
@@ -606,7 +710,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(generatedDocuments.createdAt));
   }
 
-  async createGeneratedDocument(document: InsertGeneratedDocument): Promise<GeneratedDocument> {
+  async createGeneratedDocument(
+    document: InsertGeneratedDocument,
+  ): Promise<GeneratedDocument> {
     const [newDocument] = await db
       .insert(generatedDocuments)
       .values(document)
@@ -614,7 +720,10 @@ export class DatabaseStorage implements IStorage {
     return newDocument;
   }
 
-  async updateGeneratedDocument(id: number, data: Partial<GeneratedDocument>): Promise<GeneratedDocument> {
+  async updateGeneratedDocument(
+    id: number,
+    data: Partial<GeneratedDocument>,
+  ): Promise<GeneratedDocument> {
     const [document] = await db
       .update(generatedDocuments)
       .set(data)
@@ -623,18 +732,24 @@ export class DatabaseStorage implements IStorage {
     return document;
   }
 
-  async signDocument(id: number, signature: string, role: 'client' | 'trainer'): Promise<GeneratedDocument> {
+  async signDocument(
+    id: number,
+    signature: string,
+    role: "client" | "trainer",
+  ): Promise<GeneratedDocument> {
     const now = new Date();
     const [document] = await db
       .update(generatedDocuments)
       .set({
-        ...(role === 'client' ? {
-          signedByClient: true,
-          clientSignature: signature,
-        } : {
-          signedByTrainer: true,
-          trainerSignature: signature,
-        }),
+        ...(role === "client"
+          ? {
+              signedByClient: true,
+              clientSignature: signature,
+            }
+          : {
+              signedByTrainer: true,
+              trainerSignature: signature,
+            }),
         signedAt: now,
       })
       .where(eq(generatedDocuments.id, id))
@@ -684,7 +799,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(paymentReminders.dueDate));
   }
 
-  async createPaymentReminder(reminder: InsertPaymentReminder): Promise<PaymentReminder> {
+  async createPaymentReminder(
+    reminder: InsertPaymentReminder,
+  ): Promise<PaymentReminder> {
     const [newReminder] = await db
       .insert(paymentReminders)
       .values(reminder)
@@ -692,7 +809,10 @@ export class DatabaseStorage implements IStorage {
     return newReminder;
   }
 
-  async updatePaymentReminder(id: number, data: Partial<PaymentReminder>): Promise<PaymentReminder> {
+  async updatePaymentReminder(
+    id: number,
+    data: Partial<PaymentReminder>,
+  ): Promise<PaymentReminder> {
     const [reminder] = await db
       .update(paymentReminders)
       .set(data)
@@ -708,27 +828,32 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(paymentReminders.status, "pending"),
-          sql`${paymentReminders.dueDate} < NOW()`
-        )
+          sql`${paymentReminders.dueDate} < NOW()`,
+        ),
       )
       .orderBy(paymentReminders.dueDate);
   }
 
   // Client Analytics Implementation
-  async getClientAnalytics(workspaceId: number, clientId: number): Promise<ClientAnalytics[]> {
+  async getClientAnalytics(
+    workspaceId: number,
+    clientId: number,
+  ): Promise<ClientAnalytics[]> {
     return db
       .select()
       .from(clientAnalytics)
       .where(
         and(
           eq(clientAnalytics.workspaceId, workspaceId),
-          eq(clientAnalytics.clientId, clientId)
-        )
+          eq(clientAnalytics.clientId, clientId),
+        ),
       )
       .orderBy(desc(clientAnalytics.endDate));
   }
 
-  async createClientAnalytics(analytics: InsertClientAnalytics): Promise<ClientAnalytics> {
+  async createClientAnalytics(
+    analytics: InsertClientAnalytics,
+  ): Promise<ClientAnalytics> {
     const [newAnalytics] = await db
       .insert(clientAnalytics)
       .values(analytics)
@@ -736,7 +861,10 @@ export class DatabaseStorage implements IStorage {
     return newAnalytics;
   }
 
-  async updateClientAnalytics(id: number, data: Partial<ClientAnalytics>): Promise<ClientAnalytics> {
+  async updateClientAnalytics(
+    id: number,
+    data: Partial<ClientAnalytics>,
+  ): Promise<ClientAnalytics> {
     const [analytics] = await db
       .update(clientAnalytics)
       .set({
@@ -749,7 +877,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Progress Metrics Implementation
-  async getProgressMetrics(clientId: number, category?: string): Promise<ProgressMetrics[]> {
+  async getProgressMetrics(
+    clientId: number,
+    category?: string,
+  ): Promise<ProgressMetrics[]> {
     let query = db
       .select()
       .from(progressMetrics)
@@ -762,7 +893,9 @@ export class DatabaseStorage implements IStorage {
     return query.orderBy(desc(progressMetrics.date));
   }
 
-  async createProgressMetric(metric: InsertProgressMetrics): Promise<ProgressMetrics> {
+  async createProgressMetric(
+    metric: InsertProgressMetrics,
+  ): Promise<ProgressMetrics> {
     const [newMetric] = await db
       .insert(progressMetrics)
       .values(metric)
@@ -773,7 +906,7 @@ export class DatabaseStorage implements IStorage {
   async getClientProgress(
     clientId: number,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<ProgressMetrics[]> {
     return db
       .select()
@@ -781,8 +914,8 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(progressMetrics.clientId, clientId),
-          sql`${progressMetrics.date} BETWEEN ${startDate} AND ${endDate}`
-        )
+          sql`${progressMetrics.date} BETWEEN ${startDate} AND ${endDate}`,
+        ),
       )
       .orderBy(progressMetrics.date);
   }

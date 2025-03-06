@@ -11,12 +11,12 @@ async function createTestUser() {
       role: "trainer",
       subscriptionTier: "free",
       subscriptionStatus: "active",
-      status: "active", 
+      status: "active",
       fullName: "Test User",
       preferences: {
         goals: ["Test goals"],
         healthConditions: ["None"],
-      }
+      },
     });
     console.log("Test user created successfully:", user);
   } catch (error) {

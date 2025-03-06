@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -10,7 +9,7 @@ export function ThemeToggle() {
 
   return (
     <Toggle
-      variant="outline" 
+      variant="outline"
       aria-label="Toggle theme"
       className="rounded-full w-9 p-0"
       pressed={theme === "dark"}

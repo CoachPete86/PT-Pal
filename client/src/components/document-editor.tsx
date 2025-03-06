@@ -12,7 +12,7 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Placeholder from "@tiptap/extension-placeholder";
-import { common, createLowlight } from 'lowlight'
+import { common, createLowlight } from "lowlight";
 import { Button } from "@/components/ui/button";
 import {
   Bold,
@@ -35,8 +35,8 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { Command } from "@/components/ui/command";
 import { useState, useCallback } from "react";
-import { Extension } from '@tiptap/core';
-import Suggestion from '@tiptap/suggestion';
+import { Extension } from "@tiptap/core";
+import Suggestion from "@tiptap/suggestion";
 import { InsertDocument } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -45,21 +45,42 @@ import { useToast } from "@/hooks/use-toast";
 const lowlight = createLowlight(common);
 
 const SlashCommand = Extension.create({
-  name: 'slashCommand',
+  name: "slashCommand",
   addProseMirrorPlugins() {
     return [
       Suggestion({
         editor: this.editor,
-        char: '/',
-        items: ({ query }) => [
-          { title: 'Heading 1', command: ({ editor }) => editor.chain().focus().toggleHeading({ level: 1 }).run() },
-          { title: 'Heading 2', command: ({ editor }) => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-          { title: 'Task List', command: ({ editor }) => editor.chain().focus().toggleTaskList().run() },
-          { title: 'Table', command: ({ editor }) => editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run() },
-          { title: 'Code Block', command: ({ editor }) => editor.chain().focus().toggleCodeBlock().run() },
-        ].filter(item =>
-          item.title.toLowerCase().includes(query.toLowerCase())
-        ),
+        char: "/",
+        items: ({ query }) =>
+          [
+            {
+              title: "Heading 1",
+              command: ({ editor }) =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run(),
+            },
+            {
+              title: "Heading 2",
+              command: ({ editor }) =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run(),
+            },
+            {
+              title: "Task List",
+              command: ({ editor }) =>
+                editor.chain().focus().toggleTaskList().run(),
+            },
+            {
+              title: "Table",
+              command: ({ editor }) =>
+                editor.chain().focus().insertTable({ rows: 3, cols: 3 }).run(),
+            },
+            {
+              title: "Code Block",
+              command: ({ editor }) =>
+                editor.chain().focus().toggleCodeBlock().run(),
+            },
+          ].filter((item) =>
+            item.title.toLowerCase().includes(query.toLowerCase()),
+          ),
       }),
     ];
   },
@@ -81,12 +102,12 @@ export default function DocumentEditor({
   // Load template content based on documentId if it's one of our template documents
   const templateContent = React.useMemo(() => {
     if (documentId && documentId < 0) {
-      switch(documentId) {
+      switch (documentId) {
         case -1: // Session Plan Template
           return `<h1>Session Plan Template</h1>
 <h2>Client Information</h2>
 <p>Client Name: </p>
-<p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
+<p>Date: ${new Date().toLocaleDateString("en-GB")}</p>
 <p>Session Type: </p>
 
 <h2>Session Goals</h2>
@@ -133,7 +154,7 @@ export default function DocumentEditor({
         case -2: // PAR-Q Health Questionnaire
           return `<h1>PAR-Q Health Questionnaire</h1>
 <p>Physical Activity Readiness Questionnaire (PAR-Q)</p>
-<p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
+<p>Date: ${new Date().toLocaleDateString("en-GB")}</p>
 
 <h2>Personal Information</h2>
 <p>Name: </p>
@@ -166,7 +187,7 @@ export default function DocumentEditor({
 <p>Date: ____________________</p>`;
         case -3: // Initial Consultation Form
           return `<h1>Initial Consultation Form</h1>
-<p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
+<p>Date: ${new Date().toLocaleDateString("en-GB")}</p>
 
 <h2>Personal Information</h2>
 <p>Name: </p>
@@ -223,7 +244,7 @@ export default function DocumentEditor({
 <p>Date: ____________________</p>`;
         case -4: // Client Contract
           return `<h1>Client Contract & Terms</h1>
-<p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
+<p>Date: ${new Date().toLocaleDateString("en-GB")}</p>
 
 <h2>Parties</h2>
 <p>This agreement is between:</p>
@@ -284,7 +305,7 @@ export default function DocumentEditor({
 <p>Date: ____________________</p>`;
         case -5: // Fitness Assessment Form
           return `<h1>Fitness Assessment Form</h1>
-<p>Date: ${new Date().toLocaleDateString('en-GB')}</p>
+<p>Date: ${new Date().toLocaleDateString("en-GB")}</p>
 
 <h2>Client Information</h2>
 <p>Name: </p>
@@ -352,11 +373,16 @@ export default function DocumentEditor({
   }, [documentId, initialContent]);
   const { toast } = useToast();
   const [showCommandMenu, setShowCommandMenu] = useState(false);
-  const [commandMenuPosition, setCommandMenuPosition] = useState<{ left: number; top: number } | null>(null);
+  const [commandMenuPosition, setCommandMenuPosition] = useState<{
+    left: number;
+    top: number;
+  } | null>(null);
 
   const saveMutation = useMutation({
     mutationFn: async (data: InsertDocument & { notionSync?: boolean }) => {
-      const endpoint = documentId ? `/api/documents/${documentId}` : "/api/documents";
+      const endpoint = documentId
+        ? `/api/documents/${documentId}`
+        : "/api/documents";
       const method = documentId ? "PATCH" : "POST";
 
       if (notionPageId && data.notionSync) {
@@ -381,7 +407,7 @@ export default function DocumentEditor({
           content: editor?.getHTML() || "",
           type: "general",
           workspaceId: 1, // Will be replaced by actual workspace ID in real usage
-          trainerId: 1,   // Will be replaced by actual trainer ID in real usage
+          trainerId: 1, // Will be replaced by actual trainer ID in real usage
         });
       }
     },
@@ -414,7 +440,8 @@ export default function DocumentEditor({
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to get assistant response. Premium service required.",
+        description:
+          "Failed to get assistant response. Premium service required.",
         variant: "destructive",
       });
     },
@@ -451,7 +478,8 @@ export default function DocumentEditor({
     content: templateContent,
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] px-4 py-2",
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] px-4 py-2",
       },
     },
   });
@@ -467,21 +495,27 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 1 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
           >
             <Heading1 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 2 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
           >
             <Heading2 className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 3 })}
-            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run()
+            }
           >
             <Heading3 className="h-4 w-4" />
           </Toggle>
@@ -515,21 +549,27 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("bulletList")}
-            onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleBulletList().run()
+            }
           >
             <List className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("orderedList")}
-            onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleOrderedList().run()
+            }
           >
             <ListOrdered className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("taskList")}
-            onPressedChange={() => editor.chain().focus().toggleTaskList().run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleTaskList().run()
+            }
           >
             <CheckSquare className="h-4 w-4" />
           </Toggle>
@@ -539,21 +579,31 @@ export default function DocumentEditor({
           <Toggle
             size="sm"
             pressed={editor.isActive("blockquote")}
-            onPressedChange={() => editor.chain().focus().toggleBlockquote().run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleBlockquote().run()
+            }
           >
             <Quote className="h-4 w-4" />
           </Toggle>
           <Toggle
             size="sm"
             pressed={editor.isActive("codeBlock")}
-            onPressedChange={() => editor.chain().focus().toggleCodeBlock().run()}
+            onPressedChange={() =>
+              editor.chain().focus().toggleCodeBlock().run()
+            }
           >
             <Code className="h-4 w-4" />
           </Toggle>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+            onClick={() =>
+              editor
+                .chain()
+                .focus()
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                .run()
+            }
           >
             <TableIcon className="h-4 w-4" />
           </Button>
@@ -579,7 +629,10 @@ export default function DocumentEditor({
         </div>
       </div>
 
-      <EditorContent editor={editor} className="min-h-[500px] border rounded-md" />
+      <EditorContent
+        editor={editor}
+        className="min-h-[500px] border rounded-md"
+      />
 
       <div className="flex justify-end gap-2">
         {notionPageId && (
@@ -591,7 +644,7 @@ export default function DocumentEditor({
                 content: editor.getHTML(),
                 type: "general",
                 workspaceId: 1, // Will be replaced by actual workspace ID in real usage
-                trainerId: 1,   // Will be replaced by actual trainer ID in real usage
+                trainerId: 1, // Will be replaced by actual trainer ID in real usage
                 notionSync: true,
               })
             }
@@ -607,7 +660,7 @@ export default function DocumentEditor({
               content: editor.getHTML(),
               type: "general",
               workspaceId: 1, // Will be replaced by actual workspace ID in real usage
-              trainerId: 1,   // Will be replaced by actual trainer ID in real usage
+              trainerId: 1, // Will be replaced by actual trainer ID in real usage
             })
           }
           disabled={saveMutation.isPending}

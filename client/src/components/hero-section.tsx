@@ -26,13 +26,17 @@ export default function HeroSection() {
             </span>
           </h1>
           <p className="text-xl mb-8 text-gray-200">
-            Manage your clients, create workout programmes, track progress, and grow your PT 
-            business - all in one place. PTpal is your ultimate coaching companion designed 
-            specifically for personal trainers and gym instructors.
+            Manage your clients, create workout programmes, track progress, and
+            grow your PT business - all in one place. PTpal is your ultimate
+            coaching companion designed specifically for personal trainers and
+            gym instructors.
           </p>
           <div className="flex gap-4">
             <Link href="/auth">
-              <Button size="lg" className="text-lg bg-zinc-900 hover:bg-zinc-800 transition-all duration-300">
+              <Button
+                size="lg"
+                className="text-lg bg-zinc-900 hover:bg-zinc-800 transition-all duration-300"
+              >
                 Start Free Trial
               </Button>
             </Link>

@@ -8,56 +8,59 @@ import {
 import { cn } from "@/lib/utils";
 
 // Character emoji mapping
-export type TooltipCharacter = 
-  | "coach" 
-  | "nutritionist" 
-  | "scientist" 
+export type TooltipCharacter =
+  | "coach"
+  | "nutritionist"
+  | "scientist"
   | "gym-buddy"
   | "yoga-instructor"
   | "physio";
 
-const characterConfig: Record<TooltipCharacter, {
-  emoji: string;
-  name: string;
-  color: string;
-  bubbleStyle: string;
-}> = {
-  "coach": {
+const characterConfig: Record<
+  TooltipCharacter,
+  {
+    emoji: string;
+    name: string;
+    color: string;
+    bubbleStyle: string;
+  }
+> = {
+  coach: {
     emoji: "🧢",
     name: "Coach Pete",
     color: "bg-blue-100 border-blue-300 text-blue-800",
-    bubbleStyle: "rounded-tl-none"
+    bubbleStyle: "rounded-tl-none",
   },
-  "nutritionist": {
+  nutritionist: {
     emoji: "🍎",
     name: "Natalie",
     color: "bg-green-100 border-green-300 text-green-800",
-    bubbleStyle: "rounded-tr-none"
+    bubbleStyle: "rounded-tr-none",
   },
-  "scientist": {
+  scientist: {
     emoji: "🧪",
     name: "Dr. Fit",
     color: "bg-purple-100 border-purple-300 text-purple-800",
-    bubbleStyle: "rounded-bl-none"
+    bubbleStyle: "rounded-bl-none",
   },
   "gym-buddy": {
     emoji: "💪",
     name: "Buddy",
     color: "bg-red-100 border-red-300 text-red-800",
-    bubbleStyle: "rounded-br-none"
+    bubbleStyle: "rounded-br-none",
   },
   "yoga-instructor": {
     emoji: "🧘‍♀️",
     name: "Yolanda",
     color: "bg-teal-100 border-teal-300 text-teal-800",
-    bubbleStyle: "rounded-tl-none"
+    bubbleStyle: "rounded-tl-none",
   },
-  "physio": {
+  physio: {
     emoji: "🩹",
     name: "Phil",
     color: "bg-amber-100 border-amber-300 text-amber-800",
-    bubbleStyle: "rounded-tr-none"
-  }
+    bubbleStyle: "rounded-tr-none",
+  },
 };
 
 export interface HelpTooltipProps {
@@ -84,12 +87,10 @@ export function HelpTooltip({
     <TooltipProvider>
       <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger asChild onClick={() => setOpen(true)}>
-          <span className={cn("cursor-help", className)}>
-            {children}
-          </span>
+          <span className={cn("cursor-help", className)}>{children}</span>
         </TooltipTrigger>
-        <TooltipContent 
-          side={side} 
+        <TooltipContent
+          side={side}
           align={align}
           className={cn(
             "flex items-start p-0 overflow-hidden border-2 shadow-lg max-w-[280px]",
@@ -105,14 +106,9 @@ export function HelpTooltip({
               </div>
               <div className="font-medium">{config.name}</div>
             </div>
-            
+
             {/* Content */}
-            <div 
-              className={cn(
-                "p-3 relative",
-                config.bubbleStyle,
-              )}
-            >
+            <div className={cn("p-3 relative", config.bubbleStyle)}>
               {typeof content === "string" ? (
                 <p className="text-sm">{content}</p>
               ) : (

@@ -22,13 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Instagram,
-  Twitter,
-  Facebook,
-  Copy,
-  Sparkles,
-} from "lucide-react";
+import { Instagram, Twitter, Facebook, Copy, Sparkles } from "lucide-react";
 
 const platforms = [
   { id: "instagram", label: "Instagram", icon: Instagram },
@@ -92,7 +86,10 @@ export default function ContentGenerator() {
       type: platform,
       tone,
       topic,
-      keywords: keywords.split(",").map((k) => k.trim()).filter(Boolean),
+      keywords: keywords
+        .split(",")
+        .map((k) => k.trim())
+        .filter(Boolean),
       businessName: user?.businessName,
     });
   };
@@ -114,7 +111,8 @@ export default function ContentGenerator() {
             Social Media Content Generator
           </CardTitle>
           <CardDescription>
-            Generate professional fitness content for your social media platforms
+            Generate professional fitness content for your social media
+            platforms
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -208,7 +206,8 @@ export default function ContentGenerator() {
             </div>
           </CardContent>
           <CardFooter className="text-sm text-muted-foreground">
-            Content optimized for {platforms.find((p) => p.id === platform)?.label}
+            Content optimized for{" "}
+            {platforms.find((p) => p.id === platform)?.label}
           </CardFooter>
         </Card>
       )}

@@ -10,12 +10,12 @@ const Code = React.forwardRef<HTMLPreElement, CodeProps>(
         ref={ref}
         className={cn(
           "rounded-lg bg-background p-4 font-mono text-sm shadow-sm",
-          className
+          className,
         )}
         {...props}
       />
     );
-  }
+  },
 );
 Code.displayName = "Code";
 

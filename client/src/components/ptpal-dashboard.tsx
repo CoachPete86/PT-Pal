@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, Dumbbell, Heart, Users } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Button } from "./ui/button";
 import { DropdownNav } from "./ui/dropdown-nav";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +15,12 @@ import SessionTracker from "./session-tracker";
 import NutritionTracking from "./nutrition-tracking";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, FileIcon, FileText } from "lucide-react";
-import { StaggeredList, AnimatedCard, AnimatedButton, FadeIn } from "@/components/ui/animated-elements";
+import {
+  StaggeredList,
+  AnimatedCard,
+  AnimatedButton,
+  FadeIn,
+} from "@/components/ui/animated-elements";
 import {
   Dialog,
   DialogContent,
@@ -38,28 +49,28 @@ export default function PTpalDashboard() {
     {
       id: "workoutPlans",
       label: "Workout Plans",
-      icon: Dumbbell
+      icon: Dumbbell,
     },
     {
       id: "sessionTracking",
       label: "Session Tracking",
-      icon: Activity
+      icon: Activity,
     },
     {
       id: "nutrition",
       label: "Nutrition",
-      icon: Heart
+      icon: Heart,
     },
     {
       id: "clients",
       label: "Clients",
-      icon: Users
+      icon: Users,
     },
     {
       id: "documents",
       label: "Documents",
-      icon: Users // Placeholder icon -  replace with appropriate icon
-    }
+      icon: Users, // Placeholder icon -  replace with appropriate icon
+    },
   ];
 
   const { data: workoutPlans = [], isLoading } = useQuery({
@@ -73,7 +84,9 @@ export default function PTpalDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Workout Plans</CardTitle>
-              <CardDescription>Create and manage your workout plans</CardDescription>
+              <CardDescription>
+                Create and manage your workout plans
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -91,10 +104,18 @@ export default function PTpalDashboard() {
                           <div>
                             <h3 className="font-medium">{plan.title}</h3>
                             <p className="text-sm text-gray-500">
-                              {new Date(plan.createdAt).toLocaleDateString('en-GB')}
+                              {new Date(plan.createdAt).toLocaleDateString(
+                                "en-GB",
+                              )}
                             </p>
                           </div>
-                          <AnimatedButton size="sm" variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">View</AnimatedButton>
+                          <AnimatedButton
+                            size="sm"
+                            variant="outline"
+                            className="w-full sm:w-auto mt-2 sm:mt-0"
+                          >
+                            View
+                          </AnimatedButton>
                         </div>
                       </CardContent>
                     </AnimatedCard>
@@ -105,7 +126,9 @@ export default function PTpalDashboard() {
                   <div className="text-center py-8 border border-dashed rounded-lg">
                     <Loader2 className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                     <p className="text-gray-500">No workout plans found.</p>
-                    <p className="text-sm text-gray-400 mt-1">Create your first plan above.</p>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Create your first plan above.
+                    </p>
                   </div>
                 </FadeIn>
               )}
@@ -129,12 +152,16 @@ export default function PTpalDashboard() {
                             <SelectValue placeholder="Select plan type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="oneoff">Single Session</SelectItem>
-                            <SelectItem value="program">Full Program</SelectItem>
+                            <SelectItem value="oneoff">
+                              Single Session
+                            </SelectItem>
+                            <SelectItem value="program">
+                              Full Program
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="sessionType">Session Type</Label>
                         <Select defaultValue="personal">
@@ -142,12 +169,14 @@ export default function PTpalDashboard() {
                             <SelectValue placeholder="Select session type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="personal">Personal Training</SelectItem>
+                            <SelectItem value="personal">
+                              Personal Training
+                            </SelectItem>
                             <SelectItem value="group">Group Class</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="fitnessLevel">Fitness Level</Label>
                         <Select defaultValue="intermediate">
@@ -156,12 +185,14 @@ export default function PTpalDashboard() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="beginner">Beginner</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="intermediate">
+                              Intermediate
+                            </SelectItem>
                             <SelectItem value="advanced">Advanced</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <Label htmlFor="classType">Class Type</Label>
                         <Select defaultValue="HIIT">
@@ -178,16 +209,18 @@ export default function PTpalDashboard() {
                         </Select>
                       </div>
                     </div>
-                    
+
                     <div>
-                      <Label htmlFor="clientDetails">Client Details/Requirements (Optional)</Label>
-                      <Textarea 
-                        id="clientDetails" 
-                        className="min-h-[100px]" 
+                      <Label htmlFor="clientDetails">
+                        Client Details/Requirements (Optional)
+                      </Label>
+                      <Textarea
+                        id="clientDetails"
+                        className="min-h-[100px]"
                         placeholder="Enter any client-specific details, goals, or limitations..."
                       />
                     </div>
-                    
+
                     <DialogFooter>
                       <Button>Cancel</Button>
                       <Button type="submit">Generate Workout Plan</Button>
@@ -207,7 +240,9 @@ export default function PTpalDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Client Management</CardTitle>
-              <CardDescription>Manage your client relationships</CardDescription>
+              <CardDescription>
+                Manage your client relationships
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {/* Existing client management code would go here */}
@@ -233,8 +268,12 @@ export default function PTpalDashboard() {
   return (
     <div className="container mx-auto px-4 py-6">
       <motion.div className="mb-6">
-        <h1 className="text-3xl font-bold">Welcome, {user?.fullName || user?.username}</h1>
-        <p className="text-gray-500">Track your fitness journey and connect with your trainer</p>
+        <h1 className="text-3xl font-bold">
+          Welcome, {user?.fullName || user?.username}
+        </h1>
+        <p className="text-gray-500">
+          Track your fitness journey and connect with your trainer
+        </p>
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">

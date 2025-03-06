@@ -1,31 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/hooks/use-theme';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/hooks/use-theme";
 
 // Mascot character types
-export type MascotMood = 'happy' | 'excited' | 'focused' | 'encouraging' | 'relaxed';
-export type MascotCharacter = 'coach' | 'gym-buddy' | 'scientist' | 'zen-master';
+export type MascotMood =
+  | "happy"
+  | "excited"
+  | "focused"
+  | "encouraging"
+  | "relaxed";
+export type MascotCharacter =
+  | "coach"
+  | "gym-buddy"
+  | "scientist"
+  | "zen-master";
 
 interface WorkoutMascotProps {
   character?: MascotCharacter;
   mood?: MascotMood;
   message?: string;
   triggerAnimation?: boolean; // Prop to trigger animations externally
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   isAnimating?: boolean;
-  position?: 'top-right' | 'bottom-right' | 'bottom-left' | 'top-left' | 'center';
+  position?:
+    | "top-right"
+    | "bottom-right"
+    | "bottom-left"
+    | "top-left"
+    | "center";
   onAnimationComplete?: () => void;
 }
 
 const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
-  character = 'coach',
-  mood = 'encouraging', 
+  character = "coach",
+  mood = "encouraging",
   message,
   triggerAnimation = false,
-  size = 'md',
+  size = "md",
   isAnimating = false,
-  position = 'bottom-right',
-  onAnimationComplete
+  position = "bottom-right",
+  onAnimationComplete,
 }) => {
   const { theme } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -34,101 +48,103 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
 
   // Position styling
   const positionClasses = {
-    'top-right': 'top-4 right-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-left': 'top-4 left-4',
-    'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+    "top-right": "top-4 right-4",
+    "bottom-right": "bottom-4 right-4",
+    "bottom-left": "bottom-4 left-4",
+    "top-left": "top-4 left-4",
+    center: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
   };
 
   // Size styling
   const sizeClasses = {
-    sm: 'h-16 w-16',
-    md: 'h-24 w-24',
-    lg: 'h-32 w-32'
+    sm: "h-16 w-16",
+    md: "h-24 w-24",
+    lg: "h-32 w-32",
   };
 
   // Character emojis based on mood and character type
   const characterEmojis: Record<MascotCharacter, Record<MascotMood, string>> = {
-    'coach': {
-      'happy': '🏋️‍♂️',
-      'excited': '💪',
-      'focused': '🧠',
-      'encouraging': '🔥',
-      'relaxed': '🧘‍♂️'
+    coach: {
+      happy: "🏋️‍♂️",
+      excited: "💪",
+      focused: "🧠",
+      encouraging: "🔥",
+      relaxed: "🧘‍♂️",
     },
-    'gym-buddy': {
-      'happy': '😄',
-      'excited': '🤩',
-      'focused': '😤',
-      'encouraging': '👊',
-      'relaxed': '😌'
+    "gym-buddy": {
+      happy: "😄",
+      excited: "🤩",
+      focused: "😤",
+      encouraging: "👊",
+      relaxed: "😌",
     },
-    'scientist': {
-      'happy': '🧪',
-      'excited': '⚡',
-      'focused': '🔬',
-      'encouraging': '📊',
-      'relaxed': '🧠'
+    scientist: {
+      happy: "🧪",
+      excited: "⚡",
+      focused: "🔬",
+      encouraging: "📊",
+      relaxed: "🧠",
     },
-    'zen-master': {
-      'happy': '🧘‍♀️',
-      'excited': '✨',
-      'focused': '🌿',
-      'encouraging': '🌈',
-      'relaxed': '☯️'
-    }
+    "zen-master": {
+      happy: "🧘‍♀️",
+      excited: "✨",
+      focused: "🌿",
+      encouraging: "🌈",
+      relaxed: "☯️",
+    },
   };
 
   // Set of motivational messages by character
   const motivationalMessages: Record<MascotCharacter, string[]> = {
-    'coach': [
+    coach: [
       "Push through! You're stronger than you think!",
       "One more rep! You've got this!",
       "Feel that burn! It's progress happening!",
       "Champions are made when no one's watching!",
-      "Discipline beats motivation every time!"
+      "Discipline beats motivation every time!",
     ],
-    'gym-buddy': [
+    "gym-buddy": [
       "You're crushing it today!",
       "Look at those gains coming in!",
       "We're in this together! Keep pushing!",
       "Remember why you started!",
-      "This is YOUR time to shine!"
+      "This is YOUR time to shine!",
     ],
-    'scientist': [
+    scientist: [
       "Your metabolic rate is increasing with every rep!",
       "Muscle hypertrophy occurs during recovery, not during exercise!",
       "Proper form activates 23% more muscle fibers!",
       "Maintaining consistent tempo optimizes time under tension!",
-      "Your ATP production is at optimal levels now!"
+      "Your ATP production is at optimal levels now!",
     ],
-    'zen-master': [
+    "zen-master": [
       "Be present with each movement. Feel your strength.",
       "Breathe through the challenge. Find peace in the effort.",
       "Your body achieves what your mind believes.",
       "The journey of a thousand miles begins with a single step.",
-      "Let go of perfection, embrace progress."
-    ]
+      "Let go of perfection, embrace progress.",
+    ],
   };
 
   useEffect(() => {
     // Set visibility based on if we have a message or external trigger
     setIsVisible(!!message || triggerAnimation || isAnimating);
-    
+
     // If message changes, update current message
     if (message) {
       setCurrentMessage(message);
     }
-    
+
     // If animation is triggered externally but no message provided, pick a random one
     if ((triggerAnimation || isAnimating) && !message) {
-      const randomIndex = Math.floor(Math.random() * motivationalMessages[character].length);
+      const randomIndex = Math.floor(
+        Math.random() * motivationalMessages[character].length,
+      );
       setCurrentMessage(motivationalMessages[character][randomIndex]);
     }
-    
+
     // Increment animation key to force re-animation
-    setAnimationKey(prev => prev + 1);
+    setAnimationKey((prev) => prev + 1);
   }, [message, triggerAnimation, isAnimating, character]);
 
   const handleAnimationComplete = () => {
@@ -155,7 +171,7 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
             >
               {characterEmojis[character][mood]}
             </motion.div>
-            
+
             {/* Mascot Speech Bubble */}
             {currentMessage && (
               <motion.div
@@ -168,7 +184,7 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
               >
                 {/* Speech bubble pointer */}
                 <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white dark:bg-gray-800 rotate-45" />
-                
+
                 {/* Message */}
                 <p className="relative z-10">{currentMessage}</p>
               </motion.div>

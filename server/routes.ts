@@ -6,7 +6,7 @@ import { createSubscription, SUBSCRIPTION_PRICES } from "./stripe";
 import OpenAI from "openai";
 import { insertDocumentSchema } from "../shared/schema";
 import { Client } from "@notionhq/client";
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic from "@anthropic-ai/sdk";
 import { format } from "date-fns";
 import { generateSocialContent } from "./openai";
 
@@ -16,16 +16,20 @@ if (!process.env.OPENAI_API_KEY) {
 
 // Validate OpenAI API key format
 const apiKey = process.env.OPENAI_API_KEY;
-if (!apiKey.startsWith('sk-') || apiKey.length < 40) {
-  throw new Error("Invalid OpenAI API key format. The key should start with 'sk-' and be at least 40 characters long.");
+if (!apiKey.startsWith("sk-") || apiKey.length < 40) {
+  throw new Error(
+    "Invalid OpenAI API key format. The key should start with 'sk-' and be at least 40 characters long.",
+  );
 }
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 if (!process.env.NOTION_TOKEN || !process.env.NOTION_DATABASE_ID) {
-  throw new Error("Notion configuration is incomplete. Please ensure both NOTION_TOKEN and NOTION_DATABASE_ID are set.");
+  throw new Error(
+    "Notion configuration is incomplete. Please ensure both NOTION_TOKEN and NOTION_DATABASE_ID are set.",
+  );
 }
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
@@ -59,7 +63,7 @@ export function registerRoutes(app: Express): Server {
       const { subscriptionId, clientSecret } = await createSubscription(
         email,
         req.body.paymentMethodId,
-        priceId
+        priceId,
       );
 
       res.json({ subscriptionId, clientSecret });
@@ -67,7 +71,7 @@ export function registerRoutes(app: Express): Server {
       console.error("Subscription creation error:", error);
       res.status(500).json({
         error: "Failed to create subscription",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -87,7 +91,8 @@ export function registerRoutes(app: Express): Server {
       if (req.user.role !== "premium") {
         return res.status(403).json({
           error: "Premium subscription required",
-          message: "This feature requires a premium subscription. Please upgrade your plan to access Coach Pete's expert system."
+          message:
+            "This feature requires a premium subscription. Please upgrade your plan to access Coach Pete's expert system.",
         });
       }
 
@@ -112,12 +117,12 @@ When responding:
 - Consider the user's context from their document
 - Use clear formatting with headers and bullet points when appropriate
 
-Document Context: ${context || "No context provided"}`
+Document Context: ${context || "No context provided"}`,
           },
           {
             role: "user",
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
         temperature: 0.7,
         max_tokens: 500,
@@ -127,15 +132,16 @@ Document Context: ${context || "No context provided"}`
     } catch (error: any) {
       console.error("Expert coach error:", error);
 
-      if (error.code === 'insufficient_quota') {
+      if (error.code === "insufficient_quota") {
         res.status(500).json({
           error: "Service temporarily unavailable",
-          message: "The service is currently unavailable. Please try again later."
+          message:
+            "The service is currently unavailable. Please try again later.",
         });
       } else {
         res.status(500).json({
           error: "Failed to get response",
-          message: error.message
+          message: error.message,
         });
       }
     }
@@ -169,20 +175,28 @@ Rules to follow:
 8. Always respond in valid JSON format
 9. Consider client's fitness level: ${fitnessLevel}
 10. Use British English spelling (e.g., customise, specialise, etc.)
-${clientDetails ? `11. Adapt to client profile:
+${
+  clientDetails
+    ? `11. Adapt to client profile:
     - Age: ${clientDetails.age}
     - Gender: ${clientDetails.gender}
     - Goals: ${clientDetails.goals}
-    - Limitations: ${clientDetails.limitations || 'None'}` : ''}
-${sessionType === 'group' ? `12. Group Session Specifics:
-    - Participants: ${req.body.participantInfo?.count || 'Variable'}
-    - Format: ${req.body.participantInfo?.format || 'Individual'} workout
-    ${req.body.participantInfo?.format === 'groups' ? `- Group Size: ${req.body.participantInfo.groupSize} participants per group` : ''}
-    - Circuit Types: ${req.body.circuitPreferences?.types.join(', ')}
-    - Station Rotation: ${req.body.circuitPreferences?.stationRotation ? 'Yes' : 'No'}
-    - Rest Between Stations: ${req.body.circuitPreferences?.restBetweenStations ? 'Yes' : 'No'}
-    - Mixed Equipment: ${req.body.circuitPreferences?.mixedEquipmentStations ? 'Allow' : 'Keep Simple'}` : ''}
-${planType === 'program' ? `13. Include periodisation principles for ${programDetails?.sessionsPerWeek} sessions per week over 12 weeks` : ''}
+    - Limitations: ${clientDetails.limitations || "None"}`
+    : ""
+}
+${
+  sessionType === "group"
+    ? `12. Group Session Specifics:
+    - Participants: ${req.body.participantInfo?.count || "Variable"}
+    - Format: ${req.body.participantInfo?.format || "Individual"} workout
+    ${req.body.participantInfo?.format === "groups" ? `- Group Size: ${req.body.participantInfo.groupSize} participants per group` : ""}
+    - Circuit Types: ${req.body.circuitPreferences?.types.join(", ")}
+    - Station Rotation: ${req.body.circuitPreferences?.stationRotation ? "Yes" : "No"}
+    - Rest Between Stations: ${req.body.circuitPreferences?.restBetweenStations ? "Yes" : "No"}
+    - Mixed Equipment: ${req.body.circuitPreferences?.mixedEquipmentStations ? "Allow" : "Keep Simple"}`
+    : ""
+}
+${planType === "program" ? `13. Include periodisation principles for ${programDetails?.sessionsPerWeek} sessions per week over 12 weeks` : ""}
 
 Available Equipment:
 - Dumbbells (kg): 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5
@@ -252,9 +266,10 @@ The response must be a valid JSON object with this exact structure:
   "closingMessage": string
 }`;
 
-      const generatePrompt = planType === 'oneoff'
-        ? `Generate a complete workout plan for a ${sessionType === 'group' ? classType + ' class' : 'personal training session'} that's 45 minutes long using only the available equipment.`
-        : `Generate Week 1 of a 12-week progressive programme with ${programDetails?.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
+      const generatePrompt =
+        planType === "oneoff"
+          ? `Generate a complete workout plan for a ${sessionType === "group" ? classType + " class" : "personal training session"} that's 45 minutes long using only the available equipment.`
+          : `Generate Week 1 of a 12-week progressive programme with ${programDetails?.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
 
       const response = await anthropic.messages.create({
         model: "claude-3-5-sonnet-20241022",
@@ -262,11 +277,11 @@ The response must be a valid JSON object with this exact structure:
         messages: [
           {
             role: "user",
-            content: generatePrompt
-          }
+            content: generatePrompt,
+          },
         ],
         temperature: 0.7,
-        max_tokens: 1500
+        max_tokens: 1500,
       });
 
       let plan;
@@ -274,7 +289,7 @@ The response must be a valid JSON object with this exact structure:
         plan = JSON.parse(response.content[0].text);
 
         // Validate required structure with more lenient checks
-        if (!plan || typeof plan !== 'object') {
+        if (!plan || typeof plan !== "object") {
           throw new Error("Invalid response structure from AI");
         }
 
@@ -283,23 +298,25 @@ The response must be a valid JSON object with this exact structure:
         plan.mainWorkout = plan.mainWorkout || [];
 
         // Add current date in UK format
-        const currentDate = format(new Date(), 'dd/MM/yyyy');
+        const currentDate = format(new Date(), "dd/MM/yyyy");
         plan.classDetails = {
           ...plan.classDetails,
-          date: currentDate
+          date: currentDate,
         };
 
         // Create a summary for Notion that fits within limits
         const notionSummary = {
           title: `${plan.classDetails.className} - ${currentDate}`,
-          type: sessionType === 'group' ? 'Group Class' : 'Personal Training',
+          type: sessionType === "group" ? "Group Class" : "Personal Training",
           date: currentDate,
-          duration: '45 minutes',
+          duration: "45 minutes",
           fitnessLevel,
-          exercises: plan.mainWorkout.map(circuit =>
-            circuit.exercises.map(ex => ex.exercise).join(", ")
-          ).join("; "),
-          equipment: plan.equipmentNeeded.join(", ")
+          exercises: plan.mainWorkout
+            .map((circuit) =>
+              circuit.exercises.map((ex) => ex.exercise).join(", "),
+            )
+            .join("; "),
+          equipment: plan.equipmentNeeded.join(", "),
         };
 
         let notionPageId = null;
@@ -310,55 +327,67 @@ The response must be a valid JSON object with this exact structure:
             console.warn("Missing NOTION_DATABASE_ID environment variable");
             throw new Error("Notion integration not properly configured");
           }
-          
+
           // Get database properties first to understand its schema
           try {
             const database = await notion.databases.retrieve({
-              database_id: process.env.NOTION_DATABASE_ID
+              database_id: process.env.NOTION_DATABASE_ID,
             });
-            
+
             // Build properties based on the actual database schema
             const properties: Record<string, any> = {};
-            
+
             // Name/Title is required for all Notion databases
             properties["Name"] = {
-              title: [{ text: { content: notionSummary.title } }]
+              title: [{ text: { content: notionSummary.title } }],
             };
-            
+
             // Add other properties based on what exists in the database
             const dbProps = database.properties;
-            
+
             if (dbProps["Content"]) {
               properties["Content"] = {
-                rich_text: [{ text: { content: JSON.stringify(notionSummary, null, 2).substring(0, 2000) } }]
+                rich_text: [
+                  {
+                    text: {
+                      content: JSON.stringify(notionSummary, null, 2).substring(
+                        0,
+                        2000,
+                      ),
+                    },
+                  },
+                ],
               };
             }
-            
+
             if (dbProps["Type"] && dbProps["Type"].type === "select") {
               properties["Type"] = {
-                select: { name: "Workout Plan" }
+                select: { name: "Workout Plan" },
               };
             }
-            
+
             if (dbProps["Date"] && dbProps["Date"].type === "date") {
               properties["Date"] = {
-                date: { start: new Date().toISOString() }
+                date: { start: new Date().toISOString() },
               };
             }
-            
+
             if (dbProps["User ID"] && dbProps["User ID"].type === "rich_text") {
               properties["User ID"] = {
-                rich_text: [{ text: { content: req.user.id.toString() } }]
+                rich_text: [{ text: { content: req.user.id.toString() } }],
               };
             }
-            
+
             const notionResponse = await notion.pages.create({
               parent: { database_id: process.env.NOTION_DATABASE_ID },
-              properties: properties
+              properties: properties,
             });
             notionPageId = notionResponse.id;
           } catch (error) {
-            console.error("Error retrieving Notion database or creating page:", error);
+            console.error(
+              "Error retrieving Notion database or creating page:",
+              error,
+            );
           }
         } catch (notionError) {
           console.error("Failed to save to Notion:", notionError);
@@ -389,7 +418,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Workout generation error:", error);
       res.status(500).json({
         error: "Failed to generate workout plan",
-        details: error.message
+        details: error.message,
       });
     }
   };
@@ -408,16 +437,16 @@ The response must be a valid JSON object with this exact structure:
             {
               property: "UserId",
               rich_text: {
-                equals: req.user.id.toString()
-              }
-            }
-          ]
-        }
+                equals: req.user.id.toString(),
+              },
+            },
+          ],
+        },
       });
 
       const documents = response.results.map((page: any) => {
-        const title = page.properties.Name?.title[0]?.plain_text || 'Untitled';
-        const content = page.properties.Content?.rich_text[0]?.plain_text || '';
+        const title = page.properties.Name?.title[0]?.plain_text || "Untitled";
+        const content = page.properties.Content?.rich_text[0]?.plain_text || "";
 
         return {
           title,
@@ -430,7 +459,7 @@ The response must be a valid JSON object with this exact structure:
       });
 
       const results = await Promise.all(
-        documents.map(doc => storage.upsertDocument(doc))
+        documents.map((doc) => storage.upsertDocument(doc)),
       );
 
       res.json(results);
@@ -438,7 +467,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error syncing with Notion:", error);
       res.status(500).json({
         error: "Failed to sync with Notion",
-        details: error.message
+        details: error.message,
       });
     }
   });
@@ -467,7 +496,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error updating Notion page:", error);
       res.status(500).json({
         error: "Failed to update Notion page",
-        details: error.message
+        details: error.message,
       });
     }
   });
@@ -504,7 +533,7 @@ The response must be a valid JSON object with this exact structure:
       const document = await storage.updateDocument(
         parseInt(req.params.id),
         req.user.id,
-        req.body
+        req.body,
       );
       res.json(document);
     } catch (error: any) {
@@ -539,7 +568,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error fetching clients:", error);
       res.status(500).json({
         error: "Failed to fetch clients",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -549,7 +578,7 @@ The response must be a valid JSON object with this exact structure:
       console.log("No user in session for /api/clients POST");
       return res.status(401).json({
         error: "Unauthorized",
-        message: "You must be logged in to create clients"
+        message: "You must be logged in to create clients",
       });
     }
 
@@ -557,7 +586,7 @@ The response must be a valid JSON object with this exact structure:
       if (!req.body.fullName || !req.body.email) {
         return res.status(400).json({
           error: "Missing required fields",
-          message: "Full name and email are required"
+          message: "Full name and email are required",
         });
       }
 
@@ -573,7 +602,7 @@ The response must be a valid JSON object with this exact structure:
       const client = await storage.createClient({
         ...req.body,
         trainerId: req.user.id,
-        workspaceId: workspace.id
+        workspaceId: workspace.id,
       });
 
       res.json(client);
@@ -581,7 +610,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error creating client:", error);
       res.status(500).json({
         error: "Failed to create client",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -595,11 +624,10 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error fetching workout plans:", error);
       res.status(500).json({
         error: "Failed to fetch workout plans",
-        message: error.message
+        message: error.message,
       });
     }
   });
-
 
   // Session package endpoints
   app.get("/api/session-packages", async (req, res) => {
@@ -610,15 +638,16 @@ The response must be a valid JSON object with this exact structure:
     } catch (error: any) {
       console.error("Error fetching session packages:", error);
       // Send a more graceful error response
-      if (error.code === '42P01') { // Table doesn't exist
+      if (error.code === "42P01") {
+        // Table doesn't exist
         res.status(500).json({
           error: "Service temporarily unavailable",
-          message: "The session tracking service is currently being set up."
+          message: "The session tracking service is currently being set up.",
         });
       } else {
         res.status(500).json({
           error: "Failed to fetch session packages",
-          message: error.message
+          message: error.message,
         });
       }
     }
@@ -636,7 +665,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error creating session package:", error);
       res.status(500).json({
         error: "Failed to create session package",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -656,11 +685,10 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error completing session:", error);
       res.status(500).json({
         error: "Failed to complete session",
-        message: error.message
+        message: error.message,
       });
     }
   });
-
 
   // Food Analysis endpoint
   // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -673,8 +701,11 @@ The response must be a valid JSON object with this exact structure:
         return res.status(400).json({ error: "No image provided" });
       }
 
-      if (!image.startsWith('data:image/')) {
-        return res.status(400).json({ error: "Invalid image format. Please provide a valid base64 encoded image." });
+      if (!image.startsWith("data:image/")) {
+        return res.status(400).json({
+          error:
+            "Invalid image format. Please provide a valid base64 encoded image.",
+        });
       }
 
       const response = await openai.chat.completions.create({
@@ -682,7 +713,8 @@ The response must be a valid JSON object with this exact structure:
         messages: [
           {
             role: "system",
-            content: "You are a nutrition analysis expert. Analyze food images and provide detailed nutritional information in JSON format. Include comprehensive macro breakdowns, ingredients, brands, and meal components when visible."
+            content:
+              "You are a nutrition analysis expert. Analyze food images and provide detailed nutritional information in JSON format. Include comprehensive macro breakdowns, ingredients, brands, and meal components when visible.",
           },
           {
             role: "user",
@@ -701,32 +733,35 @@ The response must be a valid JSON object with this exact structure:
           },
         ],
         max_tokens: 500,
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
       });
 
       res.json({ analysis: response.choices[0].message.content });
     } catch (error: any) {
       console.error("Food analysis error:", error);
 
-      if (error.code === 'invalid_api_key') {
+      if (error.code === "invalid_api_key") {
         res.status(500).json({
           error: "API configuration error",
-          details: "There's an issue with the API configuration. Please try again later."
+          details:
+            "There's an issue with the API configuration. Please try again later.",
         });
-      } else if (error.code === 'insufficient_quota') {
+      } else if (error.code === "insufficient_quota") {
         res.status(500).json({
           error: "Service temporarily unavailable",
-          details: "The service is currently unavailable. Please try again later."
+          details:
+            "The service is currently unavailable. Please try again later.",
         });
-      } else if (error.code === 'model_not_found') {
+      } else if (error.code === "model_not_found") {
         res.status(500).json({
           error: "Model configuration error",
-          details: "The AI model is currently unavailable. Please try again later."
+          details:
+            "The AI model is currently unavailable. Please try again later.",
         });
       } else {
         res.status(500).json({
           error: "Failed to analyze food image",
-          details: error.response?.data?.error?.message || error.message
+          details: error.response?.data?.error?.message || error.message,
         });
       }
     }
@@ -740,9 +775,10 @@ The response must be a valid JSON object with this exact structure:
       const { from, to, clientId } = req.query;
 
       // Allow trainers to view their clients' entries
-      const userId = clientId && req.user.role === 'trainer'
-        ? parseInt(clientId as string)
-        : req.user.id;
+      const userId =
+        clientId && req.user.role === "trainer"
+          ? parseInt(clientId as string)
+          : req.user.id;
 
       const dateFilter: any = {};
       if (from) dateFilter.from = new Date(from as string);
@@ -754,7 +790,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error fetching nutrition entries:", error);
       res.status(500).json({
         error: "Failed to fetch nutrition entries",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -772,7 +808,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error creating nutrition entry:", error);
       res.status(500).json({
         error: "Failed to create nutrition entry",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -784,10 +820,12 @@ The response must be a valid JSON object with this exact structure:
       const { clientId } = req.query;
 
       let mealPlans;
-      if (req.user.role === 'trainer') {
+      if (req.user.role === "trainer") {
         if (clientId) {
           // Trainer viewing specific client's meal plans
-          mealPlans = await storage.getMealPlansByClient(parseInt(clientId as string));
+          mealPlans = await storage.getMealPlansByClient(
+            parseInt(clientId as string),
+          );
         } else {
           // Trainer viewing all their created meal plans
           mealPlans = await storage.getMealPlansByTrainer(req.user.id);
@@ -802,7 +840,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error fetching meal plans:", error);
       res.status(500).json({
         error: "Failed to fetch meal plans",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -811,10 +849,10 @@ The response must be a valid JSON object with this exact structure:
     if (!req.user) return res.sendStatus(401);
 
     try {
-      if (req.user.role !== 'trainer') {
+      if (req.user.role !== "trainer") {
         return res.status(403).json({
           error: "Permission denied",
-          message: "Only trainers can create meal plans"
+          message: "Only trainers can create meal plans",
         });
       }
 
@@ -828,7 +866,7 @@ The response must be a valid JSON object with this exact structure:
       console.error("Error creating meal plan:", error);
       res.status(500).json({
         error: "Failed to create meal plan",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -840,8 +878,8 @@ The response must be a valid JSON object with this exact structure:
     try {
       if (!process.env.ANTHROPIC_API_KEY) {
         return res.status(500).json({
-          error: 'API key missing',
-          details: 'Anthropic API key is not configured'
+          error: "API key missing",
+          details: "Anthropic API key is not configured",
         });
       }
 
@@ -852,33 +890,33 @@ The response must be a valid JSON object with this exact structure:
         goals,
         nutritionRatios,
         duration, // days
-        mealsPerDay
+        mealsPerDay,
       } = req.body;
 
       // Build the prompt for Claude
       let prompt = `Create a personalized meal plan based on the following information:
 
 Client Information:
-- Age: ${clientData?.age || 'Not specified'}
-- Gender: ${clientData?.gender || 'Not specified'}
-- Weight: ${clientData?.weight || 'Not specified'}
-- Height: ${clientData?.height || 'Not specified'}
-- Activity Level: ${clientData?.activityLevel || 'Moderate'}
+- Age: ${clientData?.age || "Not specified"}
+- Gender: ${clientData?.gender || "Not specified"}
+- Weight: ${clientData?.weight || "Not specified"}
+- Height: ${clientData?.height || "Not specified"}
+- Activity Level: ${clientData?.activityLevel || "Moderate"}
 
 Dietary Preferences:
-${preferences?.preferred ? `- Preferred Foods: ${preferences.preferred.join(', ')}` : ''}
-${preferences?.disliked ? `- Disliked Foods: ${preferences.disliked.join(', ')}` : ''}
+${preferences?.preferred ? `- Preferred Foods: ${preferences.preferred.join(", ")}` : ""}
+${preferences?.disliked ? `- Disliked Foods: ${preferences.disliked.join(", ")}` : ""}
 
 Dietary Restrictions:
-${dietaryRestrictions?.map(r => `- ${r}`).join('\n') || 'None specified'}
+${dietaryRestrictions?.map((r) => `- ${r}`).join("\n") || "None specified"}
 
 Goals:
-${goals?.map(g => `- ${g}`).join('\n') || 'Balanced nutrition'}
+${goals?.map((g) => `- ${g}`).join("\n") || "Balanced nutrition"}
 
 Nutrition Ratios:
-- Protein: ${nutritionRatios?.protein || '25%'}
-- Carbs: ${nutritionRatios?.carbs || '50%'}
-- Fats: ${nutritionRatios?.fats || '25%'}
+- Protein: ${nutritionRatios?.protein || "25%"}
+- Carbs: ${nutritionRatios?.carbs || "50%"}
+- Fats: ${nutritionRatios?.fats || "25%"}
 
 Duration: ${duration || 7} days
 Meals Per Day: ${mealsPerDay || 3}
@@ -898,15 +936,16 @@ Present the meal plan in a structured JSON format.`;
         messages: [
           {
             role: "user",
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
         temperature: 0.7,
       });
 
       // Parse the JSON content from the response
       const responseText = message.content[0].text;
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
+      const jsonMatch =
+        responseText.match(/```json\n([\s\S]*?)```/) ||
         responseText.match(/```\n([\s\S]*?)```/) ||
         responseText.match(/{[\s\S]*}/);
 
@@ -925,14 +964,16 @@ Present the meal plan in a structured JSON format.`;
                 title: `${duration || 7}-Day Meal Plan`,
                 content: plan,
                 startDate: new Date(),
-                endDate: new Date(Date.now() + (duration || 7) * 24 * 60 * 60 * 1000),
-                status: 'active',
+                endDate: new Date(
+                  Date.now() + (duration || 7) * 24 * 60 * 60 * 1000,
+                ),
+                status: "active",
               });
 
               return res.status(201).json({
                 success: true,
                 plan,
-                mealPlanId: mealPlan.id
+                mealPlanId: mealPlan.id,
               });
             } catch (error) {
               console.error("Error saving meal plan", error);
@@ -940,34 +981,34 @@ Present the meal plan in a structured JSON format.`;
               return res.status(200).json({
                 success: true,
                 plan,
-                warning: "Plan was generated but could not besaved to database"
+                warning: "Plan was generated but could not besaved to database",
               });
             }
           } else {
             // Return the plan without saving it
             return res.status(200).json({
               success: true,
-              plan
+              plan,
             });
           }
         } catch (error) {
           console.error("Error parsing JSON from Anthropic response", error);
           return res.status(500).json({
             error: "Failed to parse meal plan",
-            details: "The AI generated an invalid JSON response"
+            details: "The AI generated an invalid JSON response",
           });
         }
       } else {
         return res.status(500).json({
           error: "Invalid response format",
-          details: "The AI didn't return a properly formatted meal plan"
+          details: "The AI didn't return a properly formatted meal plan",
         });
       }
     } catch (error: any) {
       console.error("Error generating meal plan:", error);
       return res.status(500).json({
         error: "Failed to generate meal plan",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
       });
     }
   });
@@ -987,9 +1028,9 @@ Present the meal plan in a structured JSON format.`;
       const { content, recipientId, workspaceId } = req.body;
 
       if (!content || !recipientId || !workspaceId) {
-        return res.status(400).json({ 
-          error: "Missing required fields", 
-          message: "Content, recipientId, and workspaceId are required" 
+        return res.status(400).json({
+          error: "Missing required fields",
+          message: "Content, recipientId, and workspaceId are required",
         });
       }
 
@@ -997,7 +1038,7 @@ Present the meal plan in a structured JSON format.`;
         senderId: req.user.id,
         content,
         recipientId,
-        workspaceId
+        workspaceId,
       });
 
       res.json(message);
@@ -1005,7 +1046,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating message:", error);
       res.status(500).json({
         error: "Failed to create message",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1036,15 +1077,16 @@ Present the meal plan in a structured JSON format.`;
     } catch (error: any) {
       console.error("Social content generation error:", error);
 
-      if (error.code === 'insufficient_quota') {
+      if (error.code === "insufficient_quota") {
         res.status(500).json({
           error: "Service temporarily unavailable",
-          message: "The service is currently unavailable. Please try again later."
+          message:
+            "The service is currently unavailable. Please try again later.",
         });
       } else {
         res.status(500).json({
           error: "Failed to generate content",
-          message: error.message
+          message: error.message,
         });
       }
     }
@@ -1064,7 +1106,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching branding:", error);
       res.status(500).json({
         error: "Failed to fetch branding",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1081,7 +1123,7 @@ Present the meal plan in a structured JSON format.`;
       if (!branding) {
         branding = await storage.createBranding({
           workspaceId: workspace.id,
-          ...req.body
+          ...req.body,
         });
       } else {
         branding = await storage.updateBranding(branding.id, req.body);
@@ -1092,7 +1134,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error updating branding:", error);
       res.status(500).json({
         error: "Failed to update branding",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1113,7 +1155,7 @@ Present the meal plan in a structured JSON format.`;
       if (!branding) {
         branding = await storage.createBranding({
           workspaceId: workspace.id,
-          logoUrl
+          logoUrl,
         });
       } else {
         branding = await storage.updateBranding(branding.id, { logoUrl });
@@ -1124,7 +1166,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error uploading logo:", error);
       res.status(500).json({
         error: "Failed to upload logo",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1143,7 +1185,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching onboarding forms:", error);
       res.status(500).json({
         error: "Failed to fetch onboarding forms",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1160,7 +1202,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating onboarding form:", error);
       res.status(500).json({
         error: "Failed to create onboarding form",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1170,14 +1212,14 @@ Present the meal plan in a structured JSON format.`;
     try {
       const form = await storage.updateOnboardingForm(
         parseInt(req.params.id),
-        req.body
+        req.body,
       );
       res.json(form);
     } catch (error: any) {
       console.error("Error updating onboarding form:", error);
       res.status(500).json({
         error: "Failed to update onboarding form",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1191,7 +1233,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error deleting onboarding form:", error);
       res.status(500).json({
         error: "Failed to delete onboarding form",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1200,13 +1242,15 @@ Present the meal plan in a structured JSON format.`;
   app.get("/api/form-responses/:formId", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const responses = await storage.getFormResponses(parseInt(req.params.formId));
+      const responses = await storage.getFormResponses(
+        parseInt(req.params.formId),
+      );
       res.json(responses);
     } catch (error: any) {
       console.error("Error fetching formresponses:", error);
       res.status(500).json({
         error: "Failed to fetch form responses",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1223,7 +1267,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating form response:", error);
       res.status(500).json({
         error: "Failed to create form response",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1238,7 +1282,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching client goals:", error);
       res.status(500).json({
         error: "Failed to fetch client goals",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1255,7 +1299,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating client goal:", error);
       res.status(500).json({
         error: "Failed to create client goal",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1265,14 +1309,14 @@ Present the meal plan in a structured JSON format.`;
     try {
       const goal = await storage.updateClientGoal(
         parseInt(req.params.id),
-        req.body
+        req.body,
       );
       res.json(goal);
     } catch (error: any) {
       console.error("Error updating client goal:", error);
       res.status(500).json({
         error: "Failed to update client goal",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1291,7 +1335,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching document templates:", error);
       res.status(500).json({
         error: "Failed to fetch document templates",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1308,7 +1352,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating document template:", error);
       res.status(500).json({
         error: "Failed to create document template",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1317,13 +1361,15 @@ Present the meal plan in a structured JSON format.`;
   app.get("/api/generated-documents/:clientId", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const documents = await storage.getGeneratedDocuments(parseInt(req.params.clientId));
+      const documents = await storage.getGeneratedDocuments(
+        parseInt(req.params.clientId),
+      );
       res.json(documents);
     } catch (error: any) {
       console.error("Error fetching generated documents:", error);
       res.status(500).json({
         error: "Failed to fetch generated documents",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1337,7 +1383,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating generated document:", error);
       res.status(500).json({
         error: "Failed to create generated document",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1349,14 +1395,14 @@ Present the meal plan in a structured JSON format.`;
       const document = await storage.signDocument(
         parseInt(req.params.id),
         signature,
-        role
+        role,
       );
       res.json(document);
     } catch (error: any) {
       console.error("Error signing document:", error);
       res.status(500).json({
         error: "Failed to sign document",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1375,7 +1421,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching payment reminders:", error);
       res.status(500).json({
         error: "Failed to fetch payment reminders",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1392,7 +1438,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating payment reminder:", error);
       res.status(500).json({
         error: "Failed to create payment reminder",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1402,14 +1448,14 @@ Present the meal plan in a structured JSON format.`;
     try {
       const reminder = await storage.updatePaymentReminder(
         parseInt(req.params.id),
-        req.body
+        req.body,
       );
       res.json(reminder);
     } catch (error: any) {
       console.error("Error updating payment reminder:", error);
       res.status(500).json({
         error: "Failed to update payment reminder",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1420,14 +1466,14 @@ Present the meal plan in a structured JSON format.`;
     try {
       const analytics = await storage.getClientAnalytics(
         req.user.workspaceId,
-        parseInt(req.params.clientId)
+        parseInt(req.params.clientId),
       );
       res.json(analytics);
     } catch (error: any) {
       console.error("Error fetching client analytics:", error);
       res.status(500).json({
         error: "Failed to fetch client analytics",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1444,7 +1490,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating client analytics:", error);
       res.status(500).json({
         error: "Failed to create client analytics",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1455,14 +1501,14 @@ Present the meal plan in a structured JSON format.`;
     try {
       const metrics = await storage.getProgressMetrics(
         parseInt(req.params.clientId),
-        req.query.category as string | undefined
+        req.query.category as string | undefined,
       );
       res.json(metrics);
     } catch (error: any) {
       console.error("Error fetching progress metrics:", error);
       res.status(500).json({
         error: "Failed to fetch progress metrics",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1479,7 +1525,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error creating progress metric:", error);
       res.status(500).json({
         error: "Failed to create progress metric",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1487,20 +1533,20 @@ Present the meal plan in a structured JSON format.`;
   app.get("/api/progress-metrics/:clientId/trend", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     try {
-      const startDate = new Date(req.query.startDate as string || new Date());
-      const endDate = new Date(req.query.endDate as string || new Date());
+      const startDate = new Date((req.query.startDate as string) || new Date());
+      const endDate = new Date((req.query.endDate as string) || new Date());
 
       const progress = await storage.getClientProgress(
         parseInt(req.params.clientId),
         startDate,
-        endDate
+        endDate,
       );
       res.json(progress);
     } catch (error: any) {
       console.error("Error fetching progress trend:", error);
       res.status(500).json({
         error: "Failed to fetch progress trend",
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -1522,7 +1568,7 @@ Present the meal plan in a structured JSON format.`;
       console.error("Error fetching workspace:", error);
       res.status(500).json({
         error: "Failed to fetch workspace",
-        message: error.message
+        message: error.message,
       });
     }
   });

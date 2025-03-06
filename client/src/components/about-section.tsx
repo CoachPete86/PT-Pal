@@ -8,33 +8,40 @@ export default function AboutSection() {
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Why Choose Our Platform?</h2>
             <p className="text-muted-foreground">
-              Built by fitness professionals for fitness professionals, our platform
-              combines cutting-edge technology with deep industry knowledge. We understand
-              the unique challenges of running a fitness business and have created tools
-              that make a real difference.
+              Built by fitness professionals for fitness professionals, our
+              platform combines cutting-edge technology with deep industry
+              knowledge. We understand the unique challenges of running a
+              fitness business and have created tools that make a real
+              difference.
             </p>
             <p className="text-muted-foreground">
-              From automated workout generation to comprehensive client management,
-              we provide everything you need to scale your business while maintaining
-              the personal touch your clients value.
+              From automated workout generation to comprehensive client
+              management, we provide everything you need to scale your business
+              while maintaining the personal touch your clients value.
             </p>
 
             <div className="grid grid-cols-3 gap-4">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    500+
+                  </div>
                   <div className="text-sm">Active Trainers</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">10k+</div>
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    10k+
+                  </div>
                   <div className="text-sm">Clients Managed</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">98%</div>
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    98%
+                  </div>
                   <div className="text-sm">Satisfaction Rate</div>
                 </CardContent>
               </Card>

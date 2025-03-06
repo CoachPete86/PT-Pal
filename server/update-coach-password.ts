@@ -17,8 +17,8 @@ async function updateCoachPassword() {
   await db
     .update(users)
     .set({ password: hashedPassword })
-    .where(eq(users.username, 'coach_pete'));
-  console.log('Coach password updated successfully');
+    .where(eq(users.username, "coach_pete"));
+  console.log("Coach password updated successfully");
 }
 
 updateCoachPassword().catch(console.error);

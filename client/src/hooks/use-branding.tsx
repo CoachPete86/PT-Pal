@@ -113,18 +113,18 @@ export function useBranding() {
   const { user } = useAuth();
 
   const { data: branding } = useQuery({
-    queryKey: ['/api/branding'],
+    queryKey: ["/api/branding"],
     enabled: !!user,
   });
 
   const updateBranding = useMutation({
     mutationFn: async (settings: Partial<BrandingSettings>) => {
-      const res = await fetch('/api/branding', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/branding", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (!res.ok) throw new Error('Failed to update branding');
+      if (!res.ok) throw new Error("Failed to update branding");
       return res.json();
     },
   });

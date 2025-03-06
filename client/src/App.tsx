@@ -16,26 +16,36 @@ import { Loader2 } from "lucide-react";
 
 function Router() {
   return (
-    <Suspense fallback={
-      <div className="h-screen w-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="h-screen w-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
       <Switch>
         <Route path="/">
           {/* Auto-redirect to dashboard for development convenience */}
-          {window.location.pathname === "/" && (window.location.href = "/dashboard")}
+          {window.location.pathname === "/" &&
+            (window.location.href = "/dashboard")}
           <HomePage />
         </Route>
         <Route path="/auth">
           {/* Auto-redirect to dashboard for development convenience */}
-          {window.location.pathname === "/auth" && (window.location.href = "/dashboard")}
+          {window.location.pathname === "/auth" &&
+            (window.location.href = "/dashboard")}
           <AuthPage />
         </Route>
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
-        <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
+        <ProtectedRoute
+          path="/content-generator"
+          component={ContentGeneratorPage}
+        />
         <ProtectedRoute path="/settings" component={SettingsPage} />
-        <ProtectedRoute path="/workout-features" component={WorkoutFeaturesDemo} />
+        <ProtectedRoute
+          path="/workout-features"
+          component={WorkoutFeaturesDemo}
+        />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

@@ -38,7 +38,11 @@ interface MacroDetails {
 interface Macros {
   protein: MacroDetails & { sources: MacroSources };
   carbs: MacroDetails & { fiber: string; sugar: string; sources: MacroSources };
-  fats: MacroDetails & { saturated: string; unsaturated: string; sources: MacroSources };
+  fats: MacroDetails & {
+    saturated: string;
+    unsaturated: string;
+    sources: MacroSources;
+  };
 }
 
 interface AnalysisResult {
@@ -67,7 +71,9 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
   const analyzeMutation = useMutation({
     mutationFn: async (base64Image: string) => {
       try {
-        const res = await apiRequest("POST", "/api/analyze-food", { image: base64Image });
+        const res = await apiRequest("POST", "/api/analyze-food", {
+          image: base64Image,
+        });
         const data = await res.json();
         if (data.error) {
           throw new Error(data.details || data.error);
@@ -101,7 +107,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
           title: "Invalid file type",
           description: "Please select an image file (JPEG, PNG, etc.)",
@@ -169,9 +175,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                   <p className="mt-2 text-sm text-muted-foreground">
                     Click to upload food image
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Max size: 4MB
-                  </p>
+                  <p className="text-xs text-muted-foreground">Max size: 4MB</p>
                 </div>
               )}
             </div>
@@ -207,7 +211,8 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
             <CardHeader>
               <CardTitle>{analyzeMutation.data.mealName}</CardTitle>
               <CardDescription>
-                {analyzeMutation.data.mealType} - {analyzeMutation.data.servingSize}
+                {analyzeMutation.data.mealType} -{" "}
+                {analyzeMutation.data.servingSize}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -230,15 +235,21 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">Protein</TableCell>
-                    <TableCell>{analyzeMutation.data.macros.protein.total}</TableCell>
+                    <TableCell>
+                      {analyzeMutation.data.macros.protein.total}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Carbohydrates</TableCell>
-                    <TableCell>{analyzeMutation.data.macros.carbs.total}</TableCell>
+                    <TableCell>
+                      {analyzeMutation.data.macros.carbs.total}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Fats</TableCell>
-                    <TableCell>{analyzeMutation.data.macros.fats.total}</TableCell>
+                    <TableCell>
+                      {analyzeMutation.data.macros.fats.total}
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -267,11 +278,15 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                     {/* Protein Sources */}
                     <Card>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Protein Sources</CardTitle>
+                        <CardTitle className="text-lg">
+                          Protein Sources
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <Code className="text-sm">
-                          {Object.entries(analyzeMutation.data.macros.protein.sources).map(([source, amount]) => (
+                          {Object.entries(
+                            analyzeMutation.data.macros.protein.sources,
+                          ).map(([source, amount]) => (
                             <div key={source} className="flex justify-between">
                               <span>{source}:</span>
                               <span>{amount}</span>
@@ -291,15 +306,24 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                           <div className="space-y-2">
                             <div className="flex justify-between font-medium">
                               <span>Fiber:</span>
-                              <span>{analyzeMutation.data.macros.carbs.fiber}</span>
+                              <span>
+                                {analyzeMutation.data.macros.carbs.fiber}
+                              </span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Sugar:</span>
-                              <span>{analyzeMutation.data.macros.carbs.sugar}</span>
+                              <span>
+                                {analyzeMutation.data.macros.carbs.sugar}
+                              </span>
                             </div>
                             <div className="border-t pt-2">
-                              {Object.entries(analyzeMutation.data.macros.carbs.sources).map(([source, amount]) => (
-                                <div key={source} className="flex justify-between">
+                              {Object.entries(
+                                analyzeMutation.data.macros.carbs.sources,
+                              ).map(([source, amount]) => (
+                                <div
+                                  key={source}
+                                  className="flex justify-between"
+                                >
                                   <span>{source}:</span>
                                   <span>{amount}</span>
                                 </div>
@@ -320,15 +344,24 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                           <div className="space-y-2">
                             <div className="flex justify-between font-medium">
                               <span>Saturated:</span>
-                              <span>{analyzeMutation.data.macros.fats.saturated}</span>
+                              <span>
+                                {analyzeMutation.data.macros.fats.saturated}
+                              </span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Unsaturated:</span>
-                              <span>{analyzeMutation.data.macros.fats.unsaturated}</span>
+                              <span>
+                                {analyzeMutation.data.macros.fats.unsaturated}
+                              </span>
                             </div>
                             <div className="border-t pt-2">
-                              {Object.entries(analyzeMutation.data.macros.fats.sources).map(([source, amount]) => (
-                                <div key={source} className="flex justify-between">
+                              {Object.entries(
+                                analyzeMutation.data.macros.fats.sources,
+                              ).map(([source, amount]) => (
+                                <div
+                                  key={source}
+                                  className="flex justify-between"
+                                >
                                   <span>{source}:</span>
                                   <span>{amount}</span>
                                 </div>
@@ -345,9 +378,11 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                     <h4 className="font-medium mb-2">Ingredients:</h4>
                     <Code className="text-sm">
                       <ul className="list-disc pl-4 space-y-1">
-                        {analyzeMutation.data.ingredients.map((ingredient, index) => (
-                          <li key={index}>{ingredient}</li>
-                        ))}
+                        {analyzeMutation.data.ingredients.map(
+                          (ingredient, index) => (
+                            <li key={index}>{ingredient}</li>
+                          ),
+                        )}
                       </ul>
                     </Code>
                   </div>
@@ -358,14 +393,16 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                       <h4 className="font-medium mb-2">Brands:</h4>
                       <Code className="text-sm">
                         <div className="flex flex-wrap gap-2">
-                          {analyzeMutation.data.brandNames.map((brand, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-background rounded-md"
-                            >
-                              {brand}
-                            </span>
-                          ))}
+                          {analyzeMutation.data.brandNames.map(
+                            (brand, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-background rounded-md"
+                              >
+                                {brand}
+                              </span>
+                            ),
+                          )}
                         </div>
                       </Code>
                     </div>
@@ -381,30 +418,33 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                     </h4>
                     <Code className="text-sm">
                       <ul className="list-disc pl-4 space-y-1">
-                        {analyzeMutation.data.clientGoalsAnalysis.map((analysis, index) => (
-                          <li key={index} className="text-muted-foreground">
-                            {analysis}
-                          </li>
-                        ))}
+                        {analyzeMutation.data.clientGoalsAnalysis.map(
+                          (analysis, index) => (
+                            <li key={index} className="text-muted-foreground">
+                              {analysis}
+                            </li>
+                          ),
+                        )}
                       </ul>
                     </Code>
                   </div>
 
                   {/* Analysis Notes */}
-                  {analyzeMutation.data.notes && analyzeMutation.data.notes.length > 0 && (
-                    <div className="rounded-lg border bg-muted/50 p-4">
-                      <h4 className="font-medium mb-2">Analysis Notes:</h4>
-                      <Code className="text-sm">
-                        <ul className="list-disc pl-4 space-y-1">
-                          {analyzeMutation.data.notes.map((note, index) => (
-                            <li key={index} className="text-muted-foreground">
-                              {note}
-                            </li>
-                          ))}
-                        </ul>
-                      </Code>
-                    </div>
-                  )}
+                  {analyzeMutation.data.notes &&
+                    analyzeMutation.data.notes.length > 0 && (
+                      <div className="rounded-lg border bg-muted/50 p-4">
+                        <h4 className="font-medium mb-2">Analysis Notes:</h4>
+                        <Code className="text-sm">
+                          <ul className="list-disc pl-4 space-y-1">
+                            {analyzeMutation.data.notes.map((note, index) => (
+                              <li key={index} className="text-muted-foreground">
+                                {note}
+                              </li>
+                            ))}
+                          </ul>
+                        </Code>
+                      </div>
+                    )}
                 </CollapsibleContent>
               </Collapsible>
             </CardContent>
@@ -423,7 +463,8 @@ export default function FoodAnalysisPage() {
         <CardHeader>
           <CardTitle>Food Analysis</CardTitle>
           <CardDescription>
-            Upload a photo of your meal to get nutritional insights powered by AI
+            Upload a photo of your meal to get nutritional insights powered by
+            AI
           </CardDescription>
         </CardHeader>
         <CardContent>

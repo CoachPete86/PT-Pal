@@ -5,7 +5,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Brain, ChartBar, Users, MessageSquare, Calendar, FileText, Zap, Settings } from "lucide-react";
+import {
+  Brain,
+  ChartBar,
+  Users,
+  MessageSquare,
+  Calendar,
+  FileText,
+  Zap,
+  Settings,
+} from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -69,8 +78,8 @@ export default function ServicesSection() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Platform Features</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to manage and grow your fitness business, all in one
-            powerful platform.
+            Everything you need to manage and grow your fitness business, all in
+            one powerful platform.
           </p>
         </div>
 

@@ -1,8 +1,30 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,19 +40,28 @@ export default function NutritionTracking() {
     protein: "",
     carbs: "",
     fat: "",
-    mealType: "breakfast"
+    mealType: "breakfast",
   });
 
   // Simulated food entries that would normally come from an API
   const [foodEntries, setFoodEntries] = useState([
-    { id: 1, name: "Oatmeal with Berries", calories: 350, protein: 12, carbs: 60, fat: 7, mealType: "breakfast", date: new Date() }
+    {
+      id: 1,
+      name: "Oatmeal with Berries",
+      calories: 350,
+      protein: 12,
+      carbs: 60,
+      fat: 7,
+      mealType: "breakfast",
+      date: new Date(),
+    },
   ]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewEntry({
       ...newEntry,
-      [name]: name === "name" ? value : Number(value) || ""
+      [name]: name === "name" ? value : Number(value) || "",
     });
   };
 
@@ -42,7 +73,7 @@ export default function NutritionTracking() {
       toast({
         title: "Missing information",
         description: "Please enter at least a food name and calories.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -51,7 +82,7 @@ export default function NutritionTracking() {
     const entry = {
       id: Date.now(),
       ...newEntry,
-      date: new Date()
+      date: new Date(),
     };
 
     setFoodEntries([entry, ...foodEntries]);
@@ -63,12 +94,12 @@ export default function NutritionTracking() {
       protein: "",
       carbs: "",
       fat: "",
-      mealType: "breakfast"
+      mealType: "breakfast",
     });
 
     toast({
       title: "Food logged successfully",
-      description: `Added ${entry.name} to your food journal.`
+      description: `Added ${entry.name} to your food journal.`,
     });
   };
 
@@ -105,13 +136,55 @@ export default function NutritionTracking() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={[
-                      { day: 'Mon', calories: 2100, protein: 130, carbs: 190, fat: 70 },
-                      { day: 'Tue', calories: 1950, protein: 125, carbs: 180, fat: 65 },
-                      { day: 'Wed', calories: 2200, protein: 140, carbs: 200, fat: 75 },
-                      { day: 'Thu', calories: 2000, protein: 120, carbs: 185, fat: 70 },
-                      { day: 'Fri', calories: 2250, protein: 145, carbs: 205, fat: 80 },
-                      { day: 'Sat', calories: 1800, protein: 115, carbs: 160, fat: 60 },
-                      { day: 'Sun', calories: 2100, protein: 135, carbs: 195, fat: 70 },
+                      {
+                        day: "Mon",
+                        calories: 2100,
+                        protein: 130,
+                        carbs: 190,
+                        fat: 70,
+                      },
+                      {
+                        day: "Tue",
+                        calories: 1950,
+                        protein: 125,
+                        carbs: 180,
+                        fat: 65,
+                      },
+                      {
+                        day: "Wed",
+                        calories: 2200,
+                        protein: 140,
+                        carbs: 200,
+                        fat: 75,
+                      },
+                      {
+                        day: "Thu",
+                        calories: 2000,
+                        protein: 120,
+                        carbs: 185,
+                        fat: 70,
+                      },
+                      {
+                        day: "Fri",
+                        calories: 2250,
+                        protein: 145,
+                        carbs: 205,
+                        fat: 80,
+                      },
+                      {
+                        day: "Sat",
+                        calories: 1800,
+                        protein: 115,
+                        carbs: 160,
+                        fat: 60,
+                      },
+                      {
+                        day: "Sun",
+                        calories: 2100,
+                        protein: 135,
+                        carbs: 195,
+                        fat: 70,
+                      },
                     ]}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
@@ -120,7 +193,11 @@ export default function NutritionTracking() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="calories" fill="#8884d8" name="Calories (kcal)" />
+                    <Bar
+                      dataKey="calories"
+                      fill="#8884d8"
+                      name="Calories (kcal)"
+                    />
                     <Bar dataKey="protein" fill="#82ca9d" name="Protein (g)" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -132,7 +209,9 @@ export default function NutritionTracking() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold">2,050</div>
-                    <p className="text-xs text-muted-foreground">Avg. Daily Calories</p>
+                    <p className="text-xs text-muted-foreground">
+                      Avg. Daily Calories
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -140,7 +219,9 @@ export default function NutritionTracking() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold">130g</div>
-                    <p className="text-xs text-muted-foreground">Avg. Daily Protein</p>
+                    <p className="text-xs text-muted-foreground">
+                      Avg. Daily Protein
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -148,7 +229,9 @@ export default function NutritionTracking() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold">188g</div>
-                    <p className="text-xs text-muted-foreground">Avg. Daily Carbs</p>
+                    <p className="text-xs text-muted-foreground">
+                      Avg. Daily Carbs
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -156,7 +239,9 @@ export default function NutritionTracking() {
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold">70g</div>
-                    <p className="text-xs text-muted-foreground">Avg. Daily Fat</p>
+                    <p className="text-xs text-muted-foreground">
+                      Avg. Daily Fat
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -187,7 +272,9 @@ export default function NutritionTracking() {
                         <Label htmlFor="mealType">Meal Type</Label>
                         <Select
                           value={newEntry.mealType}
-                          onValueChange={(value) => setNewEntry({ ...newEntry, mealType: value })}
+                          onValueChange={(value) =>
+                            setNewEntry({ ...newEntry, mealType: value })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select meal type" />
@@ -252,28 +339,40 @@ export default function NutritionTracking() {
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full">Log Food</Button>
+                    <Button type="submit" className="w-full">
+                      Log Food
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Today's Food Journal</CardTitle>
+                  <CardTitle className="text-lg">
+                    Today's Food Journal
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {foodEntries.length > 0 ? (
                     <div className="space-y-4">
-                      {foodEntries.map(entry => (
-                        <div key={entry.id} className="flex items-center justify-between border-b pb-2">
+                      {foodEntries.map((entry) => (
+                        <div
+                          key={entry.id}
+                          className="flex items-center justify-between border-b pb-2"
+                        >
                           <div>
                             <div className="font-medium">{entry.name}</div>
-                            <div className="text-sm text-muted-foreground capitalize">{entry.mealType}</div>
+                            <div className="text-sm text-muted-foreground capitalize">
+                              {entry.mealType}
+                            </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-medium">{entry.calories} kcal</div>
+                            <div className="font-medium">
+                              {entry.calories} kcal
+                            </div>
                             <div className="text-sm text-muted-foreground">
-                              P: {entry.protein}g | C: {entry.carbs}g | F: {entry.fat}g
+                              P: {entry.protein}g | C: {entry.carbs}g | F:{" "}
+                              {entry.fat}g
                             </div>
                           </div>
                         </div>
@@ -299,23 +398,35 @@ export default function NutritionTracking() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="font-medium">Available Meal Plans</h3>
-                    <Button variant="outline" size="sm">Create New Plan</Button>
+                    <Button variant="outline" size="sm">
+                      Create New Plan
+                    </Button>
                   </div>
 
                   <div className="rounded-lg border divide-y">
                     <div className="p-4 flex justify-between items-center">
                       <div>
-                        <div className="font-medium">High Protein Meal Plan</div>
-                        <div className="text-sm text-muted-foreground">7-day plan • 2200 kcal/day</div>
+                        <div className="font-medium">
+                          High Protein Meal Plan
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          7-day plan • 2200 kcal/day
+                        </div>
                       </div>
-                      <Button variant="ghost" size="sm">View</Button>
+                      <Button variant="ghost" size="sm">
+                        View
+                      </Button>
                     </div>
                     <div className="p-4 flex justify-between items-center">
                       <div>
                         <div className="font-medium">Weight Loss Plan</div>
-                        <div className="text-sm text-muted-foreground">14-day plan • 1800 kcal/day</div>
+                        <div className="text-sm text-muted-foreground">
+                          14-day plan • 1800 kcal/day
+                        </div>
                       </div>
-                      <Button variant="ghost" size="sm">View</Button>
+                      <Button variant="ghost" size="sm">
+                        View
+                      </Button>
                     </div>
                   </div>
                 </div>
