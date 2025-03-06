@@ -763,7 +763,6 @@ export default function PersonalizedWorkoutGenerator() {
     </div>
   );
 }
-import React, { useState } from "react";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
