@@ -14,32 +14,35 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // Create a mock user with developer/trainer privileges
+  const mockUser: User = {
+    id: 10,
+    email: 'developer@example.com',
+    username: 'developer',
+    fullName: 'Developer Account',
+    role: 'trainer',
+    subscriptionTier: 'premium',
+    subscriptionStatus: 'active',
+    trialEndsAt: null,
+    trainerId: null,
+    createdAt: new Date(),
+    onboardingStatus: 'completed',
+    lastActive: new Date(),
+    profilePicture: null,
+    preferences: { goals: 'Development testing', healthConditions: 'None' },
+    status: 'active',
+    password: ''
+  };
+
+  const [user, setUser] = useState<User | null>(mockUser);
   const { toast } = useToast();
 
-  // Check auth status
+  // Auto-login for development - no API call needed
   const { isLoading } = useQuery({
     queryKey: ['/api/user'],
     queryFn: async () => {
-      try {
-        const res = await fetch('/api/user', {
-          credentials: 'include'
-        });
-        if (!res.ok) {
-          if (res.status === 401) {
-            setUser(null);
-            return null;
-          }
-          throw new Error('Authentication check failed');
-        }
-        const data = await res.json();
-        setUser(data);
-        return data;
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setUser(null);
-        return null;
-      }
+      // Just return the mock user directly
+      return mockUser;
     },
     retry: false
   });

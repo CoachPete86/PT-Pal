@@ -22,8 +22,16 @@ function Router() {
       </div>
     }>
       <Switch>
-        <Route path="/" component={HomePage} />
-        <Route path="/auth" component={AuthPage} />
+        <Route path="/">
+          {/* Auto-redirect to dashboard for development convenience */}
+          {window.location.pathname === "/" && (window.location.href = "/dashboard")}
+          <HomePage />
+        </Route>
+        <Route path="/auth">
+          {/* Auto-redirect to dashboard for development convenience */}
+          {window.location.pathname === "/auth" && (window.location.href = "/dashboard")}
+          <AuthPage />
+        </Route>
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
         <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />
