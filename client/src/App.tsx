@@ -37,19 +37,19 @@ function Router() {
             (window.location.href = "/dashboard")}
           <AuthPage />
         </Route>
-        <ProtectedRoute path="/dashboard" component={DashboardPage} />
+        <ProtectedRoute path="/dashboard" component={() => <DashboardPage />} />
         <ProtectedRoute
           path="/content-generator"
-          component={ContentGeneratorPage}
+          component={() => <ContentGeneratorPage />}
         />
-        <ProtectedRoute path="/settings" component={SettingsPage} />
+        <ProtectedRoute path="/settings" component={() => <SettingsPage />} />
         <ProtectedRoute
           path="/workout-features"
-          component={WorkoutFeaturesDemo}
+          component={() => <WorkoutFeaturesDemo />}
         />
         <ProtectedRoute
           path="/movement-analysis"
-          component={MovementAnalysisPage}
+          component={() => <MovementAnalysisPage />}
         />
         <Route component={NotFound} />
       </Switch>

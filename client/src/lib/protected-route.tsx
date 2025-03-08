@@ -9,7 +9,7 @@ export function ProtectedRoute({
   component: Component,
 }: {
   path: string;
-  component: () => React.JSX.Element;
+  component: () => React.JSX.Element | null;
 }) {
   // Skip all auth checks and always render the component directly
   // This is for development convenience only
