@@ -14,7 +14,7 @@ async function updateCoachCredentials() {
     const existingUser = await db
       .select()
       .from(users)
-      .where(eq(users.email, "Coachpete@86.com"))
+      .where(eq(users.email, "coachpete@86.com"))
       .limit(1);
     
     if (existingUser.length > 0) {
@@ -22,7 +22,7 @@ async function updateCoachCredentials() {
       await db
         .update(users)
         .set({
-          email: "Coachpete@86.com",
+          email: "coachpete@86.com",
           username: "CoachPete",
           password: hashedPassword,
           fullName: "Coach Pete Ryan",
@@ -37,7 +37,7 @@ async function updateCoachCredentials() {
     } else {
       // Create new user
       const result = await db.insert(users).values({
-        email: "Coachpete@86.com",
+        email: "coachpete@86.com",
         username: "CoachPete",
         password: hashedPassword,
         fullName: "Coach Pete Ryan",
