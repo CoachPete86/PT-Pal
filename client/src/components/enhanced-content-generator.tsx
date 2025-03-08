@@ -67,6 +67,7 @@ export default function EnhancedContentGenerator() {
   const { toast } = useToast();
   const { branding } = useBranding();
   const [activeTab, setActiveTab] = useState("text-generator");
+  // Using user's fullName or businessName from profile if available
   const businessName = user?.fullName || "My Fitness Business";
   
   // Text generator state

@@ -1036,7 +1036,7 @@ export default function EnhancedBusinessSettings() {
                         ? "border-primary bg-primary/5"
                         : "hover:border-primary/50"
                     }`}
-                    onClick={() => handleSubscriptionSelect(tier.id)}
+                    onClick={() => handleSubscriptionSelect(tier.id as SubscriptionTier)}
                   >
                     <div className="flex items-center justify-between">
                       <div>
