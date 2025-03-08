@@ -11,8 +11,15 @@ import ClientEngagementHub from './client-engagement-hub';
 import PersonalizedWorkoutGenerator from './personalized-workout-generator';
 import WhiteLabelCustomization from './white-label-customization';
 
-// Mock data for charts
-// Get session data from API by processing session packages
+import { useQuery } from "@tanstack/react-query";
+
+// Fetch actual session data from API
+// Fetch session packages data
+const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
+  queryKey: ["/api/session-packages"],
+  retry: false,
+});
+
 const transformSessionData = (packages = []) => {
   // Default empty data structure for chart
   const defaultMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -47,6 +54,7 @@ const transformSessionData = (packages = []) => {
 };
 
 // Process session data for charts
+const sessionData = transformSessionData(sessionPackages || []);
 const sessionData = transformSessionData(sessionPackages);
 
 import { useQuery } from "@tanstack/react-query";
@@ -171,6 +179,11 @@ export default function PTpalDashboard() {
               <CardDescription>Personal vs. Group sessions</CardDescription>
             </CardHeader>
             <CardContent>
+              {isLoadingPackages ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <Clock className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={sessionData}>
                   <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
@@ -180,6 +193,7 @@ export default function PTpalDashboard() {
                   <Legend />
                 </BarChart>
               </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
 
