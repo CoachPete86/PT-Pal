@@ -12,29 +12,63 @@ import PersonalizedWorkoutGenerator from './personalized-workout-generator';
 import WhiteLabelCustomization from './white-label-customization';
 
 // Mock data for charts
-const sessionData = [
-  { name: "Jan", personal: 3, group: 5 },
-  { name: "Feb", personal: 4, group: 4 },
-  { name: "Mar", personal: 5, group: 7 },
-  { name: "Apr", personal: 8, group: 10 },
-  { name: "May", personal: 10, group: 8 },
-  { name: "Jun", personal: 12, group: 9 },
-  { name: "Jul", personal: 11, group: 10 },
-];
+// Get session data from API by processing session packages
+const transformSessionData = (packages = []) => {
+  // Default empty data structure for chart
+  const defaultMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const sessionData = defaultMonths.map(name => ({ 
+    name, 
+    personal: 0, 
+    group: 0 
+  }));
+  
+  // Process real session data if available
+  if (packages.length > 0) {
+    packages.forEach(pkg => {
+      if (pkg.sessions) {
+        pkg.sessions.forEach(session => {
+          if (session.date) {
+            const date = new Date(session.date);
+            const monthIndex = date.getMonth();
+            
+            // Increment the appropriate session type
+            if (session.type === 'personal') {
+              sessionData[monthIndex].personal += 1;
+            } else if (session.type === 'group') {
+              sessionData[monthIndex].group += 1;
+            }
+          }
+        });
+      }
+    });
+  }
+  
+  return sessionData;
+};
 
-const revenueData = [
-  { name: "Jan", revenue: 400 },
-  { name: "Feb", revenue: 600 },
-  { name: "Mar", revenue: 550 },
-  { name: "Apr", revenue: 800 },
-  { name: "May", revenue: 900 },
-  { name: "Jun", revenue: 1200 },
-  { name: "Jul", revenue: 1100 },
-];
+// Process session data for charts
+const sessionData = transformSessionData(sessionPackages);
+
+import { useQuery } from "@tanstack/react-query";
 
 export default function PTpalDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState("week");
+  
+  // Fetch client data
+  const { data: clients = [] } = useQuery({
+    queryKey: ["/api/clients"],
+  });
+  
+  // Fetch session packages
+  const { data: sessionPackages = [] } = useQuery({
+    queryKey: ["/api/session-packages"],
+  });
+  
+  // Fetch workout plans
+  const { data: workoutPlans = [] } = useQuery({
+    queryKey: ["/api/workout-plans"],
+  });
 
   // Render based on active tab
   const renderContent = () => {
@@ -53,6 +87,24 @@ export default function PTpalDashboard() {
 
   // Render the default dashboard overview
   const renderOverview = () => {
+    // Calculate statistics from real data
+    const totalClients = clients.length;
+    
+    // Calculate completed sessions
+    const completedSessions = sessionPackages.reduce((total, pkg) => {
+      return total + (pkg.sessions?.filter(s => s.status === "completed")?.length || 0);
+    }, 0);
+    
+    // Calculate completion rate
+    const totalScheduledSessions = sessionPackages.reduce((total, pkg) => {
+      return total + (pkg.sessions?.length || 0);
+    }, 0);
+    const completionRate = totalScheduledSessions ? 
+      Math.round((completedSessions / totalScheduledSessions) * 100) : 0;
+    
+    // Active workout plans
+    const activePlans = workoutPlans.filter(plan => plan.status === "active").length;
+    
     return (
       <div className="grid gap-4 md:gap-6">
         {/* KPI Cards */}
@@ -64,9 +116,11 @@ export default function PTpalDashboard() {
             <CardContent>
               <div className="flex items-center">
                 <UsersRound className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">24</div>
+                <div className="text-2xl font-bold">{totalClients || 0}</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">+3 this month</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {totalClients ? `Managing ${totalClients} clients` : "No clients yet"}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -76,9 +130,11 @@ export default function PTpalDashboard() {
             <CardContent>
               <div className="flex items-center">
                 <CalendarDays className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">156</div>
+                <div className="text-2xl font-bold">{completedSessions}</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">87% completion rate</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {completionRate}% completion rate
+              </p>
             </CardContent>
           </Card>
           <Card>

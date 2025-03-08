@@ -24,25 +24,25 @@ export default function AboutSection() {
               <Card>
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
-                    500+
+                    <span className="text-sm">Personal Trainer</span>
                   </div>
-                  <div className="text-sm">Active Trainers</div>
+                  <div className="text-sm">Personalized Coaching</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
-                    10k+
+                    <span className="text-sm">AI Powered</span>
                   </div>
-                  <div className="text-sm">Clients Managed</div>
+                  <div className="text-sm">Smart Workout Plans</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
-                    98%
+                    <span className="text-sm">Results Focused</span>
                   </div>
-                  <div className="text-sm">Satisfaction Rate</div>
+                  <div className="text-sm">Achieve Your Goals</div>
                 </CardContent>
               </Card>
             </div>
