@@ -1,434 +1,231 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import PersonalizedWorkoutGenerator from "@/components/personalized-workout-generator";
-import ClientEngagementHub from "@/components/client-engagement-hub";
-import WhiteLabelCustomization from "@/components/white-label-customization";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UsersRound, CalendarDays, TrendingUp, Clock, Dumbbell, DollarSign, BarChartBig, Star, Award, Mail, ImageIcon, Settings, Palette, Trophy, AlertCircle, Plus, ArrowUpRight, Filter } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
+import {
+  BarChart,
+  DollarSign,
+  Users,
+  Calendar,
+  TrendingUp,
+  Loader2,
+} from "lucide-react";
 
+// Transform session data function
+const transformSessionData = (sessionPackages: any[] = []) => {
+  // Process the data for charts
+  const sessionData = {
+    completedSessions: 0,
+    totalRevenue: 0,
+    activeClients: 0,
+    upcomingSessions: 0,
+    monthlyData: [],
+    // Add other properties as needed
+  };
 
-// Helper function to transform session data  (Keeping the original logic for completeness)
-const transformSessionData = (packages = []) => {
-  const defaultMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const sessionData = defaultMonths.map(name => ({ 
-    name, 
-    personal: 0, 
-    group: 0 
-  }));
-  if (packages.length > 0) {
-    packages.forEach(pkg => {
-      if (pkg.sessions) {
-        pkg.sessions.forEach(session => {
-          if (session.date) {
-            const date = new Date(session.date);
-            const monthIndex = date.getMonth();
-            if (session.type === 'personal') {
-              sessionData[monthIndex].personal += 1;
-            } else if (session.type === 'group') {
-              sessionData[monthIndex].group += 1;
-            }
-          }
-        });
-      }
-    });
-  }
   return sessionData;
 };
 
 export default function PTpalDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [timeRange, setTimeRange] = useState("week");
 
-  // Fetch client data
-  const { data: clients = [] } = useQuery({
-    queryKey: ["/api/clients"],
-  });
-
-  // Fetch session packages
-  const { data: sessionPackages = [] } = useQuery({
+  // Fetch session packages data
+  const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
     queryKey: ["/api/session-packages"],
+    retry: false,
   });
 
   // Process session data for charts
   const sessionData = transformSessionData(sessionPackages || []);
 
-  // Fetch workout plans
-  const { data: workoutPlans = [] } = useQuery({
-    queryKey: ["/api/workout-plans"],
-  });
-
-  // Render based on active tab
-  const renderContent = () => {
-    switch (activeTab) {
-      case "personalized-workout":
-        return <PersonalizedWorkoutGenerator />;
-      case "engagement-hub":
-        return <ClientEngagementHub />;
-      case "white-label":
-        return <WhiteLabelCustomization />;
-      case "overview":
-      default:
-        return renderOverview();
-    }
-  };
-
-  // Re-using and expanding the original renderOverview function.
-  const renderOverview = () => {
-    // Calculate statistics from real data
-    const totalClients = clients.length;
-    const completedSessions = sessionPackages.reduce((total, pkg) => {
-      return total + (pkg.sessions?.filter(s => s.status === "completed")?.length || 0);
-    }, 0);
-    const totalScheduledSessions = sessionPackages.reduce((total, pkg) => {
-      return total + (pkg.sessions?.length || 0);
-    }, 0);
-    const completionRate = totalScheduledSessions ? 
-      Math.round((completedSessions / totalScheduledSessions) * 100) : 0;
-    const activePlans = workoutPlans.filter(plan => plan.status === "active").length;
-
-    return (
-      <div className="grid gap-4 md:gap-6">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <UsersRound className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">{totalClients || 0}</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {totalClients ? `Managing ${totalClients} clients` : "No clients yet"}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Sessions Completed</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <CalendarDays className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">{completedSessions}</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {completionRate}% completion rate
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">$3,240</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">+15% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Client Retention</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
-                <div className="text-2xl font-bold">92%</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">+2% from last month</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {/* Session Overview Chart */}
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Sessions Overview</CardTitle>
-              <CardDescription>Personal vs. Group sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={sessionData}>
-                  <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                  <Bar dataKey="personal" name="Personal Sessions" fill="#5570f1" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="group" name="Group Classes" fill="#97a3ea" radius={[4, 4, 0, 0]} />
-                  <Legend />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Revenue Chart - Placeholder, needs data */}
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Revenue Trend</CardTitle>
-              <CardDescription>Monthly revenue in USD</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={[{name: "Jan", revenue: 1000}, {name: "Feb", revenue: 1200}]}> {/* Placeholder data */}
-                  <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                  <Bar dataKey="revenue" fill="#1ad598" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-        {/* Upcoming Sessions */}
-        <div className="grid grid-cols-1 gap-4">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Upcoming Sessions</CardTitle>
-                  <CardDescription>Next 7 days</CardDescription>
-                </div>
-                <Button size="sm">View Calendar</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[1, 2, 3].map((session) => (
-                  <div key={session} className="flex items-center p-3 bg-muted/50 rounded-lg">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                      <Clock className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium">Personal Training with Jane Smith</h4>
-                      <p className="text-xs text-muted-foreground">Tomorrow, 10:00 AM - 11:00 AM</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Reschedule</Button>
-                      <Button size="sm">Start</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="border-t bg-muted/10 flex justify-between pt-3">
-              <div className="text-sm text-muted-foreground">Showing 3 of 12 sessions</div>
-              <Button variant="ghost" size="sm">
-                See all <ArrowUpRight className="ml-1 h-4 w-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-
-        {/* Recent Client Activity */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Recent Client Activity</CardTitle>
-              <CardDescription>Client interactions and milestones</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[1, 2, 3, 4].map((activity) => (
-                  <div key={activity} className="flex p-3 border rounded-lg">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                      {activity % 2 === 0 ? (
-                        <Dumbbell className="h-4 w-4 text-primary" />
-                      ) : (
-                        <Award className="h-4 w-4 text-primary" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium">
-                        {activity % 2 === 0
-                          ? "Mike Johnson completed his workout"
-                          : "Sarah Williams achieved a milestone"}
-                      </h4>
-                      <p className="text-xs text-muted-foreground">2 hours ago</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="border-t bg-muted/10 flex justify-between pt-3">
-              <div className="text-sm text-muted-foreground">Recent updates</div>
-              <Button variant="outline" size="sm" onClick={() => setActiveTab("engagement-hub")}>
-                <Mail className="mr-1 h-4 w-4" />
-                Open Engagement Hub
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Performing Services</CardTitle>
-              <CardDescription>Based on client attendance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { name: "Personal Training", value: "86%", icon: <Dumbbell className="h-4 w-4" /> },
-                  { name: "HIIT Classes", value: "78%", icon: <BarChartBig className="h-4 w-4" /> },
-                  { name: "Nutrition Coaching", value: "72%", icon: <Star className="h-4 w-4" /> },
-                ].map((service, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        {service.icon}
-                      </div>
-                      <span className="text-sm font-medium">{service.name}</span>
-                    </div>
-                    <span className="text-sm font-semibold">{service.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle>AI Workout Generator</CardTitle>
-              <CardDescription>Create personalized workouts for your clients</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Dumbbell className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Intelligent Workouts</h4>
-                  <p className="text-xs text-muted-foreground">Based on client goals and history</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                <div className="border p-2 rounded-md text-center">
-                  <p className="text-sm font-medium">17</p>
-                  <p className="text-xs text-muted-foreground">Generated</p>
-                </div>
-                <div className="border p-2 rounded-md text-center">
-                  <p className="text-sm font-medium">94%</p>
-                  <p className="text-xs text-muted-foreground">Client Satisfaction</p>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="border-t pt-3">
-              <Button className="w-full" onClick={() => setActiveTab("personalized-workout")}>
-                Create Workout
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle>Client Engagement Hub</CardTitle>
-              <CardDescription>Connect with your clients</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Client Communication</h4>
-                  <p className="text-xs text-muted-foreground">Messages, goals and progress tracking</p>
-                </div>
-              </div>
-              <div className="border p-3 rounded-md mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm">2 clients inactive</span>
-                </div>
-                <Button size="sm" variant="ghost">Check in</Button>
-              </div>
-              <div className="border p-3 rounded-md flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-green-500" />
-                  <span className="text-sm">5 goals achieved</span>
-                </div>
-                <Button size="sm" variant="ghost">Celebrate</Button>
-              </div>
-            </CardContent>
-            <CardFooter className="border-t pt-3">
-              <Button className="w-full" onClick={() => setActiveTab("engagement-hub")}>
-                Open Hub
-              </Button>
-            </CardFooter>
-          </Card>
-
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle>White Label Customization</CardTitle>
-              <CardDescription>Personalize your brand experience</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                  <Palette className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Brand Customization</h4>
-                  <p className="text-xs text-muted-foreground">Colors, logos and domain settings</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                <div className="h-6 rounded-md bg-blue-500"></div>
-                <div className="h-6 rounded-md bg-green-500"></div>
-                <div className="h-6 rounded-md bg-purple-500"></div>
-                <div className="h-6 rounded-md bg-amber-500"></div>
-              </div>
-              <p className="text-xs text-muted-foreground mb-1">Branding completion:</p>
-              <Progress value={60} className="h-2 mb-2" />
-              <p className="text-xs text-right">60%</p>
-            </CardContent>
-            <CardFooter className="border-t pt-3">
-              <Button className="w-full" onClick={() => setActiveTab("white-label")}>
-                Customize Brand
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Welcome back, Coach</h1>
-          <p className="text-muted-foreground">Here's what's happening with your clients today.</p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex items-center gap-2">
-          <Tabs value={activeTab} className="w-[400px]">
-            <TabsList className="grid grid-cols-4">
-              <TabsTrigger value="overview" onClick={() => setActiveTab("overview")}>
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="personalized-workout" onClick={() => setActiveTab("personalized-workout")}>
-                Workouts
-              </TabsTrigger>
-              <TabsTrigger value="engagement-hub" onClick={() => setActiveTab("engagement-hub")}>
-                Engagement
-              </TabsTrigger>
-              <TabsTrigger value="white-label" onClick={() => setActiveTab("white-label")}>
-                Branding
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <Button variant="outline" size="sm">
+            Last 30 Days
+          </Button>
         </div>
       </div>
 
-      {renderContent()}
+      <Tabs
+        defaultValue="overview"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="clients">Clients</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Completed Sessions
+                </CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingPackages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    sessionData.completedSessions
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  +20% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingPackages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    `$${sessionData.totalRevenue}`
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  +15% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Active Clients
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingPackages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    sessionData.activeClients
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  +10% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Upcoming Sessions
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingPackages ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    sessionData.upcomingSessions
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Next 7 days
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-4">
+              <CardHeader>
+                <CardTitle>Monthly Overview</CardTitle>
+              </CardHeader>
+              <CardContent className="pl-2">
+                {isLoadingPackages ? (
+                  <div className="flex h-80 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="h-80 w-full">
+                    {/* Chart component would go here */}
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-muted-foreground">
+                        Revenue and session charts by month
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="col-span-3">
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>
+                  Latest client sessions and updates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingPackages ? (
+                  <div className="flex h-60 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    <div className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          Session with Alex Morgan
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          1 hour ago
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          New booking from Chris Evans
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          3 hours ago
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          Payment received from Sarah Johnson
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Yesterday at 3:12 PM
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
