@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import PersonalizedWorkoutGenerator from "@/components/personalized-workout-generator";
+import ClientEngagementHub from "@/components/client-engagement-hub";
+import WhiteLabelCustomization from "@/components/white-label-customization";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Button } from '@/components/ui/button';
@@ -7,29 +11,16 @@ import { UsersRound, CalendarDays, TrendingUp, Clock, Dumbbell, DollarSign, BarC
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import ClientEngagementHub from './client-engagement-hub';
-import PersonalizedWorkoutGenerator from './personalized-workout-generator';
-import WhiteLabelCustomization from './white-label-customization';
 
-import { useQuery } from "@tanstack/react-query";
 
-// Fetch actual session data from API
-// Fetch session packages data
-const { data: sessionPackages, isLoading: isLoadingPackages } = useQuery({
-  queryKey: ["/api/session-packages"],
-  retry: false,
-});
-
+// Helper function to transform session data  (Keeping the original logic for completeness)
 const transformSessionData = (packages = []) => {
-  // Default empty data structure for chart
   const defaultMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const sessionData = defaultMonths.map(name => ({ 
     name, 
     personal: 0, 
     group: 0 
   }));
-  
-  // Process real session data if available
   if (packages.length > 0) {
     packages.forEach(pkg => {
       if (pkg.sessions) {
@@ -37,8 +28,6 @@ const transformSessionData = (packages = []) => {
           if (session.date) {
             const date = new Date(session.date);
             const monthIndex = date.getMonth();
-            
-            // Increment the appropriate session type
             if (session.type === 'personal') {
               sessionData[monthIndex].personal += 1;
             } else if (session.type === 'group') {
@@ -49,29 +38,26 @@ const transformSessionData = (packages = []) => {
       }
     });
   }
-  
   return sessionData;
 };
-
-import { useQuery } from "@tanstack/react-query";
-
-// Process session data for charts
-const sessionData = transformSessionData(sessionPackages || []);
 
 export default function PTpalDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState("week");
-  
+
   // Fetch client data
   const { data: clients = [] } = useQuery({
     queryKey: ["/api/clients"],
   });
-  
+
   // Fetch session packages
   const { data: sessionPackages = [] } = useQuery({
     queryKey: ["/api/session-packages"],
   });
-  
+
+  // Process session data for charts
+  const sessionData = transformSessionData(sessionPackages || []);
+
   // Fetch workout plans
   const { data: workoutPlans = [] } = useQuery({
     queryKey: ["/api/workout-plans"],
@@ -92,26 +78,20 @@ export default function PTpalDashboard() {
     }
   };
 
-  // Render the default dashboard overview
+  // Re-using and expanding the original renderOverview function.
   const renderOverview = () => {
     // Calculate statistics from real data
     const totalClients = clients.length;
-    
-    // Calculate completed sessions
     const completedSessions = sessionPackages.reduce((total, pkg) => {
       return total + (pkg.sessions?.filter(s => s.status === "completed")?.length || 0);
     }, 0);
-    
-    // Calculate completion rate
     const totalScheduledSessions = sessionPackages.reduce((total, pkg) => {
       return total + (pkg.sessions?.length || 0);
     }, 0);
     const completionRate = totalScheduledSessions ? 
       Math.round((completedSessions / totalScheduledSessions) * 100) : 0;
-    
-    // Active workout plans
     const activePlans = workoutPlans.filter(plan => plan.status === "active").length;
-    
+
     return (
       <div className="grid gap-4 md:gap-6">
         {/* KPI Cards */}
@@ -178,11 +158,6 @@ export default function PTpalDashboard() {
               <CardDescription>Personal vs. Group sessions</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingPackages ? (
-                <div className="flex items-center justify-center h-[300px]">
-                  <Clock className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={sessionData}>
                   <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
@@ -192,11 +167,10 @@ export default function PTpalDashboard() {
                   <Legend />
                 </BarChart>
               </ResponsiveContainer>
-              )}
             </CardContent>
           </Card>
 
-          {/* Revenue Chart */}
+          {/* Revenue Chart - Placeholder, needs data */}
           <Card className="md:col-span-1">
             <CardHeader>
               <CardTitle>Revenue Trend</CardTitle>
@@ -204,7 +178,7 @@ export default function PTpalDashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={revenueData}>
+                <BarChart data={[{name: "Jan", revenue: 1000}, {name: "Feb", revenue: 1200}]}> {/* Placeholder data */}
                   <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis fontSize={12} tickLine={false} axisLine={false} />
                   <Bar dataKey="revenue" fill="#1ad598" radius={[4, 4, 0, 0]} />
@@ -213,7 +187,6 @@ export default function PTpalDashboard() {
             </CardContent>
           </Card>
         </div>
-
         {/* Upcoming Sessions */}
         <div className="grid grid-cols-1 gap-4">
           <Card>
