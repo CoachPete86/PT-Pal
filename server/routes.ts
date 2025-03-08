@@ -11,6 +11,10 @@ import { format } from "date-fns";
 import { generateSocialContent } from "./openai";
 import { generatePersonalizedWorkout } from "./routes/personalized-workout";
 import { uploadAndAnalyzeMovement, analyzeDemo } from "./routes/movement-analysis";
+import multer from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
@@ -1577,6 +1581,30 @@ Present the meal plan in a structured JSON format.`;
       });
     }
   });
+
+  // Movement Analysis Endpoints
+  // Setup multer for file uploads
+  const uploadStorage = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+      cb(null, './uploads');
+    },
+    filename: (req: any, file: any, cb: any) => {
+      const uniqueFilename = `${uuidv4()}-${file.originalname}`;
+      cb(null, uniqueFilename);
+    }
+  });
+  
+  const upload = multer({ storage: uploadStorage });
+  
+  // Create uploads directory if it doesn't exist
+  const uploadsDir = './uploads';
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  
+  // Movement Analysis endpoints
+  app.post('/api/movement-analysis/upload', upload.single('video'), uploadAndAnalyzeMovement);
+  app.get('/api/movement-analysis/demo', analyzeDemo);
 
   const httpServer = createServer(app);
   return httpServer;
