@@ -67,6 +67,7 @@ export default function EnhancedContentGenerator() {
   const { toast } = useToast();
   const { branding } = useBranding();
   const [activeTab, setActiveTab] = useState("text-generator");
+  const businessName = user?.fullName || "My Fitness Business";
   
   // Text generator state
   const [platform, setPlatform] = useState("instagram");
@@ -223,7 +224,7 @@ export default function EnhancedContentGenerator() {
         .split(",")
         .map((k) => k.trim())
         .filter(Boolean),
-      businessName: branding?.businessName || user?.businessName,
+      businessName: businessName,
       includeImage: true,
     });
   };
@@ -286,7 +287,7 @@ export default function EnhancedContentGenerator() {
       description: imageDescription,
       platform,
       tone,
-      businessName: branding?.businessName || user?.businessName,
+      businessName: businessName,
     });
   };
 

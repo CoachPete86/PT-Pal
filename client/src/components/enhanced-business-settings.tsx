@@ -42,7 +42,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, FileUpload, Building, Palette, Globe, CreditCard, Settings, User, Upload } from "lucide-react";
+import { AlertCircle, File, Building, Palette, Globe, CreditCard, Settings, User, Upload } from "lucide-react";
 import { LoadingState } from "@/components/ui/loading-states";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -80,12 +80,14 @@ type BasicInfoValues = z.infer<typeof basicInfoSchema>;
 type BrandingValues = z.infer<typeof brandingSchema>;
 type SocialMediaValues = z.infer<typeof socialMediaSchema>;
 
+type SubscriptionTier = "free" | "starter" | "professional" | "business" | "enterprise";
+
 const subscriptionTiers = [
-  { id: "free", name: "Free", price: 0 },
-  { id: "starter", name: "Starter", price: 19 },
-  { id: "professional", name: "Professional", price: 49 },
-  { id: "business", name: "Business", price: 99 },
-  { id: "enterprise", name: "Enterprise", price: 199 },
+  { id: "free" as SubscriptionTier, name: "Free", price: 0 },
+  { id: "starter" as SubscriptionTier, name: "Starter", price: 19 },
+  { id: "professional" as SubscriptionTier, name: "Professional", price: 49 },
+  { id: "business" as SubscriptionTier, name: "Business", price: 99 },
+  { id: "enterprise" as SubscriptionTier, name: "Enterprise", price: 199 },
 ];
 
 const currencies = [
@@ -107,7 +109,7 @@ export default function EnhancedBusinessSettings() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [selectedTier, setSelectedTier] = useState(user?.subscriptionTier || "free");
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>(user?.subscriptionTier as SubscriptionTier || "free");
   const [setupComplete, setSetupComplete] = useState(false);
 
   // Get user profile and business data
@@ -342,7 +344,7 @@ export default function EnhancedBusinessSettings() {
     }
   }
 
-  function handleSubscriptionSelect(tier: string) {
+  function handleSubscriptionSelect(tier: SubscriptionTier) {
     setSelectedTier(tier);
   }
 
@@ -813,7 +815,7 @@ export default function EnhancedBusinessSettings() {
                           {uploadingLogo ? (
                             <LoadingState variant="pulse" size="sm" className="mr-2" />
                           ) : (
-                            <FileUpload className="h-4 w-4 mr-2" />
+                            <File className="h-4 w-4 mr-2" />
                           )}
                           Upload Logo
                         </Button>
