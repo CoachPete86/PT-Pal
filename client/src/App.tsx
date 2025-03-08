@@ -9,6 +9,7 @@ import DashboardPage from "@/pages/dashboard-new";
 import ContentGeneratorPage from "@/pages/content-generator-page";
 import SettingsPage from "@/pages/settings-page";
 import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
+import MovementAnalysisPage from "@/pages/movement-analysis-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -45,6 +46,10 @@ function Router() {
         <ProtectedRoute
           path="/workout-features"
           component={WorkoutFeaturesDemo}
+        />
+        <ProtectedRoute
+          path="/movement-analysis"
+          component={MovementAnalysisPage}
         />
         <Route component={NotFound} />
       </Switch>

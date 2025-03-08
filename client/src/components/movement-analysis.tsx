@@ -434,7 +434,7 @@ export default function MovementAnalysis() {
                 <p className="text-sm text-muted-foreground">
                   {uploading 
                     ? 'This may take a moment depending on your connection speed.' 
-                    : 'We're creating a personalized blueprint analysis of your form.'}
+                    : "We're creating a personalized blueprint analysis of your form."}
                 </p>
               </div>
             </AlertDialogDescription>

@@ -17,6 +17,7 @@ import {
   Settings,
   User,
   X,
+  Activity,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -42,6 +43,7 @@ const mainNavItems = [
   { href: "/#about", label: "About" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/content-generator", label: "Content" },
+  { href: "/movement-analysis", label: "Movement Analysis" },
 ];
 
 export default function Navbar() {
@@ -144,6 +146,14 @@ export default function Navbar() {
                           <div className="flex items-center cursor-pointer">
                             <BookOpen className="mr-2 h-4 w-4" />
                             Documents
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/movement-analysis">
+                          <div className="flex items-center cursor-pointer">
+                            <Activity className="mr-2 h-4 w-4" />
+                            Movement Analysis
                           </div>
                         </Link>
                       </DropdownMenuItem>
