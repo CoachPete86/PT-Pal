@@ -10,6 +10,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { format } from "date-fns";
 import { generateSocialContent } from "./openai";
 import { generatePersonalizedWorkout } from "./routes/personalized-workout";
+import { uploadAndAnalyzeMovement, analyzeDemo } from "./routes/movement-analysis";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
