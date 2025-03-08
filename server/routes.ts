@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
@@ -1601,6 +1601,9 @@ Present the meal plan in a structured JSON format.`;
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
+  
+  // Serve attached assets directory for the movement analysis blueprint images
+  app.use('/attached_assets', express.static(path.join(process.cwd(), 'attached_assets')));
   
   // Movement Analysis endpoints
   app.post('/api/movement-analysis/upload', upload.single('video'), uploadAndAnalyzeMovement);
