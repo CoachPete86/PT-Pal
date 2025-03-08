@@ -55,8 +55,6 @@ const transformSessionData = (packages = []) => {
 
 // Process session data for charts
 const sessionData = transformSessionData(sessionPackages || []);
-const sessionData = transformSessionData(sessionPackages);
-
 import { useQuery } from "@tanstack/react-query";
 
 export default function PTpalDashboard() {
