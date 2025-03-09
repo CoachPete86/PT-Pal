@@ -50,7 +50,6 @@ const anthropic = new Anthropic({
 });
 
 export function registerRoutes(app: Express): Server {
-  const server = createServer(app);
   setupAuth(app);
 
   // Subscription creation endpoint
@@ -933,50 +932,8 @@ Please create a structured meal plan with the following:
 2. Macro breakdown per day
 3. Each meal with ingredients, preparation instructions, and nutrition information
 4. A weekly grocery list
-`;
 
-      // Use Claude to generate meal plan
-      const response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 4000,
-        temperature: 0.7,
-        system: "You are a professional nutritionist and meal planner. Create detailed meal plans with exact nutritional information.",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      });
-
-      let mealPlan;
-      const responseText = response.content[0].text;
-      
-      // Try to extract JSON from the response
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
-        responseText.match(/```\n([\s\S]*?)```/);
-        
-      if (jsonMatch && jsonMatch[1]) {
-        try {
-          mealPlan = JSON.parse(jsonMatch[1]);
-        } catch (e) {
-          console.error("Failed to parse JSON from response:", e);
-        }
-      }
-
-      if (!mealPlan) {
-        // Fallback to using the raw text response
-        mealPlan = { rawPlan: responseText };
-      }
-
-      return res.status(200).json(mealPlan);
-    } catch (error) {
-      console.error("Error generating meal plan:", error);
-      return res.status(500).json({
-        error: "Failed to generate meal plan",
-        details: error.message,
-      });
-    }
-  });
-  return server;
-}
+Present the meal plan injson\n([\s\S]*?)```/) ||
+        responseText.match(/```\n([\s\S]*?)```/) ||
+        responseText.match(/json\n([\s\S]*?)```/) ||
+        responseText.match(/presentjson\n([\s\S]*?)
