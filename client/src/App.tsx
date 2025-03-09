@@ -19,56 +19,53 @@ import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+// Importing new pages -  assuming these files exist or will be created.
+import SolutionsPage from "@/pages/solutions-page";
+import HowItWorksPage from "@/pages/how-it-works-page";
+import ResourcesPage from "@/pages/resources-page";
+import SupportPage from "@/pages/support-page";
+
 
 function Router() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen w-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex h-screen w-full items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }
     >
       <Switch>
-        {/* Public Marketing Pages */}
-        <Route path="/">
-          <HomePage />
+        <Route path="/" component={HomePage} />
+        <Route path="/login" component={AuthPage} />
+        <Route path="/signup" component={AuthPage} />
+        <Route path="/reset-password" component={AuthPage} />
+        <Route path="/services" component={ServicesPage} />
+        <Route path="/features" component={FeaturesPage} />
+        <Route path="/solutions" component={SolutionsPage} />
+        <Route path="/pricing" component={PricingPage} />
+        <Route path="/how-it-works" component={HowItWorksPage} />
+        <Route path="/resources" component={ResourcesPage} />
+        <Route path="/support" component={SupportPage} />
+        <Route path="/demo" component={DemoPage} />
+        <Route path="/dashboard">
+          <ProtectedRoute component={DashboardPage} />
         </Route>
-        <Route path="/auth">
-          <AuthPage />
+        <Route path="/content-generator">
+          <ProtectedRoute component={ContentGeneratorPage} />
         </Route>
-        <Route path="/services">
-          <ServicesPage />
+        <Route path="/settings">
+          <ProtectedRoute component={SettingsPage} />
         </Route>
-        <Route path="/pricing">
-          <PricingPage />
+        <Route path="/workout-features">
+          <ProtectedRoute component={WorkoutFeaturesDemo} />
         </Route>
-        <Route path="/features">
-          <FeaturesPage />
+        <Route path="/movement-analysis">
+          <ProtectedRoute component={MovementAnalysisPage} />
         </Route>
-        <Route path="/demo">
-          <DemoPage />
+        <Route path="/meal-plan">
+          <ProtectedRoute component={MealPlanPage} />
         </Route>
-
-        {/* Protected App Pages */}
-        <ProtectedRoute path="/dashboard" component={() => <DashboardPage />} />
-        <ProtectedRoute
-          path="/content-generator"
-          component={() => <ContentGeneratorPage />}
-        />
-        <ProtectedRoute path="/settings" component={() => <SettingsPage />} />
-        <ProtectedRoute
-          path="/workout-features"
-          component={() => <WorkoutFeaturesDemo />}
-        />
-        <ProtectedRoute
-          path="/movement-analysis"
-          component={() => <MovementAnalysisPage />}
-        />
-        <ProtectedRoute
-          path="/meal-plan"
-          component={() => <MealPlanPage />}
-        />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

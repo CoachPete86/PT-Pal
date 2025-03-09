@@ -157,14 +157,14 @@ export default function FeaturesPage() {
 
   const clientFeatures = [
     {
-      title: "Personalized Dashboard",
-      description: "Keep clients engaged with a personalized fitness tracking hub.",
+      title: "Personalised Dashboard",
+      description: "Keep clients engaged with a personalised fitness tracking hub.",
       details: [
         "At-a-glance view of upcoming sessions and recent achievements",
-        "Progress visualization with customizable metrics",
+        "Progress visualisation with customisable metrics",
         "Workout and nutrition plan access",
         "Direct messaging with their trainer",
-        "Notification center for reminders and updates"
+        "Notification centre for reminders and updates"
       ],
       icon: <LayoutDashboard size={24} className="text-primary" />,
     },

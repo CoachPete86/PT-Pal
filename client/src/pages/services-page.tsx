@@ -48,13 +48,13 @@ export default function ServicesPage() {
   const featureCards = [
     {
       title: "AI Workout Generator",
-      description: "Create personalized workout plans in seconds. Customized by fitness level, equipment, and goals.",
+      description: "Create personalised workout plans in seconds. Customised by fitness level, equipment, and goals.",
       icon: <Brain size={24} className="text-primary" />,
       cta: "Explore Workout Generator"
     },
     {
       title: "Movement Analysis",
-      description: "Upload videos for AI-powered form analysis. Get blueprint-style visualization and personalized feedback.",
+      description: "Upload videos for AI-powered form analysis. Get blueprint-style visualisation and personalised feedback.",
       icon: <Camera size={24} className="text-primary" />,
       cta: "Learn About Movement Analysis"
     },
@@ -66,7 +66,7 @@ export default function ServicesPage() {
     },
     {
       title: "Client Management Suite",
-      description: "Centralized dashboard for managing clients, bookings, and progress tracking. All your client data in one place.",
+      description: "Centralised dashboard for managing clients, bookings, and progress tracking. All your client data in one place.",
       icon: <Users size={24} className="text-primary" />,
       cta: "View Management Features"
     },
@@ -127,7 +127,7 @@ export default function ServicesPage() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Comprehensive Features for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover our powerful suite of tools designed specifically for personal trainers and fitness coaches to optimize their business and enhance client experiences.
+            Discover our powerful suite of tools designed specifically for personal trainers and fitness coaches to optimise their business and enhance client experiences.
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export default function ServicesPage() {
                 <CardTitle>How accurate is the movement analysis feature?</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Our movement analysis uses computer vision technology to provide detailed form feedback. The system can identify key movement patterns and common errors, providing blueprint-style visualization and specific correction points for improving technique.</p>
+                <p>Our movement analysis uses computer vision technology to provide detailed form feedback. The system can identify key movement patterns and common errors, providing blueprint-style visualisation and specific correction points for improving technique.</p>
               </CardContent>
             </Card>
             <Card>

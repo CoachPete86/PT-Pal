@@ -1,31 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import { motion } from "framer-motion";
-import {
-  BarChart,
-  BookOpen,
-  ChevronDown,
-  Home,
-  LogOut,
-  Menu,
-  Settings,
-  User,
-  X,
-  Activity,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -33,263 +8,113 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { NotificationCenter } from "./notification-center";
-import { UniversalSearch } from "./universal-search";
-
-// Public navigation items visible to all users
-const publicNavItems = [
-  { href: "/#services", label: "Services" },
-  { href: "/#about", label: "About" },
-];
-
-// Navigation items only visible to authenticated users
-const authenticatedNavItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/content-generator", label: "Content" },
-  { href: "/movement-analysis", label: "Movement Analysis" },
-  { href: "/workout-features", label: "Workout Tools" },
-  { href: "/meal-plan", label: "Meal Plans" },
-];
+import { Menu } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Navbar() {
-  const { user, logoutMutation } = useAuth();
+  const [location] = useLocation();
+  const { user, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [, setLocation] = useLocation();
 
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-  ) => {
-    if (href.startsWith("/#")) {
-      e.preventDefault();
-      const id = href.substring(2);
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-      // Set the URL without triggering navigation
-      window.history.pushState(null, "", href);
-    } else {
-      setLocation(href);
-    }
-  };
+  const closeSheet = () => setIsOpen(false);
+
+  const navItems = [
+    { title: "Features", path: "/features" },
+    { title: "Solutions", path: "/solutions" },
+    { title: "Pricing", path: "/pricing" },
+    { title: "How It Works", path: "/how-it-works" },
+    { title: "Resources", path: "/resources" },
+    { title: "Support", path: "/support" },
+  ];
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/">
-              <div className="flex items-center space-x-2 cursor-pointer">
-                {/* We use the default icon since branding is not directly available in User type */}
-                <BarChart className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">{"PTpal"}</span>
-              </div>
+    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="font-bold text-xl mr-6">
+            PTpal
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.title}
+                href={item.path}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  location === item.path
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {item.title}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="flex items-center gap-4">
+          {isAuthenticated ? (
+            <Link href="/dashboard">
+              <Button variant="default">Dashboard</Button>
             </Link>
-          </div>
-
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="gap-6">
-              {user 
-                ? [...publicNavItems, ...authenticatedNavItems].map((item) => (
-                    <NavigationMenuItem key={item.href}>
-                      <a
-                        href={item.href}
-                        onClick={(e) => handleNavClick(e, item.href)}
-                        className="text-sm font-medium transition-colors hover:text-primary"
-                      >
-                        {item.label}
-                      </a>
-                    </NavigationMenuItem>
-                  ))
-                : publicNavItems.map((item) => (
-                    <NavigationMenuItem key={item.href}>
-                      <a
-                        href={item.href}
-                        onClick={(e) => handleNavClick(e, item.href)}
-                        className="text-sm font-medium transition-colors hover:text-primary"
-                      >
-                        {item.label}
-                      </a>
-                    </NavigationMenuItem>
-                  ))
-              }
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          <div className="flex items-center gap-4">
-            {/* Mobile menu button - always visible */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-80">
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                </SheetHeader>
-                <div className="mt-6 space-y-4">
-                  {user 
-                    ? [...publicNavItems, ...authenticatedNavItems].map((item) => (
-                        <a
-                          key={item.href}
-                          href={item.href}
-                          className="flex items-center py-2 text-sm font-medium"
-                          onClick={(e) => {
-                            handleNavClick(e, item.href);
-                            setIsOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </a>
-                      ))
-                    : publicNavItems.map((item) => (
-                        <a
-                          key={item.href}
-                          href={item.href}
-                          className="flex items-center py-2 text-sm font-medium"
-                          onClick={(e) => {
-                            handleNavClick(e, item.href);
-                            setIsOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </a>
-                      ))
-                  }
-                  {user ? (
-                    <>
-                      <Link href="/dashboard">
-                        <div
-                          className="flex items-center py-2 text-sm font-medium text-primary cursor-pointer"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Dashboard
-                        </div>
-                      </Link>
-                      <Link href="/settings">
-                        <div
-                          className="flex items-center py-2 text-sm font-medium cursor-pointer"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Settings
-                        </div>
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logoutMutation.mutate();
-                          setIsOpen(false);
-                        }}
-                        disabled={logoutMutation.isPending}
-                        className="flex w-full items-center py-2 text-sm font-medium text-red-600"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link href="/auth">
-                      <div
-                        className="flex items-center py-2 text-sm font-medium text-primary cursor-pointer"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Get Started
-                      </div>
-                    </Link>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-                
-            {/* Desktop navigation for authenticated users */}
-            {user ? (
-              <div className="hidden md:flex items-center gap-4">
-                <UniversalSearch />
-                <NotificationCenter />
-                <Link href="/dashboard">
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <User className="h-4 w-4" />
-                      <span className="hidden sm:inline">
-                        {user.username}
-                      </span>
-                      <ChevronDown className="h-4 w-4" />
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost">Log In</Button>
+              </Link>
+              <Link href="/signup">
+                <Button variant="default">Sign Up</Button>
+              </Link>
+            </>
+          )}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-4 mt-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.path}
+                    onClick={closeSheet}
+                    className={`text-lg font-medium transition-colors hover:text-primary ${
+                      location === item.path
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+                {isAuthenticated ? (
+                  <Link href="/dashboard" onClick={closeSheet}>
+                    <Button className="w-full" variant="default">
+                      Dashboard
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <div className="flex items-center cursor-pointer">
-                          <User className="mr-2 h-4 w-4" />
-                          Profile
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings">
-                        <div className="flex items-center cursor-pointer">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/documents">
-                        <div className="flex items-center cursor-pointer">
-                          <BookOpen className="mr-2 h-4 w-4" />
-                          Documents
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/movement-analysis">
-                        <div className="flex items-center cursor-pointer">
-                          <Activity className="mr-2 h-4 w-4" />
-                          Movement Analysis
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/workout-features">
-                        <div className="flex items-center cursor-pointer">
-                          <Activity className="mr-2 h-4 w-4" />
-                          Workout Tools
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="text-red-600"
-                      onClick={() => logoutMutation.mutate()}
-                      disabled={logoutMutation.isPending}
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <div className="hidden md:block">
-                <Link href="/auth">
-                  <Button size="sm">Get Started</Button>
-                </Link>
-              </div>
-            )}
-          </div>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={closeSheet}>
+                      <Button className="w-full" variant="outline">
+                        Log In
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={closeSheet}>
+                      <Button className="w-full" variant="default">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-    </motion.nav>
+    </header>
   );
 }
