@@ -11,6 +11,10 @@ import SettingsPage from "@/pages/settings-page";
 import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
 import MovementAnalysisPage from "@/pages/movement-analysis-page";
 import MealPlanPage from "@/pages/meal-plan-page";
+import ServicesPage from "@/pages/services-page";
+import PricingPage from "@/pages/pricing-page";
+import FeaturesPage from "@/pages/features-page";
+import DemoPage from "@/pages/demo-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -26,12 +30,27 @@ function Router() {
       }
     >
       <Switch>
+        {/* Public Marketing Pages */}
         <Route path="/">
           <HomePage />
         </Route>
         <Route path="/auth">
           <AuthPage />
         </Route>
+        <Route path="/services">
+          <ServicesPage />
+        </Route>
+        <Route path="/pricing">
+          <PricingPage />
+        </Route>
+        <Route path="/features">
+          <FeaturesPage />
+        </Route>
+        <Route path="/demo">
+          <DemoPage />
+        </Route>
+
+        {/* Protected App Pages */}
         <ProtectedRoute path="/dashboard" component={() => <DashboardPage />} />
         <ProtectedRoute
           path="/content-generator"
