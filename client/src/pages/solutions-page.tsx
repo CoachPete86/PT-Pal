@@ -62,7 +62,7 @@ export default function SolutionsPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+        <div className="text-centre mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Tailored Solutions for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             PTpal adapts to your unique business model, providing specialised tools for different types of fitness professionals.
@@ -73,7 +73,7 @@ export default function SolutionsPage() {
           {solutions.map((solution, index) => (
             <Card key={index} className="flex flex-col h-full">
               <CardHeader>
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-centre gap-3 mb-3">
                   {solution.icon}
                   <CardTitle>{solution.title}</CardTitle>
                 </div>
@@ -101,7 +101,7 @@ export default function SolutionsPage() {
           ))}
         </div>
 
-        <div className="bg-muted rounded-lg p-8 text-center">
+        <div className="bg-muted rounded-lg p-8 text-centre">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Not sure which solution fits your needs?</h2>
           <p className="mb-6 max-w-2xl mx-auto">
             Schedule a personalised demo with our team to see how PTpal can be customised for your specific business requirements.

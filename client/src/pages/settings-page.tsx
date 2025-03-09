@@ -62,11 +62,11 @@ export default function SettingsPage() {
 
         <Tabs defaultValue="workspace" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="workspace" className="flex items-center gap-2">
+            <TabsTrigger value="workspace" className="flex items-centre gap-2">
               <Building2 className="h-4 w-4" />
               Workspace
             </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
+            <TabsTrigger value="account" className="flex items-centre gap-2">
               <User className="h-4 w-4" />
               Account
             </TabsTrigger>

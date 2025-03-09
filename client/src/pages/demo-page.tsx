@@ -122,7 +122,7 @@ export default function DemoPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+        <div className="text-centre mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Schedule a Personalized Demo</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             See how our platform can transform your fitness business with a personalized demonstration tailored to your specific needs.
@@ -179,8 +179,8 @@ export default function DemoPage() {
 
           <div className="bg-card p-8 rounded-lg border">
             {isSuccess ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="text-centre py-12">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-centre justify-centre mx-auto mb-6">
                   <svg className="w-8 h-8 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -297,19 +297,19 @@ export default function DemoPage() {
                               defaultValue={field.value}
                               className="flex flex-col space-y-1"
                             >
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-centre space-x-2">
                                 <RadioGroupItem value="1-10" id="clients-1-10" />
                                 <label htmlFor="clients-1-10" className="text-sm cursor-pointer">1-10</label>
                               </div>
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-centre space-x-2">
                                 <RadioGroupItem value="11-30" id="clients-11-30" />
                                 <label htmlFor="clients-11-30" className="text-sm cursor-pointer">11-30</label>
                               </div>
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-centre space-x-2">
                                 <RadioGroupItem value="31-50" id="clients-31-50" />
                                 <label htmlFor="clients-31-50" className="text-sm cursor-pointer">31-50</label>
                               </div>
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-centre space-x-2">
                                 <RadioGroupItem value="50+" id="clients-50+" />
                                 <label htmlFor="clients-50+" className="text-sm cursor-pointer">50+</label>
                               </div>

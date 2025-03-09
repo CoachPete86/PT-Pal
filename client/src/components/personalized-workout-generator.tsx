@@ -293,7 +293,7 @@ export default function PersonalizedWorkoutGenerator() {
   };
   
   // Analyze movement from video
-  const analyzeMovement = async () => {
+  const analyseMovement = async () => {
     if (!uploadedVideo) {
       toast({
         title: "No video uploaded",
@@ -349,7 +349,7 @@ export default function PersonalizedWorkoutGenerator() {
       }, 2000);
       
       // Actual API call would look like this:
-      // const response = await axios.post('/api/analyze-movement', formData);
+      // const response = await axios.post('/api/analyse-movement', formData);
       // setAnalysisResults(response.data);
       // setIsAnalyzing(false);
       
@@ -357,7 +357,7 @@ export default function PersonalizedWorkoutGenerator() {
       console.error("Movement analysis failed:", error);
       toast({
         title: "Analysis failed",
-        description: "Could not analyze the video. Please try again.",
+        description: "Could not analyse the video. Please try again.",
         variant: "destructive"
       });
       setIsAnalyzing(false);
@@ -386,17 +386,17 @@ export default function PersonalizedWorkoutGenerator() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Personalized Workout Generator</h1>
           <p className="text-muted-foreground">
-            Create customized workouts that adapt to client preferences, history, and fitness level.
+            Create customised workouts that adapt to client preferences, history, and fitness level.
           </p>
         </div>
         
         <Tabs defaultValue="generator" onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="generator" className="flex items-center gap-2">
+            <TabsTrigger value="generator" className="flex items-centre gap-2">
               <Dumbbell className="h-4 w-4" />
               Workout Generator
             </TabsTrigger>
-            <TabsTrigger value="movement-analysis" className="flex items-center gap-2">
+            <TabsTrigger value="movement-analysis" className="flex items-centre gap-2">
               <Video className="h-4 w-4" />
               Movement Analysis
             </TabsTrigger>
@@ -743,7 +743,7 @@ export default function PersonalizedWorkoutGenerator() {
                       control={form.control}
                       name="includeWarmup"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                        <FormItem className="flex flex-row items-centre space-x-2 space-y-0">
                           <FormControl>
                             <Switch
                               checked={field.value}
@@ -759,7 +759,7 @@ export default function PersonalizedWorkoutGenerator() {
                       control={form.control}
                       name="includeCooldown"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                        <FormItem className="flex flex-row items-centre space-x-2 space-y-0">
                           <FormControl>
                             <Switch
                               checked={field.value}
@@ -819,7 +819,7 @@ export default function PersonalizedWorkoutGenerator() {
             {generatedWorkout ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-centre gap-2">
                     <BarChart className="h-5 w-5" />
                     {generatedWorkout.title}
                   </CardTitle>
@@ -839,7 +839,7 @@ export default function PersonalizedWorkoutGenerator() {
                     <div className="space-y-6">
                       {generatedWorkout.warmup && (
                         <div>
-                          <h3 className="font-semibold flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold flex items-centre gap-2 mb-2">
                             <Heart className="h-4 w-4 text-red-500" />
                             Warm-up ({generatedWorkout.warmup.duration})
                           </h3>
@@ -857,7 +857,7 @@ export default function PersonalizedWorkoutGenerator() {
                       )}
 
                       <div>
-                        <h3 className="font-semibold flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold flex items-centre gap-2 mb-2">
                           <Dumbbell className="h-4 w-4" />
                           Main Workout
                         </h3>
@@ -896,7 +896,7 @@ export default function PersonalizedWorkoutGenerator() {
 
                       {generatedWorkout.cooldown && (
                         <div>
-                          <h3 className="font-semibold flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold flex items-centre gap-2 mb-2">
                             <ArrowRight className="h-4 w-4 text-blue-500" />
                             Cool-down ({generatedWorkout.cooldown.duration})
                           </h3>
@@ -950,9 +950,9 @@ export default function PersonalizedWorkoutGenerator() {
                 </CardFooter>
               </Card>
             ) : (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center max-w-md space-y-3 p-8">
-                  <div className="mx-auto w-14 h-14 rounded-full bg-muted/50 flex items-center justify-center">
+              <div className="h-full flex items-centre justify-centre">
+                <div className="text-centre max-w-md space-y-3 p-8">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-muted/50 flex items-centre justify-centre">
                     <Dumbbell className="h-7 w-7 text-muted-foreground" />
                   </div>
                   <h3 className="text-xl font-semibold">
@@ -980,12 +980,12 @@ export default function PersonalizedWorkoutGenerator() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
+                    <div className="flex flex-col items-centre justify-centre border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
                       {videoUrl ? (
                         <div className="w-full space-y-4">
                           <video src={videoUrl} controls className="w-full rounded-md"></video>
-                          <div className="flex gap-2 justify-center">
-                            <Button onClick={analyzeMovement} disabled={isAnalyzing}>
+                          <div className="flex gap-2 justify-centre">
+                            <Button onClick={analyseMovement} disabled={isAnalyzing}>
                               {isAnalyzing ? (
                                 <>
                                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -1004,17 +1004,17 @@ export default function PersonalizedWorkoutGenerator() {
                           </div>
                         </div>
                       ) : (
-                        <div className="text-center space-y-4">
-                          <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                        <div className="text-centre space-y-4">
+                          <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-centre justify-centre">
                             <Video className="h-8 w-8 text-muted-foreground" />
                           </div>
                           <div className="space-y-2">
-                            <h3 className="font-medium text-center">Upload a video of your movement</h3>
+                            <h3 className="font-medium text-centre">Upload a video of your movement</h3>
                             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                               Record or upload a video of your exercise form for AI analysis and personalized feedback
                             </p>
                           </div>
-                          <div className="flex flex-wrap gap-2 justify-center">
+                          <div className="flex flex-wrap gap-2 justify-centre">
                             <Button onClick={handleBrowseClick} variant="secondary">
                               <Upload className="h-4 w-4 mr-2" />
                               Browse Files
@@ -1037,7 +1037,7 @@ export default function PersonalizedWorkoutGenerator() {
                     
                     {showAnalysisResults && analysisResults && (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-centre justify-between">
                           <h3 className="text-lg font-semibold">Analysis Results</h3>
                           <Badge variant={analysisResults.score > 8 ? "secondary" : analysisResults.score > 5 ? "outline" : "destructive"}>
                             Form Score: {analysisResults.score}/10

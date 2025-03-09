@@ -661,7 +661,7 @@ export default function ClientEngagementHub() {
                         className="w-full justify-start font-normal"
                         onClick={() => handleSelectClient(client)}
                       >
-                        <div className="flex items-center w-full">
+                        <div className="flex items-centre w-full">
                           <Avatar className="h-6 w-6 mr-2">
                             <AvatarFallback>
                               {client.name
@@ -695,7 +695,7 @@ export default function ClientEngagementHub() {
                             className="w-full justify-start font-normal text-muted-foreground"
                             onClick={() => handleSelectClient(client)}
                           >
-                            <div className="flex items-center w-full">
+                            <div className="flex items-centre w-full">
                               <Avatar className="h-6 w-6 mr-2">
                                 <AvatarFallback>
                                   {client.name
@@ -723,8 +723,8 @@ export default function ClientEngagementHub() {
           <div className="flex-1">
             <Card className="h-full flex flex-col">
               <CardHeader className="pb-2 border-b">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
+                <div className="flex justify-between items-centre">
+                  <div className="flex items-centre gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {selectedClient.name
@@ -738,7 +738,7 @@ export default function ClientEngagementHub() {
                       <CardDescription>{selectedClient.email}</CardDescription>
                     </div>
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-2 items-centre">
                     <Badge
                       variant={
                         selectedClient.status === "active"
@@ -829,11 +829,11 @@ export default function ClientEngagementHub() {
                                   {message.attachments?.map((attachment) => (
                                     <div
                                       key={attachment.id}
-                                      className="mt-2 flex items-center gap-2 text-xs bg-background/40 p-2 rounded"
+                                      className="mt-2 flex items-centre gap-2 text-xs bg-background/40 p-2 rounded"
                                     >
                                       <a
                                         href={attachment.url}
-                                        className="flex items-center gap-1 underline"
+                                        className="flex items-centre gap-1 underline"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                       >
@@ -892,13 +892,13 @@ export default function ClientEngagementHub() {
                               render={({ field }) => (
                                 <FormItem className="flex-1">
                                   <FormControl>
-                                    <div className="flex items-center border rounded-md px-3 py-2 relative">
+                                    <div className="flex items-centre border rounded-md px-3 py-2 relative">
                                       <Textarea
                                         {...field}
                                         placeholder="Type your message..."
                                         className="flex-1 border-0 focus-visible:ring-0 p-0 resize-none h-10 max-h-32"
                                       />
-                                      <div className="flex gap-2 items-center">
+                                      <div className="flex gap-2 items-centre">
                                         <label
                                           htmlFor="image-upload"
                                           className="cursor-pointer p-1.5 rounded-md hover:bg-muted"
@@ -933,7 +933,7 @@ export default function ClientEngagementHub() {
                             </Button>
                           </div>
 
-                          <div className="flex justify-between items-center">
+                          <div className="flex justify-between items-centre">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm">
@@ -1028,7 +1028,7 @@ export default function ClientEngagementHub() {
 
                 {activeTab === "goals" && (
                   <div className="p-4">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-centre mb-4">
                       <h3 className="text-lg font-medium">Client Milestones</h3>
                       <Dialog
                         open={activeMilestoneDialog === "add"}
@@ -1130,7 +1130,7 @@ export default function ClientEngagementHub() {
                     </div>
 
                     {getClientMilestones(selectedClient.id).length === 0 ? (
-                      <div className="text-center py-8">
+                      <div className="text-centre py-8">
                         <Award className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <h3 className="text-lg font-medium mb-1">No milestones yet</h3>
                         <p className="text-muted-foreground max-w-sm mx-auto mb-4">
@@ -1186,8 +1186,8 @@ export default function ClientEngagementHub() {
                                   </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pb-4">
-                                  <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center">
+                                  <div className="flex items-centre justify-between text-sm">
+                                    <div className="flex items-centre">
                                       <Calendar className="mr-1 h-4 w-4 text-muted-foreground" />
                                       <span>
                                         Target: {formatDate(milestone.targetDate)}
@@ -1202,7 +1202,7 @@ export default function ClientEngagementHub() {
                           {getClientMilestones(selectedClient.id).filter(
                             (m) => m.status === "pending"
                           ).length === 0 && (
-                            <div className="rounded-lg border p-4 text-center text-muted-foreground">
+                            <div className="rounded-lg border p-4 text-centre text-muted-foreground">
                               No upcoming milestones
                             </div>
                           )}
@@ -1219,7 +1219,7 @@ export default function ClientEngagementHub() {
                               <Card key={milestone.id} className="overflow-hidden bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900">
                                 <CardHeader className="pb-2 pt-4">
                                   <div className="flex justify-between items-start">
-                                    <CardTitle className="text-base flex items-center">
+                                    <CardTitle className="text-base flex items-centre">
                                       <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
                                       {milestone.title}
                                     </CardTitle>
@@ -1229,8 +1229,8 @@ export default function ClientEngagementHub() {
                                   </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pb-4">
-                                  <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center">
+                                  <div className="flex items-centre justify-between text-sm">
+                                    <div className="flex items-centre">
                                       <Calendar className="mr-1 h-4 w-4 text-muted-foreground" />
                                       <span>
                                         Completed:{" "}
@@ -1249,7 +1249,7 @@ export default function ClientEngagementHub() {
                           {getClientMilestones(selectedClient.id).filter(
                             (m) => m.status === "achieved"
                           ).length === 0 && (
-                            <div className="rounded-lg border p-4 text-center text-muted-foreground">
+                            <div className="rounded-lg border p-4 text-centre text-muted-foreground">
                               No achieved milestones yet
                             </div>
                           )}
@@ -1269,7 +1269,7 @@ export default function ClientEngagementHub() {
                                 <Card key={milestone.id} className="overflow-hidden bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-900">
                                   <CardHeader className="pb-2 pt-4">
                                     <div className="flex justify-between items-start">
-                                      <CardTitle className="text-base flex items-center">
+                                      <CardTitle className="text-base flex items-centre">
                                         <AlertCircle className="mr-2 h-4 w-4 text-amber-500" />
                                         {milestone.title}
                                       </CardTitle>
@@ -1279,8 +1279,8 @@ export default function ClientEngagementHub() {
                                     </CardDescription>
                                   </CardHeader>
                                   <CardContent className="pb-4">
-                                    <div className="flex items-center justify-between text-sm">
-                                      <div className="flex items-center">
+                                    <div className="flex items-centre justify-between text-sm">
+                                      <div className="flex items-centre">
                                         <Calendar className="mr-1 h-4 w-4 text-muted-foreground" />
                                         <span>
                                           Target: {formatDate(milestone.targetDate)}
@@ -1302,7 +1302,7 @@ export default function ClientEngagementHub() {
 
                 {activeTab === "checkins" && (
                   <div className="p-4">
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-centre mb-4">
                       <h3 className="text-lg font-medium">Client Check-ins</h3>
                       <Button size="sm">
                         <Plus className="mr-1 h-4 w-4" />
@@ -1446,7 +1446,7 @@ export default function ClientEngagementHub() {
                             <CardHeader className="pb-2">
                               <div className="flex justify-between">
                                 <div>
-                                  <CardTitle className="flex items-center text-base">
+                                  <CardTitle className="flex items-centre text-base">
                                     <Bell className="mr-2 h-4 w-4 text-primary" />
                                     Upcoming Check-in
                                   </CardTitle>
@@ -1477,7 +1477,7 @@ export default function ClientEngagementHub() {
                           {getClientCheckIns(selectedClient.id)
                             .filter((ci) => ci.status !== "scheduled")
                             .length === 0 ? (
-                            <div className="rounded-lg border p-4 text-center text-muted-foreground">
+                            <div className="rounded-lg border p-4 text-centre text-muted-foreground">
                               No check-in history
                             </div>
                           ) : (
@@ -1557,8 +1557,8 @@ export default function ClientEngagementHub() {
             </Card>
           </div>
         ) : (
-          <Card className="flex-1 flex flex-col items-center justify-center p-6">
-            <div className="text-center max-w-sm space-y-4">
+          <Card className="flex-1 flex flex-col items-centre justify-centre p-6">
+            <div className="text-centre max-w-sm space-y-4">
               <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold">Select a Client</h3>
               <p className="text-muted-foreground">

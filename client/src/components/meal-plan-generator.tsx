@@ -259,7 +259,7 @@ export default function MealPlanGenerator({ clientId }: { clientId?: number }) {
             <CardHeader>
               <CardTitle>Personalized Meal Plan Generator</CardTitle>
               <CardDescription>
-                Generate a customized meal plan based on your client's needs and preferences.
+                Generate a customised meal plan based on your client's needs and preferences.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -771,7 +771,7 @@ export default function MealPlanGenerator({ clientId }: { clientId?: number }) {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex justify-centre">
                   <Button
                     onClick={() => {
                       // Print functionality
@@ -785,7 +785,7 @@ export default function MealPlanGenerator({ clientId }: { clientId?: number }) {
             </div>
           ) : (
             <Card>
-              <CardContent className="flex items-center justify-center h-40">
+              <CardContent className="flex items-centre justify-centre h-40">
                 <p className="text-muted-foreground">
                   No meal plan generated yet. Please use the generator to create a meal plan.
                 </p>

@@ -13,7 +13,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { NotificationCenter } from "./notification-center";
+import { NotificationCenter } from "./notification-centre";
 import { UniversalSearch } from "./universal-search";
 import {
   Apple,
@@ -151,7 +151,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <Sidebar collapsible="icon">
           <SidebarHeader className="border-b border-border/50 p-4">
             <Link href="/dashboard">
-              <div className="flex cursor-pointer items-center gap-2">
+              <div className="flex cursor-pointer items-centre gap-2">
                 <BarChart className="h-6 w-6 text-primary" />
                 <span className="text-xl font-bold">PTpal</span>
               </div>
@@ -210,9 +210,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter className="border-t border-border/50 p-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <div className="flex-1 overflow-hidden">
-                <div className="flex items-center gap-2">
+                <div className="flex items-centre gap-2">
                   <UserCircle className="h-7 w-7 text-muted-foreground" />
                   <div className="flex-1 overflow-hidden">
                     <p className="truncate text-sm font-medium">{user.fullName || user.username}</p>
@@ -235,7 +235,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </Sidebar>
         
         <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+          <header className="sticky top-0 z-10 flex h-14 items-centre gap-4 border-b bg-background px-4 sm:px-6">
             <Button
               variant="ghost"
               size="icon"
@@ -247,7 +247,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="ml-auto flex items-center gap-4">
+            <div className="ml-auto flex items-centre gap-4">
               <UniversalSearch />
               <NotificationCenter />
             </div>

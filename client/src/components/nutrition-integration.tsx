@@ -367,9 +367,9 @@ export default function NutritionIntegration() {
     if (!macroResults) return [];
     
     return [
-      { name: "Protein", value: macroResults.protein * 4, color: "#8884d8" },
-      { name: "Carbs", value: macroResults.carbs * 4, color: "#82ca9d" },
-      { name: "Fat", value: macroResults.fat * 9, color: "#ffc658" },
+      { name: "Protein", value: macroResults.protein * 4, colour: "#8884d8" },
+      { name: "Carbs", value: macroResults.carbs * 4, colour: "#82ca9d" },
+      { name: "Fat", value: macroResults.fat * 9, colour: "#ffc658" },
     ];
   };
 
@@ -410,15 +410,15 @@ export default function NutritionIntegration() {
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3">
-          <TabsTrigger value="food-diary" className="flex items-center gap-2">
+          <TabsTrigger value="food-diary" className="flex items-centre gap-2">
             <FileText className="h-4 w-4" />
             Food Diary
           </TabsTrigger>
-          <TabsTrigger value="macro-calculator" className="flex items-center gap-2">
+          <TabsTrigger value="macro-calculator" className="flex items-centre gap-2">
             <Calculator className="h-4 w-4" />
             Macro Calculator
           </TabsTrigger>
-          <TabsTrigger value="meal-planning" className="flex items-center gap-2">
+          <TabsTrigger value="meal-planning" className="flex items-centre gap-2">
             <Utensils className="h-4 w-4" />
             Meal Planning
           </TabsTrigger>
@@ -526,7 +526,7 @@ export default function NutritionIntegration() {
             </CardHeader>
             <CardContent>
               {foodEntriesQuery.isLoading ? (
-                <div className="flex justify-center p-6">Loading entries...</div>
+                <div className="flex justify-centre p-6">Loading entries...</div>
               ) : foodEntriesQuery.data && foodEntriesQuery.data.length > 0 ? (
                 <div className="space-y-4">
                   <div className="rounded-md border">
@@ -581,7 +581,7 @@ export default function NutritionIntegration() {
                   </Card>
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-centre py-8 text-muted-foreground">
                   No entries yet. Add your first food entry above.
                 </div>
               )}
@@ -748,7 +748,7 @@ export default function NutritionIntegration() {
                                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                 >
                                   {getMacroChartData().map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                    <Cell key={`cell-${index}`} fill={entry.colour} />
                                   ))}
                                 </Pie>
                                 <Tooltip formatter={(value) => `${value} kcal`} />
@@ -772,14 +772,14 @@ export default function NutritionIntegration() {
         {/* Meal Planning Tab */}
         <TabsContent value="meal-planning" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardHeader className="flex flex-row items-centre justify-between pb-2">
               <div>
                 <CardTitle>Meal Plans</CardTitle>
                 <CardDescription>Create and view your meal plans</CardDescription>
               </div>
               <Dialog open={isCreatingMealPlan} onOpenChange={setIsCreatingMealPlan}>
                 <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2">
+                  <Button className="flex items-centre gap-2">
                     <Plus className="h-4 w-4" />
                     Create Meal Plan
                   </Button>
@@ -850,7 +850,7 @@ export default function NutritionIntegration() {
             </CardHeader>
             <CardContent>
               {mealPlansQuery.isLoading ? (
-                <div className="text-center py-12">Loading meal plans...</div>
+                <div className="text-centre py-12">Loading meal plans...</div>
               ) : mealPlansQuery.data && mealPlansQuery.data.length > 0 ? (
                 <div className="space-y-4">
                   {mealPlansQuery.data.map((plan) => (
@@ -929,7 +929,7 @@ export default function NutritionIntegration() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
+                <div className="text-centre py-12 text-muted-foreground">
                   No meal plans yet. Create your first meal plan to get started.
                 </div>
               )}

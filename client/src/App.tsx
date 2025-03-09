@@ -30,7 +30,7 @@ function Router() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex h-screen w-full items-centre justify-centre">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }

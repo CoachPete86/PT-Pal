@@ -55,11 +55,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Mobile navigation */}
       <div className="md:hidden border-b sticky top-0 bg-background z-10">
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-centre justify-between p-3">
           <Link to="/" className="font-semibold text-xl">
             Fitness Pro
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-centre gap-2">
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={logout}>
               <LogOut className="w-5 h-5" />
@@ -71,7 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center p-2 min-w-[4rem] ${
+              className={`flex flex-col items-centre p-2 min-w-[4rem] ${
                 location === item.path
                   ? "text-primary font-medium"
                   : "text-muted-foreground"
@@ -96,7 +96,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+              className={`flex items-centre gap-3 px-3 py-2 rounded-md transition-colours ${
                 location === item.path
                   ? "bg-primary/10 text-primary"
                   : "hover:bg-muted"
@@ -107,16 +107,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </div>
-        <div className="p-4 border-t flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <div className="p-4 border-t flex items-centre justify-between">
+          <div className="flex items-centre gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-centre justify-centre text-primary">
               {user.fullName?.charAt(0) || "U"}
             </div>
             <span className="text-sm font-medium truncate max-w-[120px]">
               {user.fullName || "User"}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-centre gap-2">
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={logout} title="Logout">
               <LogOut className="w-4 h-4" />

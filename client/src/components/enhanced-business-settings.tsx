@@ -58,8 +58,8 @@ const basicInfoSchema = z.object({
 });
 
 const brandingSchema = z.object({
-  primaryColor: z.string().min(1, "Primary color is required"),
-  secondaryColor: z.string().min(1, "Secondary color is required"),
+  primaryColor: z.string().min(1, "Primary colour is required"),
+  secondaryColor: z.string().min(1, "Secondary colour is required"),
   fontFamily: z.string().default("Inter"),
   currency: z.string().min(1, "Currency is required"),
   currencySymbol: z.string().min(1, "Currency symbol is required"),
@@ -367,7 +367,7 @@ export default function EnhancedBusinessSettings() {
 
   if (profileLoading || brandingLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[500px]">
+      <div className="flex items-centre justify-centre min-h-[500px]">
         <LoadingState size="lg" />
       </div>
     );
@@ -376,8 +376,8 @@ export default function EnhancedBusinessSettings() {
   if (setupComplete) {
     return (
       <div className="max-w-3xl mx-auto py-10 space-y-8">
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
+        <div className="text-centre space-y-4">
+          <div className="inline-flex items-centre justify-centre w-12 h-12 rounded-full bg-primary/10 text-primary">
             <Settings className="h-6 w-6" />
           </div>
           <h1 className="text-3xl font-bold">Setup Complete!</h1>
@@ -389,7 +389,7 @@ export default function EnhancedBusinessSettings() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-centre gap-2">
                 <Building className="h-5 w-5" />
                 Business Information
               </CardTitle>
@@ -414,26 +414,26 @@ export default function EnhancedBusinessSettings() {
           
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-centre gap-2">
                 <Palette className="h-5 w-5" />
                 Branding
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <span className="text-muted-foreground">Primary Color</span>
                   <div 
                     className="w-6 h-6 rounded-full border" 
                     style={{ backgroundColor: brandingForm.getValues("primaryColor") }}
                   ></div>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <span className="text-muted-foreground">Currency</span>
                   <span className="font-medium">{brandingForm.getValues("currencySymbol")} ({brandingForm.getValues("currency")})</span>
                 </div>
                 {logoPreview && (
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <span className="text-muted-foreground">Logo</span>
                     <img src={logoPreview} alt="Logo" className="h-8" />
                   </div>
@@ -443,7 +443,7 @@ export default function EnhancedBusinessSettings() {
           </Card>
         </div>
         
-        <div className="flex justify-center">
+        <div className="flex justify-centre">
           <Button onClick={() => window.location.href = "/dashboard"}>
             Go to Dashboard
           </Button>
@@ -472,19 +472,19 @@ export default function EnhancedBusinessSettings() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
         <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="basic-info" className="flex gap-2 items-center">
+          <TabsTrigger value="basic-info" className="flex gap-2 items-centre">
             <Building className="h-4 w-4" />
             <span className="hidden sm:inline">Business Info</span>
           </TabsTrigger>
-          <TabsTrigger value="branding" className="flex gap-2 items-center">
+          <TabsTrigger value="branding" className="flex gap-2 items-centre">
             <Palette className="h-4 w-4" />
             <span className="hidden sm:inline">Branding</span>
           </TabsTrigger>
-          <TabsTrigger value="social-media" className="flex gap-2 items-center">
+          <TabsTrigger value="social-media" className="flex gap-2 items-centre">
             <Globe className="h-4 w-4" />
             <span className="hidden sm:inline">Social Media</span>
           </TabsTrigger>
-          <TabsTrigger value="subscription" className="flex gap-2 items-center">
+          <TabsTrigger value="subscription" className="flex gap-2 items-centre">
             <CreditCard className="h-4 w-4" />
             <span className="hidden sm:inline">Subscription</span>
           </TabsTrigger>
@@ -641,7 +641,7 @@ export default function EnhancedBusinessSettings() {
                             <FormLabel>Primary Color</FormLabel>
                             <div className="flex gap-2">
                               <FormControl>
-                                <Input {...field} type="color" className="w-12 h-10 p-1" />
+                                <Input {...field} type="colour" className="w-12 h-10 p-1" />
                               </FormControl>
                               <Input 
                                 value={field.value} 
@@ -650,7 +650,7 @@ export default function EnhancedBusinessSettings() {
                               />
                             </div>
                             <FormDescription>
-                              Main brand color used throughout the app
+                              Main brand colour used throughout the app
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -666,7 +666,7 @@ export default function EnhancedBusinessSettings() {
                             <FormLabel>Secondary Color</FormLabel>
                             <div className="flex gap-2">
                               <FormControl>
-                                <Input {...field} type="color" className="w-12 h-10 p-1" />
+                                <Input {...field} type="colour" className="w-12 h-10 p-1" />
                               </FormControl>
                               <Input 
                                 value={field.value} 
@@ -675,7 +675,7 @@ export default function EnhancedBusinessSettings() {
                               />
                             </div>
                             <FormDescription>
-                              Accent color for highlights and secondary elements
+                              Accent colour for highlights and secondary elements
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -767,7 +767,7 @@ export default function EnhancedBusinessSettings() {
                     <FormLabel>Business Logo</FormLabel>
                     <div className="flex flex-col gap-2 mt-2">
                       <div className="flex items-start gap-4">
-                        <div className="w-20 h-20 flex items-center justify-center border rounded-md overflow-hidden bg-muted">
+                        <div className="w-20 h-20 flex items-centre justify-centre border rounded-md overflow-hidden bg-muted">
                           {logoPreview ? (
                             <img
                               src={logoPreview}
@@ -787,7 +787,7 @@ export default function EnhancedBusinessSettings() {
                         <div className="flex-1 space-y-2">
                           <Label
                             htmlFor="logo-upload"
-                            className="cursor-pointer inline-flex items-center gap-2 text-sm px-4 py-2 border rounded-md hover:bg-muted"
+                            className="cursor-pointer inline-flex items-centre gap-2 text-sm px-4 py-2 border rounded-md hover:bg-muted"
                           >
                             <Upload className="h-4 w-4" />
                             Choose Logo File
@@ -888,7 +888,7 @@ export default function EnhancedBusinessSettings() {
                       <FormItem>
                         <FormLabel>Instagram</FormLabel>
                         <div className="flex">
-                          <div className="bg-muted flex items-center px-3 rounded-l-md border border-r-0 border-input">
+                          <div className="bg-muted flex items-centre px-3 rounded-l-md border border-r-0 border-input">
                             instagram.com/
                           </div>
                           <FormControl>
@@ -910,7 +910,7 @@ export default function EnhancedBusinessSettings() {
                       <FormItem>
                         <FormLabel>Facebook</FormLabel>
                         <div className="flex">
-                          <div className="bg-muted flex items-center px-3 rounded-l-md border border-r-0 border-input">
+                          <div className="bg-muted flex items-centre px-3 rounded-l-md border border-r-0 border-input">
                             facebook.com/
                           </div>
                           <FormControl>
@@ -932,7 +932,7 @@ export default function EnhancedBusinessSettings() {
                       <FormItem>
                         <FormLabel>Twitter</FormLabel>
                         <div className="flex">
-                          <div className="bg-muted flex items-center px-3 rounded-l-md border border-r-0 border-input">
+                          <div className="bg-muted flex items-centre px-3 rounded-l-md border border-r-0 border-input">
                             twitter.com/
                           </div>
                           <FormControl>
@@ -954,7 +954,7 @@ export default function EnhancedBusinessSettings() {
                       <FormItem>
                         <FormLabel>YouTube</FormLabel>
                         <div className="flex">
-                          <div className="bg-muted flex items-center px-3 rounded-l-md border border-r-0 border-input">
+                          <div className="bg-muted flex items-centre px-3 rounded-l-md border border-r-0 border-input">
                             youtube.com/c/
                           </div>
                           <FormControl>
@@ -976,7 +976,7 @@ export default function EnhancedBusinessSettings() {
                       <FormItem>
                         <FormLabel>LinkedIn</FormLabel>
                         <div className="flex">
-                          <div className="bg-muted flex items-center px-3 rounded-l-md border border-r-0 border-input">
+                          <div className="bg-muted flex items-centre px-3 rounded-l-md border border-r-0 border-input">
                             linkedin.com/in/
                           </div>
                           <FormControl>
@@ -1038,7 +1038,7 @@ export default function EnhancedBusinessSettings() {
                     }`}
                     onClick={() => handleSubscriptionSelect(tier.id as SubscriptionTier)}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-centre justify-between">
                       <div>
                         <h3 className="text-lg font-medium">{tier.name}</h3>
                         <p className="text-muted-foreground">
@@ -1079,103 +1079,103 @@ export default function EnhancedBusinessSettings() {
                   <div className="grid gap-2 text-sm">
                     {selectedTier === "free" ? (
                       <>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Up to 5 clients</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Basic workout templates</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Client messaging</span>
                         </div>
                       </>
                     ) : selectedTier === "starter" ? (
                       <>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Up to 15 clients</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Advanced workout templates</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Client progress tracking</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Basic AI content generation (10/month)</span>
                         </div>
                       </>
                     ) : selectedTier === "professional" ? (
                       <>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Up to 50 clients</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>AI workout personalization</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Advanced analytics & reporting</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>AI content generation with images (50/month)</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>White labeling</span>
                         </div>
                       </>
                     ) : selectedTier === "business" ? (
                       <>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Unlimited clients</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Multiple trainers (up to 5)</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Advanced business analytics</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Unlimited AI content generation with images</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Custom domain & branding</span>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>All Business tier features</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Unlimited trainers</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Custom feature development</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>Dedicated support manager</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           <Check className="h-4 w-4 text-primary" />
                           <span>API access</span>
                         </div>

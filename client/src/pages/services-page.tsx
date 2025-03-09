@@ -108,7 +108,7 @@ export default function ServicesPage() {
     },
     {
       title: "White-Label Customization",
-      description: "Fully customizable branding with your logo, colors, and welcome message. Present a professional image.",
+      description: "Fully customizable branding with your logo, colours, and welcome message. Present a professional image.",
       icon: <Award size={24} className="text-primary" />,
       cta: "Discover Branding Options"
     },
@@ -124,7 +124,7 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+        <div className="text-centre mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Comprehensive Features for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover our powerful suite of tools designed specifically for personal trainers and fitness coaches to optimise their business and enhance client experiences.
@@ -141,7 +141,7 @@ export default function ServicesPage() {
             <motion.div key={index} variants={itemVariants}>
               <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-centre gap-3">
                     {feature.icon}
                     <CardTitle>{feature.title}</CardTitle>
                   </div>
@@ -159,12 +159,12 @@ export default function ServicesPage() {
           ))}
         </motion.div>
 
-        <div className="mt-24 text-center">
+        <div className="mt-24 text-centre">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your fitness business?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Join thousands of fitness professionals who have elevated their coaching experience with our comprehensive platform.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Link href="/pricing">
               <Button size="lg" className="px-8">View Pricing Plans</Button>
             </Link>
@@ -175,14 +175,14 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-24">
-          <h2 className="text-3xl font-bold mb-12 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold mb-12 text-centre">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
                 <CardTitle>How does the AI workout generator work?</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Our AI workout generator uses advanced machine learning to create personalized workouts based on your client's fitness level, goals, and available equipment. You can customize intensity, duration, and focus areas to match exactly what your clients need.</p>
+                <p>Our AI workout generator uses advanced machine learning to create personalized workouts based on your client's fitness level, goals, and available equipment. You can customise intensity, duration, and focus areas to match exactly what your clients need.</p>
               </CardContent>
             </Card>
             <Card>
@@ -190,7 +190,7 @@ export default function ServicesPage() {
                 <CardTitle>Can I white-label the platform for my business?</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Yes! You can fully customize the platform with your logo, brand colors, and welcome message. Your clients will experience a seamless branded environment that reinforces your professional identity.</p>
+                <p>Yes! You can fully customise the platform with your logo, brand colours, and welcome message. Your clients will experience a seamless branded environment that reinforces your professional identity.</p>
               </CardContent>
             </Card>
             <Card>

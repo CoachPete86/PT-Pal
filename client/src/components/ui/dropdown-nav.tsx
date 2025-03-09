@@ -33,7 +33,7 @@ export function DropdownNav({
             variant="outline"
             className="w-full justify-between px-4 py-5 text-base font-medium"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               {activeOption.icon && <activeOption.icon className="h-4 w-4" />}
               <span>{activeOption.label}</span>
             </div>
@@ -46,7 +46,7 @@ export function DropdownNav({
             <DropdownMenu.Item
               key={option.id}
               className={cn(
-                "relative flex cursor-default select-none items-center rounded-sm px-3 py-2.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                "relative flex cursor-default select-none items-centre rounded-sm px-3 py-2.5 text-sm outline-none transition-colours focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
                 activeTab === option.id && "bg-accent text-accent-foreground",
               )}
               onClick={() => onSelect(option.id)}

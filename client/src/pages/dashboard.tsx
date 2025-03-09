@@ -156,7 +156,7 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center mb-4">
+              <p className="text-centre mb-4">
                 Business analytics functionality coming soon.
               </p>
             </CardContent>
@@ -171,7 +171,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid gap-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row items-centre justify-between">
                 <div>
                   <CardTitle>Client Management</CardTitle>
                   <CardDescription>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                 </div>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button className="flex items-center gap-2">
+                    <Button className="flex items-centre gap-2">
                       <User className="h-4 w-4" />
                       Add New Client
                     </Button>
@@ -201,7 +201,7 @@ export default function DashboardPage() {
                   {[1, 2, 3].map((id) => (
                     <div
                       key={id}
-                      className="flex items-center justify-between p-4 rounded-lg border"
+                      className="flex items-centre justify-between p-4 rounded-lg border"
                     >
                       <div>
                         <h3 className="font-medium">Client {id}</h3>
@@ -224,7 +224,7 @@ export default function DashboardPage() {
         );
       default:
         return (
-          <div className="flex items-center justify-center h-[70vh]">
+          <div className="flex items-centre justify-centre h-[70vh]">
             <Card className="max-w-md mx-auto">
               <CardHeader>
                 <CardTitle>Coming Soon</CardTitle>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center mb-4">
+                <p className="text-centre mb-4">
                   We're working hard to bring you this functionality soon.
                 </p>
                 <Button
@@ -252,14 +252,14 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-centre justify-between">
           <h2 className="text-3xl font-bold tracking-tight">
             {navItems.find((item) => item.id === selectedTab)?.label || "Dashboard"}
           </h2>
           {selectedTab === "clients" && !selectedClientId && (
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
+                <Button className="flex items-centre gap-2">
                   <User className="h-4 w-4" />
                   Add New Client
                 </Button>

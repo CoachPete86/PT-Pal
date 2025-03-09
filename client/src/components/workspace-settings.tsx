@@ -96,7 +96,7 @@ export default function WorkspaceSettings() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48">
+      <div className="flex items-centre justify-centre h-48">
         <LoadingState variant="plate" size="lg" />
       </div>
     );
@@ -106,7 +106,7 @@ export default function WorkspaceSettings() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <Building2 className="h-5 w-5" />
             Workspace Settings
           </CardTitle>
@@ -152,7 +152,7 @@ export default function WorkspaceSettings() {
               />
 
               <div className="space-y-4">
-                <h3 className="flex items-center gap-2 font-medium">
+                <h3 className="flex items-centre gap-2 font-medium">
                   <Brush className="h-5 w-5" />
                   Theme Customization
                 </h3>
@@ -228,7 +228,7 @@ export default function WorkspaceSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <CreditCard className="h-5 w-5" />
             Subscription
           </CardTitle>
@@ -238,7 +238,7 @@ export default function WorkspaceSettings() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <div>
                 <h3 className="font-medium">Current Plan</h3>
                 <p className="text-sm text-muted-foreground">

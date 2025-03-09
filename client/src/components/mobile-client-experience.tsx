@@ -217,14 +217,14 @@ export default function MobileClientExperience() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row md:items-centre md:justify-between">
             <div>
               <CardTitle>Mobile Client Experience</CardTitle>
               <CardDescription>Access your training anywhere, anytime</CardDescription>
             </div>
             {isInstallPromptAvailable && (
               <Button 
-                className="mt-4 md:mt-0 flex items-center gap-2"
+                className="mt-4 md:mt-0 flex items-centre gap-2"
                 onClick={handleInstallApp}
               >
                 <Smartphone className="h-4 w-4" />
@@ -240,7 +240,7 @@ export default function MobileClientExperience() {
               <CardHeader>
                 <CardTitle>PTpal on Your Mobile</CardTitle>
                 <CardDescription>
-                  Take your training experience to the next level with our mobile-optimized platform
+                  Take your training experience to the next level with our mobile-optimised platform
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -248,7 +248,7 @@ export default function MobileClientExperience() {
                   {/* App Preview */}
                   <div className="flex-1">
                     <div className="border border-border rounded-xl overflow-hidden shadow-lg max-w-[280px] mx-auto">
-                      <div className="h-12 bg-primary flex items-center justify-center text-white font-bold">
+                      <div className="h-12 bg-primary flex items-centre justify-centre text-white font-bold">
                         PTpal
                       </div>
                       <div className="h-[480px] bg-card overflow-y-auto p-3">
@@ -361,27 +361,27 @@ export default function MobileClientExperience() {
               </CardContent>
               <CardFooter className="block">
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button className="flex items-center gap-2" onClick={() => setQrVisible(!qrVisible)}>
+                  <Button className="flex items-centre gap-2" onClick={() => setQrVisible(!qrVisible)}>
                     <QrCode className="h-4 w-4" />
                     {qrVisible ? "Hide QR Code" : "Show QR Code"}
                   </Button>
                   
-                  <Button variant="outline" className="flex items-center gap-2" onClick={handleInstallApp} disabled={!isInstallPromptAvailable}>
+                  <Button variant="outline" className="flex items-centre gap-2" onClick={handleInstallApp} disabled={!isInstallPromptAvailable}>
                     <Smartphone className="h-4 w-4" />
                     Install PTpal App
                   </Button>
                 </div>
                 
                 {qrVisible && (
-                  <div className="mt-4 p-4 border rounded-lg flex flex-col items-center">
+                  <div className="mt-4 p-4 border rounded-lg flex flex-col items-centre">
                     {/* Placeholder for QR code image */}
-                    <div className="w-48 h-48 bg-muted flex items-center justify-center">
-                      <div className="text-center text-sm text-muted-foreground">
+                    <div className="w-48 h-48 bg-muted flex items-centre justify-centre">
+                      <div className="text-centre text-sm text-muted-foreground">
                         <QrCode className="h-20 w-20 mx-auto mb-2 opacity-70" />
                         QR Code for Mobile App
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-center">
+                    <p className="mt-2 text-sm text-centre">
                       Scan this QR code with your phone's camera to access the PTpal app
                     </p>
                   </div>
@@ -398,7 +398,7 @@ export default function MobileClientExperience() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <Label htmlFor="enable-notifications">Enable notifications</Label>
                   <Switch
                     id="enable-notifications"
@@ -420,10 +420,10 @@ export default function MobileClientExperience() {
                 <div className="pt-4 space-y-4">
                   <h3 className="text-sm font-medium">Notification Preferences</h3>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label 
                       htmlFor="session-reminders" 
-                      className="text-sm flex items-center gap-2"
+                      className="text-sm flex items-centre gap-2"
                     >
                       <Clock className="h-4 w-4 text-muted-foreground" />
                       <span>Session reminders</span>
@@ -435,10 +435,10 @@ export default function MobileClientExperience() {
                     />
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label 
                       htmlFor="goal-updates" 
-                      className="text-sm flex items-center gap-2"
+                      className="text-sm flex items-centre gap-2"
                     >
                       <BarChart className="h-4 w-4 text-muted-foreground" />
                       <span>Goal progress updates</span>
@@ -450,10 +450,10 @@ export default function MobileClientExperience() {
                     />
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label 
                       htmlFor="trainer-messages" 
-                      className="text-sm flex items-center gap-2"
+                      className="text-sm flex items-centre gap-2"
                     >
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <span>Trainer messages</span>
@@ -465,10 +465,10 @@ export default function MobileClientExperience() {
                     />
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label 
                       htmlFor="achievement-alerts" 
-                      className="text-sm flex items-center gap-2"
+                      className="text-sm flex items-centre gap-2"
                     >
                       <Trophy className="h-4 w-4 text-muted-foreground" />
                       <span>Achievement alerts</span>
@@ -536,7 +536,7 @@ export default function MobileClientExperience() {
                           <CardContent>
                             <div className="space-y-3">
                               {upcomingSessions.map(session => (
-                                <div key={session.id} className="flex justify-between items-center">
+                                <div key={session.id} className="flex justify-between items-centre">
                                   <div>
                                     <p className="font-medium">{session.title}</p>
                                     <p className="text-sm text-muted-foreground">{session.date}</p>
@@ -558,7 +558,7 @@ export default function MobileClientExperience() {
                           <CardContent>
                             <div className="space-y-3">
                               {recentAchievements.map(achievement => (
-                                <div key={achievement.id} className="flex items-center gap-3">
+                                <div key={achievement.id} className="flex items-centre gap-3">
                                   <div className="bg-primary/10 p-2 rounded-full">
                                     <Trophy className="h-4 w-4 text-primary" />
                                   </div>
@@ -623,7 +623,7 @@ export default function MobileClientExperience() {
                         <div className="border rounded-lg p-4">
                           <div className="grid grid-cols-7 gap-1 mb-2">
                             {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
-                              <div key={i} className="text-center text-sm text-muted-foreground font-medium">
+                              <div key={i} className="text-centre text-sm text-muted-foreground font-medium">
                                 {day}
                               </div>
                             ))}
@@ -703,8 +703,8 @@ export default function MobileClientExperience() {
                             <CardTitle className="text-base">Weight Progress</CardTitle>
                           </CardHeader>
                           <CardContent className="p-4">
-                            <div className="h-[200px] flex items-center justify-center bg-muted/30 rounded-md">
-                              <div className="text-center text-muted-foreground">
+                            <div className="h-[200px] flex items-centre justify-centre bg-muted/30 rounded-md">
+                              <div className="text-centre text-muted-foreground">
                                 <BarChart className="h-10 w-10 mx-auto mb-2 opacity-70" />
                                 <p>Weight tracking chart will appear here</p>
                               </div>
@@ -777,17 +777,17 @@ export default function MobileClientExperience() {
                         <h3 className="text-sm font-medium">Notifications</h3>
                         
                         <div className="rounded-md border p-4 space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="push-notifications">Push notifications</Label>
                             <Switch id="push-notifications" checked={notificationsEnabled} />
                           </div>
                           
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="email-reminders">Email reminders</Label>
                             <Switch id="email-reminders" defaultChecked />
                           </div>
                           
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="quiet-hours">Quiet hours (10 PM - 7 AM)</Label>
                             <Switch id="quiet-hours" defaultChecked />
                           </div>
@@ -799,12 +799,12 @@ export default function MobileClientExperience() {
                         <h3 className="text-sm font-medium">Display</h3>
                         
                         <div className="rounded-md border p-4 space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="dark-mode">Dark mode</Label>
                             <Switch id="dark-mode" />
                           </div>
                           
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="large-text">Larger text</Label>
                             <Switch id="large-text" />
                           </div>
@@ -830,12 +830,12 @@ export default function MobileClientExperience() {
                         <h3 className="text-sm font-medium">Data & Privacy</h3>
                         
                         <div className="rounded-md border p-4 space-y-3">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="save-offline">Save workouts offline</Label>
                             <Switch id="save-offline" defaultChecked />
                           </div>
                           
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-centre justify-between">
                             <Label htmlFor="data-usage">Reduce data usage</Label>
                             <Switch id="data-usage" />
                           </div>

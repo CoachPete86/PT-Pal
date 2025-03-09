@@ -491,7 +491,7 @@ export default function DocumentEditor({
   return (
     <div className="space-y-4">
       <div className="border-b pb-4 flex flex-wrap gap-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-centre gap-1">
           <Toggle
             size="sm"
             pressed={editor.isActive("heading", { level: 1 })}
@@ -521,7 +521,7 @@ export default function DocumentEditor({
           </Toggle>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-centre gap-1">
           <Toggle
             size="sm"
             pressed={editor.isActive("bold")}
@@ -545,7 +545,7 @@ export default function DocumentEditor({
           </Toggle>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-centre gap-1">
           <Toggle
             size="sm"
             pressed={editor.isActive("bulletList")}
@@ -575,7 +575,7 @@ export default function DocumentEditor({
           </Toggle>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-centre gap-1">
           <Toggle
             size="sm"
             pressed={editor.isActive("blockquote")}
@@ -609,7 +609,7 @@ export default function DocumentEditor({
           </Button>
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-centre gap-2">
           <Button
             size="sm"
             variant="outline"

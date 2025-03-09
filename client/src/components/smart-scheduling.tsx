@@ -117,17 +117,17 @@ export default function SmartScheduling() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-centre gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Smart Scheduling</h1>
           <p className="text-muted-foreground">
             Manage your sessions, client packages, and automated notifications
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-centre gap-3">
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" variant="default">
+              <Button className="flex items-centre gap-2" variant="default">
                 <Calendar className="h-4 w-4" />
                 New Session
               </Button>
@@ -140,7 +140,7 @@ export default function SmartScheduling() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="client" className="text-right">
                     Client
                   </Label>
@@ -158,7 +158,7 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="date" className="text-right">
                     Date
                   </Label>
@@ -169,13 +169,13 @@ export default function SmartScheduling() {
                     defaultValue={new Date().toISOString().split("T")[0]}
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="time" className="text-right">
                     Time
                   </Label>
                   <Input id="time" type="time" className="col-span-3" defaultValue="17:00" />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="session-type" className="text-right">
                     Type
                   </Label>
@@ -190,7 +190,7 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="duration" className="text-right">
                     Duration
                   </Label>
@@ -206,8 +206,8 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <div className="col-start-2 col-span-3 flex items-center space-x-2">
+                <div className="grid grid-cols-4 items-centre gap-4">
+                  <div className="col-start-2 col-span-3 flex items-centre space-x-2">
                     <Checkbox id="send-reminder" />
                     <Label htmlFor="send-reminder">Send automatic reminder</Label>
                   </div>
@@ -221,7 +221,7 @@ export default function SmartScheduling() {
 
           <Dialog open={showNewPackageDialog} onOpenChange={setShowNewPackageDialog}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" variant="outline">
+              <Button className="flex items-centre gap-2" variant="outline">
                 <Package className="h-4 w-4" />
                 New Package
               </Button>
@@ -234,7 +234,7 @@ export default function SmartScheduling() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="client" className="text-right">
                     Client
                   </Label>
@@ -252,7 +252,7 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="package-type" className="text-right">
                     Package Type
                   </Label>
@@ -267,13 +267,13 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="sessions" className="text-right">
                     Sessions
                   </Label>
                   <Input id="sessions" type="number" className="col-span-3" defaultValue="10" />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="expiry" className="text-right">
                     Expiration
                   </Label>
@@ -290,12 +290,12 @@ export default function SmartScheduling() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-centre gap-4">
                   <Label htmlFor="price" className="text-right">
                     Price
                   </Label>
                   <div className="col-span-3 flex">
-                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
+                    <span className="inline-flex items-centre px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
                       $
                     </span>
                     <Input
@@ -306,8 +306,8 @@ export default function SmartScheduling() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <div className="col-start-2 col-span-3 flex items-center space-x-2">
+                <div className="grid grid-cols-4 items-centre gap-4">
+                  <div className="col-start-2 col-span-3 flex items-centre space-x-2">
                     <Switch id="auto-renew" />
                     <Label htmlFor="auto-renew">Auto-renew subscription</Label>
                   </div>
@@ -343,11 +343,11 @@ export default function SmartScheduling() {
                     {upcomingSessions.map((session) => (
                       <div
                         key={session.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg"
+                        className="flex flex-col sm:flex-row sm:items-centre justify-between p-4 border rounded-lg"
                       >
                         <div className="flex items-start gap-3">
                           <div
-                            className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                            className={`h-10 w-10 rounded-full flex items-centre justify-centre ${
                               session.status === "confirmed"
                                 ? "bg-green-100 text-green-600"
                                 : "bg-amber-100 text-amber-600"
@@ -360,7 +360,7 @@ export default function SmartScheduling() {
                             )}
                           </div>
                           <div>
-                            <div className="flex items-center">
+                            <div className="flex items-centre">
                               <h4 className="font-medium">{session.client}</h4>
                               <Badge
                                 variant={session.status === "confirmed" ? "default" : "outline"}
@@ -374,13 +374,13 @@ export default function SmartScheduling() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-3 sm:mt-0">
+                        <div className="flex items-centre gap-2 mt-3 sm:mt-0">
                           {!session.reminded && (
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => setShowReminderDialog(true)}
-                              className="flex items-center gap-1"
+                              className="flex items-centre gap-1"
                             >
                               <Bell className="h-3 w-3" />
                               Remind
@@ -437,19 +437,19 @@ export default function SmartScheduling() {
                 <div className="mt-6 pt-4 border-t">
                   <h3 className="font-medium mb-2">Notifications</h3>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-centre justify-between">
                       <Label htmlFor="email-reminders" className="text-sm">
                         Email reminders
                       </Label>
                       <Switch id="email-reminders" defaultChecked />
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-centre justify-between">
                       <Label htmlFor="sms-reminders" className="text-sm">
                         SMS reminders
                       </Label>
                       <Switch id="sms-reminders" defaultChecked />
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-centre justify-between">
                       <Label htmlFor="expiry-alerts" className="text-sm">
                         Package expiry alerts
                       </Label>
@@ -477,11 +477,11 @@ export default function SmartScheduling() {
                     {clientPackages.map((pkg) => (
                       <div
                         key={pkg.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg"
+                        className="flex flex-col sm:flex-row sm:items-centre justify-between p-4 border rounded-lg"
                       >
                         <div className="flex items-start gap-3">
                           <div
-                            className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                            className={`h-10 w-10 rounded-full flex items-centre justify-centre ${
                               pkg.status === "active"
                                 ? "bg-green-100 text-green-600"
                                 : "bg-amber-100 text-amber-600"
@@ -490,7 +490,7 @@ export default function SmartScheduling() {
                             <Package className="h-5 w-5" />
                           </div>
                           <div>
-                            <div className="flex items-center">
+                            <div className="flex items-centre">
                               <h4 className="font-medium">{pkg.client}</h4>
                               <Badge
                                 variant={pkg.status === "active" ? "default" : "outline"}
@@ -513,7 +513,7 @@ export default function SmartScheduling() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 mt-3 sm:mt-0">
+                        <div className="flex items-centre gap-2 mt-3 sm:mt-0">
                           <Button variant="outline" size="sm">
                             Edit
                           </Button>
@@ -543,7 +543,7 @@ export default function SmartScheduling() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-centre mb-2">
                     <div className="text-sm font-medium">Expiring This Month</div>
                     <div className="text-amber-600 font-semibold">3</div>
                   </div>
@@ -553,7 +553,7 @@ export default function SmartScheduling() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-centre mb-2">
                     <div className="text-sm font-medium">Auto-Renewing Next Month</div>
                     <div className="text-green-600 font-semibold">5</div>
                   </div>
@@ -563,7 +563,7 @@ export default function SmartScheduling() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-centre mb-2">
                     <div className="text-sm font-medium">Low Session Balance</div>
                     <div className="text-orange-600 font-semibold">2</div>
                   </div>
@@ -589,8 +589,8 @@ export default function SmartScheduling() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center p-8 border-2 border-dashed rounded-md">
-                <div className="text-center">
+              <div className="flex items-centre justify-centre p-8 border-2 border-dashed rounded-md">
+                <div className="text-centre">
                   <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-4 text-lg font-semibold">Calendar View</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -616,7 +616,7 @@ export default function SmartScheduling() {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <div className="flex items-center p-3 border rounded-lg">
+            <div className="flex items-centre p-3 border rounded-lg">
               <UserCheck className="h-5 w-5 mr-3 text-muted-foreground" />
               <div>
                 <h4 className="font-medium">Sarah Johnson</h4>
@@ -637,7 +637,7 @@ export default function SmartScheduling() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-centre space-x-2">
               <Checkbox id="notify-client" defaultChecked />
               <Label htmlFor="notify-client">Notify client via email</Label>
             </div>
@@ -661,7 +661,7 @@ export default function SmartScheduling() {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            <div className="flex items-center p-3 border rounded-lg">
+            <div className="flex items-centre p-3 border rounded-lg">
               <AlertTriangle className="h-5 w-5 mr-3 text-amber-500" />
               <div>
                 <h4 className="font-medium">Michael Chen</h4>
@@ -673,11 +673,11 @@ export default function SmartScheduling() {
             <div className="space-y-2">
               <Label htmlFor="reminder-method">Reminder Method</Label>
               <div className="flex space-x-4">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <Checkbox id="email-reminder" defaultChecked />
                   <Label htmlFor="email-reminder">Email</Label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <Checkbox id="sms-reminder" defaultChecked />
                   <Label htmlFor="sms-reminder">SMS</Label>
                 </div>

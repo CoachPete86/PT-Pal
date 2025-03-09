@@ -87,12 +87,12 @@ export default function MovementAnalysis() {
     setRecording(false);
     toast({
       title: "Recording complete",
-      description: "Ready to analyze your movement"
+      description: "Ready to analyse your movement"
     });
     
     // In a real app, we would save the recording as a file
     // For demo, let's simulate a successful recording
-    // by enabling the analyze button
+    // by enabling the analyse button
   };
 
   const uploadAndAnalyze = async () => {
@@ -131,7 +131,7 @@ export default function MovementAnalysis() {
       toast({
         variant: "destructive",
         title: "Analysis failed",
-        description: "Could not analyze your movement video"
+        description: "Could not analyse your movement video"
       });
     }
   };
@@ -179,7 +179,7 @@ export default function MovementAnalysis() {
         <div className="grid md:grid-cols-2 gap-6">
           <AnimatedCard className="overflow-hidden">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-centre">
                 <svg className="mr-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -187,7 +187,7 @@ export default function MovementAnalysis() {
               </CardTitle>
               <CardDescription>Blueprint-style technical visualization</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center p-0">
+            <CardContent className="flex justify-centre p-0">
               <img 
                 src={analysisResult.referenceImageUrl} 
                 alt="Ideal form reference" 
@@ -201,7 +201,7 @@ export default function MovementAnalysis() {
           
           <AnimatedCard className="overflow-hidden">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-centre">
                 <svg className="mr-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -209,7 +209,7 @@ export default function MovementAnalysis() {
               </CardTitle>
               <CardDescription>Your form compared to ideal form</CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center p-0">
+            <CardContent className="flex justify-centre p-0">
               <img 
                 src={analysisResult.comparisonImageUrl} 
                 alt="Form comparison" 
@@ -224,15 +224,15 @@ export default function MovementAnalysis() {
         
         <AnimatedCard>
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center">
+            <CardTitle className="text-2xl flex items-centre">
               <svg className="mr-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               {analysisResult.movement} Analysis
             </CardTitle>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-centre space-x-2">
               <div className="font-medium">Form Score:</div>
-              <div className="flex items-center space-x-2 flex-1">
+              <div className="flex items-centre space-x-2 flex-1">
                 <Progress value={analysisResult.score * 10} className="h-2" />
                 <span className="font-bold">{analysisResult.score.toFixed(1)}/10</span>
               </div>
@@ -308,7 +308,7 @@ export default function MovementAnalysis() {
 
   return (
     <div className="container max-w-4xl mx-auto py-8">
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <h1 className="text-3xl font-bold mb-2">Movement Analysis</h1>
         <p className="text-muted-foreground">
           Upload a video of your exercise form for AI-powered analysis and feedback
@@ -326,7 +326,7 @@ export default function MovementAnalysis() {
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                <div className="border-2 border-dashed rounded-lg p-6 text-centre hover:bg-muted/50 transition-colours cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <input 
                     type="file" 
                     ref={fileInputRef}
@@ -345,7 +345,7 @@ export default function MovementAnalysis() {
                   </p>
                 </div>
                 
-                <div className="text-center">
+                <div className="text-centre">
                   <span className="text-sm text-muted-foreground">or</span>
                 </div>
                 
@@ -370,7 +370,7 @@ export default function MovementAnalysis() {
                 </Button>
               </div>
               
-              <div className="relative border rounded-lg overflow-hidden bg-muted/50 flex items-center justify-center min-h-[200px]">
+              <div className="relative border rounded-lg overflow-hidden bg-muted/50 flex items-centre justify-centre min-h-[200px]">
                 {videoFile ? (
                   <video 
                     ref={videoPreviewRef}
@@ -378,7 +378,7 @@ export default function MovementAnalysis() {
                     controls
                   />
                 ) : (
-                  <div className="text-center p-4">
+                  <div className="text-centre p-4">
                     <svg className="mx-auto h-12 w-12 text-muted-foreground mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -422,10 +422,10 @@ export default function MovementAnalysis() {
               {uploading ? 'Uploading Video...' : 'Analyzing Movement...'}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4">
-              <div className="flex justify-center">
+              <div className="flex justify-centre">
                 <LoadingState variant={analyzing ? "dumbbell" : "pulse"} size="lg" />
               </div>
-              <div className="text-center space-y-2">
+              <div className="text-centre space-y-2">
                 <p>
                   {uploading 
                     ? 'Uploading your video... Please wait.' 

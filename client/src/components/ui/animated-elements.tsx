@@ -83,7 +83,7 @@ export function CollapsibleSection({
   return (
     <div className={cn("border rounded-lg overflow-hidden", className)}>
       <motion.div
-        className="p-4 font-medium bg-muted/30 flex justify-between items-center cursor-pointer"
+        className="p-4 font-medium bg-muted/30 flex justify-between items-centre cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
       >
@@ -230,7 +230,7 @@ export function SuccessAnimation({ className }: { className?: string }) {
   return (
     <motion.div
       className={cn(
-        "rounded-full bg-green-100 p-2 flex items-center justify-center",
+        "rounded-full bg-green-100 p-2 flex items-centre justify-centre",
         className,
       )}
       initial={{ scale: 0 }}
@@ -269,7 +269,7 @@ export function ExpandableSection({
       )}
     >
       <motion.div
-        className="flex items-center justify-between p-4 cursor-pointer"
+        className="flex items-centre justify-between p-4 cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
       >
@@ -309,7 +309,7 @@ export function AddItemButton({
   return (
     <motion.button
       className={cn(
-        "w-full flex items-center justify-center gap-2 py-3 px-4 border-2 border-dashed rounded-md text-muted-foreground hover:text-foreground transition-colors",
+        "w-full flex items-centre justify-centre gap-2 py-3 px-4 border-2 border-dashed rounded-md text-muted-foreground hover:text-foreground transition-colours",
         className,
       )}
       onClick={onClick}

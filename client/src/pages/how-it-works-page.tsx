@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+        <div className="text-centre mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">How PTpal Transforms Your Coaching Business</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             PTpal handles the tedious administrative tasks so you can focus on what you do best: coaching clients and growing your business.
@@ -73,12 +73,12 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="bg-muted rounded-lg p-8">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-centre">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to transform your coaching business?</h2>
             <p className="mb-6">
               Join thousands of fitness professionals who have streamlined their workflow and grown their business with PTpal.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-centre gap-4">
               <Link href="/signup">
                 <Button size="lg">Start Free Trial</Button>
               </Link>

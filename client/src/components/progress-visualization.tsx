@@ -172,7 +172,7 @@ export function ProgressVisualization({
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">
+          <p className="text-centre text-muted-foreground">
             Please select a client to view progress visualization.
           </p>
         </CardContent>
@@ -182,7 +182,7 @@ export function ProgressVisualization({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-centre gap-4">
         <div className="flex flex-wrap gap-2">
           <Popover>
             <PopoverTrigger asChild>
@@ -253,7 +253,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedWorkoutData.length > 0 ? (
@@ -284,7 +284,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No weight data available
                     </p>
@@ -300,7 +300,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedWorkoutData.length > 0 ? (
@@ -338,7 +338,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No body composition data available
                     </p>
@@ -358,7 +358,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedWorkoutData.length > 0 ? (
@@ -389,7 +389,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No strength data available
                     </p>
@@ -405,7 +405,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedWorkoutData.length > 0 ? (
@@ -436,7 +436,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No endurance data available
                     </p>
@@ -456,7 +456,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoadingNutrition ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedNutritionData.length > 0 ? (
@@ -487,7 +487,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No calorie data available
                     </p>
@@ -503,7 +503,7 @@ export function ProgressVisualization({
               </CardHeader>
               <CardContent>
                 {isLoadingNutrition ? (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 ) : processedNutritionData.length > 0 ? (
@@ -548,7 +548,7 @@ export function ProgressVisualization({
                     )}
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex justify-center items-center h-[300px]">
+                  <div className="flex justify-centre items-centre h-[300px]">
                     <p className="text-muted-foreground">
                       No macronutrient data available
                     </p>

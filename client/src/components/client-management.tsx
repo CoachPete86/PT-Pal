@@ -150,7 +150,7 @@ export default function ClientManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-centre justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Clients</h2>
         <Button onClick={() => setShowAddClientDialog(true)}>
           <UserPlus className="h-4 w-4 mr-2" />
@@ -159,7 +159,7 @@ export default function ClientManagement() {
       </div>
 
       <Tabs defaultValue="all">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-centre mb-4">
           <TabsList>
             <TabsTrigger value="all">All Clients</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
@@ -187,11 +187,11 @@ export default function ClientManagement() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-centre py-8">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : filteredClients.length === 0 ? (
-                <div className="text-center py-8">
+                <div className="text-centre py-8">
                   <UserIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-2">No clients found</p>
                   {searchQuery ? (
@@ -228,7 +228,7 @@ export default function ClientManagement() {
                           </TableCell>
                           <TableCell>{client.email}</TableCell>
                           <TableCell>
-                            <div className="flex items-center">
+                            <div className="flex items-centre">
                               <div
                                 className={`h-2 w-2 rounded-full mr-2 ${
                                   client.status === "active"
@@ -299,7 +299,7 @@ export default function ClientManagement() {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-centre py-8">
                   <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
               ) : (
@@ -360,7 +360,7 @@ export default function ClientManagement() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-                  <CardContent className="flex items-center gap-4 p-6">
+                  <CardContent className="flex items-centre gap-4 p-6">
                     <Clock className="h-8 w-8 text-yellow-500" />
                     <div>
                       <p className="text-sm font-medium">Inactive 30+ Days</p>
@@ -377,7 +377,7 @@ export default function ClientManagement() {
                 </Card>
 
                 <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5">
-                  <CardContent className="flex items-center gap-4 p-6">
+                  <CardContent className="flex items-centre gap-4 p-6">
                     <AlertCircle className="h-8 w-8 text-red-500" />
                     <div>
                       <p className="text-sm font-medium">Inactive 90+ Days</p>
@@ -465,7 +465,7 @@ export default function ClientManagement() {
                 </Select>
               </div>
 
-              <div className="flex items-center space-x-2 pt-2">
+              <div className="flex items-centre space-x-2 pt-2">
                 <Checkbox
                   id="welcome-email"
                   checked={newClient.sendWelcomeEmail}

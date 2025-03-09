@@ -143,7 +143,7 @@ export default function FeaturesPage() {
     },
     {
       title: "Business Analytics",
-      description: "Gain data-driven insights to optimize your fitness business.",
+      description: "Gain data-driven insights to optimise your fitness business.",
       details: [
         "Revenue and payment tracking with visual reports",
         "Client retention and attendance analytics",
@@ -259,7 +259,7 @@ export default function FeaturesPage() {
       title: "White-Label Branding",
       description: "Present a professional, branded experience to your clients.",
       details: [
-        "Custom logo and colors throughout the platform",
+        "Custom logo and colours throughout the platform",
         "Personalized welcome messages and emails",
         "Branded workout plans and PDFs",
         "Custom domain integration option",
@@ -317,7 +317,7 @@ export default function FeaturesPage() {
           <motion.div key={index} variants={itemVariants}>
             <Card className="h-full">
               <CardHeader>
-                <div className="flex items-center gap-3">
+                <div className="flex items-centre gap-3">
                   {feature.icon}
                   <CardTitle>{feature.title}</CardTitle>
                 </div>
@@ -356,7 +356,7 @@ export default function FeaturesPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+        <div className="text-centre mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Powerful Features for Fitness Success</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Explore our comprehensive suite of tools designed to revolutionize your fitness business and enhance client experiences.
@@ -376,7 +376,7 @@ export default function FeaturesPage() {
               </TabsList>
               
               <TabsContent value="trainer">
-                <div className="text-center mb-8 mt-4">
+                <div className="text-centre mb-8 mt-4">
                   <h2 className="text-2xl font-semibold">Trainer & Business Tools</h2>
                   <p className="text-muted-foreground mt-2">Powerful features to streamline operations and enhance your coaching</p>
                 </div>
@@ -384,7 +384,7 @@ export default function FeaturesPage() {
               </TabsContent>
               
               <TabsContent value="client">
-                <div className="text-center mb-8 mt-4">
+                <div className="text-centre mb-8 mt-4">
                   <h2 className="text-2xl font-semibold">Client Experience Features</h2>
                   <p className="text-muted-foreground mt-2">Engaging tools that keep your clients motivated and on track</p>
                 </div>
@@ -392,7 +392,7 @@ export default function FeaturesPage() {
               </TabsContent>
               
               <TabsContent value="platform">
-                <div className="text-center mb-8 mt-4">
+                <div className="text-centre mb-8 mt-4">
                   <h2 className="text-2xl font-semibold">Platform Capabilities</h2>
                   <p className="text-muted-foreground mt-2">Technical foundation that powers your professional fitness business</p>
                 </div>
@@ -402,12 +402,12 @@ export default function FeaturesPage() {
           </div>
         </div>
 
-        <div className="mt-24 text-center">
+        <div className="mt-24 text-centre">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your fitness business?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Experience the difference a comprehensive platform can make for your coaching business and client results.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Link href="/pricing">
               <Button size="lg" className="px-8">View Pricing Plans</Button>
             </Link>

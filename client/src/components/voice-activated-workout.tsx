@@ -538,7 +538,7 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-centre">
           <div>
             <CardTitle>{workoutTitle}</CardTitle>
             <CardDescription>Voice-guided workout session</CardDescription>
@@ -564,7 +564,7 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
 
         {/* Current Exercise */}
         <div className="border rounded-lg p-4 space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-centre">
             <h3 className="font-semibold">
               {currentExerciseIndex < exercises.length
                 ? isResting
@@ -585,7 +585,7 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
                   : exercises[currentExerciseIndex].instruction}
               </p>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-centre">
                 <span className="text-sm font-medium">
                   {isResting
                     ? "Rest"
@@ -603,7 +603,7 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
 
         {/* Voice and Speech Controls */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center justify-between space-x-2">
+          <div className="flex items-centre justify-between space-x-2">
             <Label htmlFor="voice-commands" className="text-sm">
               Voice Commands
             </Label>
@@ -614,7 +614,7 @@ const VoiceActivatedWorkout: React.FC<VoiceActivatedWorkoutProps> = ({
             />
           </div>
 
-          <div className="flex items-center justify-between space-x-2">
+          <div className="flex items-centre justify-between space-x-2">
             <Label htmlFor="speech-guidance" className="text-sm">
               Voice Guidance
             </Label>

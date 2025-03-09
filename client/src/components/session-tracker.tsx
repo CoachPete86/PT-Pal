@@ -152,7 +152,7 @@ export default function SessionTracker() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-centre justify-centre min-h-[200px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -162,7 +162,7 @@ export default function SessionTracker() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <CalendarCheck className="h-5 w-5" />
             Session Tracking
           </CardTitle>
@@ -179,7 +179,7 @@ export default function SessionTracker() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <CalendarCheck className="h-5 w-5" />
             Session Tracking
           </CardTitle>
@@ -200,7 +200,7 @@ export default function SessionTracker() {
     >
       <AnimatedCard>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 500, damping: 10 }}
@@ -221,7 +221,7 @@ export default function SessionTracker() {
                   <CardContent className="p-4">
                     <div className="flex justify-between mb-4">
                       <div>
-                        <h3 className="font-semibold flex items-center gap-2">
+                        <h3 className="font-semibold flex items-centre gap-2">
                           <FileText className="h-4 w-4 text-primary" />
                           <motion.span
                             initial={{ opacity: 0, x: -5 }}
@@ -232,7 +232,7 @@ export default function SessionTracker() {
                             {pkg.totalSessions}
                           </motion.span>
                         </h3>
-                        <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                        <p className="text-sm text-muted-foreground flex items-centre gap-2 mt-1">
                           <Clock className="h-4 w-4" />
                           Purchased:{" "}
                           {new Date(
@@ -248,7 +248,7 @@ export default function SessionTracker() {
                     >
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
                         <div>
-                          <Label className="flex items-center gap-1">
+                          <Label className="flex items-centre gap-1">
                             <User className="h-4 w-4" />
                             Client Name
                           </Label>
@@ -260,7 +260,7 @@ export default function SessionTracker() {
                           />
                         </div>
                         <div>
-                          <Label className="flex items-center gap-1">
+                          <Label className="flex items-centre gap-1">
                             <CalendarCheck className="h-4 w-4" />
                             Session Date
                           </Label>
@@ -272,7 +272,7 @@ export default function SessionTracker() {
                           />
                         </div>
                         <div>
-                          <Label className="flex items-center gap-1">
+                          <Label className="flex items-centre gap-1">
                             <Clock className="h-4 w-4" />
                             Duration (minutes)
                           </Label>
@@ -299,8 +299,8 @@ export default function SessionTracker() {
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <Label className="flex items-center gap-2">
+                        <div className="flex items-centre justify-between mb-2">
+                          <Label className="flex items-centre gap-2">
                             Client Signature
                             <span className="text-xs text-muted-foreground">
                               (required)
@@ -310,7 +310,7 @@ export default function SessionTracker() {
                             variant="outline"
                             size="sm"
                             onClick={clearSignature}
-                            className="flex items-center gap-1"
+                            className="flex items-centre gap-1"
                           >
                             <RefreshCw className="h-4 w-4" />
                             Clear
@@ -353,7 +353,7 @@ export default function SessionTracker() {
                             document.body.removeChild(a);
                           }
                         }}
-                        className="flex items-center gap-2"
+                        className="flex items-centre gap-2"
                         disabled={
                           !signaturePadRef.current ||
                           signaturePadRef.current.isEmpty()
@@ -377,11 +377,11 @@ export default function SessionTracker() {
                           signaturePadRef.current.isEmpty() ||
                           completeSessionMutation.isPending
                         }
-                        className="flex items-center gap-2 relative"
+                        className="flex items-centre gap-2 relative"
                       >
                         {showSuccessAnimation && (
                           <motion.div
-                            className="absolute inset-0 flex items-center justify-center bg-primary rounded-md"
+                            className="absolute inset-0 flex items-centre justify-centre bg-primary rounded-md"
                             initial={{ opacity: 0, scale: 0 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0 }}

@@ -107,7 +107,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
         {onExportPdf && (
           <button
             onClick={onExportPdf}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            className="flex items-centre gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +132,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
         {onExportNotion && (
           <button
             onClick={onExportNotion}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            className="flex items-centre gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -149,15 +149,15 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
       </div>
 
       {/* Header with Logo and Title */}
-      <div className="mb-6 border-b pb-6 flex flex-col items-center">
-        <div className="flex justify-center mb-4">
-          <div className="h-24 w-24 bg-primary/20 rounded-full flex items-center justify-center text-4xl">
+      <div className="mb-6 border-b pb-6 flex flex-col items-centre">
+        <div className="flex justify-centre mb-4">
+          <div className="h-24 w-24 bg-primary/20 rounded-full flex items-centre justify-centre text-4xl">
             🏋️‍♂️
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-center mb-2">SESSION PLAN</h1>
+        <h1 className="text-3xl font-bold text-centre mb-2">SESSION PLAN</h1>
         {sessionDetails.focus && (
-          <h2 className="text-xl text-center text-primary mb-4">
+          <h2 className="text-xl text-centre text-primary mb-4">
             {sessionDetails.focus}
           </h2>
         )}
@@ -170,18 +170,18 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
             📋 CLIENT DETAILS
           </h2>
           <div className="space-y-2">
-            <p className="flex items-center gap-2">
+            <p className="flex items-centre gap-2">
               <span className="font-semibold min-w-[120px]">
                 👤 Client Name:
               </span>
               <span className="font-medium">{sessionDetails.clientName}</span>
             </p>
-            <p className="flex items-center gap-2">
+            <p className="flex items-centre gap-2">
               <span className="font-semibold min-w-[120px]">👨‍🏫 Coach:</span>
               <span className="font-medium">{sessionDetails.coach}</span>
             </p>
             {sessionDetails.date && (
-              <p className="flex items-center gap-2">
+              <p className="flex items-centre gap-2">
                 <span className="font-semibold min-w-[120px]">📅 Date:</span>
                 <span className="font-medium">{sessionDetails.date}</span>
               </p>
@@ -193,17 +193,17 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
             🔍 SESSION DETAILS
           </h2>
           <div className="space-y-2">
-            <p className="flex items-center gap-2">
+            <p className="flex items-centre gap-2">
               <span className="font-semibold min-w-[120px]">
                 🎯 Session Type:
               </span>
               <span className="font-medium">{sessionDetails.sessionType}</span>
             </p>
-            <p className="flex items-center gap-2">
+            <p className="flex items-centre gap-2">
               <span className="font-semibold min-w-[120px]">⏱ Duration:</span>
               <span className="font-medium">{sessionDetails.duration}</span>
             </p>
-            <p className="flex items-center gap-2">
+            <p className="flex items-centre gap-2">
               <span className="font-semibold min-w-[120px]">📍 Location:</span>
               <span className="font-medium">{sessionDetails.location}</span>
             </p>
@@ -219,7 +219,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-700 p-4 rounded-md shadow-sm">
-            <h3 className="font-bold mb-2 flex items-center gap-2">
+            <h3 className="font-bold mb-2 flex items-centre gap-2">
               <span className="text-2xl">🔧</span> Main Equipment
             </h3>
             <ul className="list-disc ml-6 space-y-1">
@@ -233,7 +233,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
 
           {equipmentNeeded.weights && equipmentNeeded.weights.length > 0 && (
             <div className="bg-white dark:bg-gray-700 p-4 rounded-md shadow-sm">
-              <h3 className="font-bold mb-2 flex items-center gap-2">
+              <h3 className="font-bold mb-2 flex items-centre gap-2">
                 <span className="text-2xl">⚖️</span> Weights
               </h3>
               <ul className="list-disc ml-6 space-y-1">
@@ -248,7 +248,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
 
           {equipmentNeeded.machines && equipmentNeeded.machines.length > 0 && (
             <div className="bg-white dark:bg-gray-700 p-4 rounded-md shadow-sm">
-              <h3 className="font-bold mb-2 flex items-center gap-2">
+              <h3 className="font-bold mb-2 flex items-centre gap-2">
                 <span className="text-2xl">🤖</span> Machines
               </h3>
               <ul className="list-disc ml-6 space-y-1">
@@ -263,7 +263,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
 
           {equipmentNeeded.other && (
             <div className="bg-white dark:bg-gray-700 p-4 rounded-md shadow-sm">
-              <h3 className="font-bold mb-2 flex items-center gap-2">
+              <h3 className="font-bold mb-2 flex items-centre gap-2">
                 <span className="text-2xl">📦</span> Other Items
               </h3>
               <p className="font-medium ml-2">{equipmentNeeded.other}</p>
@@ -312,7 +312,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
 
       {/* The Workout */}
       <section className="mb-8">
-        <h2 className="text-2xl font-bold mb-6 text-center bg-primary/10 py-3 rounded-lg text-primary border-b-2 border-primary">
+        <h2 className="text-2xl font-bold mb-6 text-centre bg-primary/10 py-3 rounded-lg text-primary border-b-2 border-primary">
           💪 2. THE WORKOUT
         </h2>
 
@@ -326,7 +326,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
             </div>
 
             <div className="mb-4 flex flex-wrap gap-3">
-              <div className="bg-white dark:bg-gray-700 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
+              <div className="bg-white dark:bg-gray-700 px-3 py-1 rounded-full text-sm font-semibold flex items-centre gap-1 shadow-sm">
                 <span className="text-primary">⏱️</span> {block.format}
               </div>
             </div>
@@ -586,7 +586,7 @@ const SessionPlanTemplate: React.FC<SessionPlanTemplateProps> = ({
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 pt-4 border-t text-center text-gray-500 dark:text-gray-400">
+      <footer className="mt-12 pt-4 border-t text-centre text-gray-500 dark:text-gray-400">
         <p>Created with FitPro AI • {new Date().toLocaleDateString()}</p>
       </footer>
     </div>

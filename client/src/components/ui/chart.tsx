@@ -11,8 +11,8 @@ export type ChartConfig = {
     label?: React.ReactNode;
     icon?: React.ComponentType;
   } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
+    | { colour?: string; theme?: never }
+    | { colour?: never; theme: Record<keyof typeof THEMES, string> }
   );
 };
 
@@ -50,7 +50,7 @@ const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+          "flex aspect-video justify-centre text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className,
         )}
         {...props}
@@ -66,11 +66,11 @@ const ChartContainer = React.forwardRef<
 ChartContainer.displayName = "Chart";
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(
-    ([_, config]) => config.theme || config.color,
+  const colourConfig = Object.entries(config).filter(
+    ([_, config]) => config.theme || config.colour,
   );
 
-  if (!colorConfig.length) {
+  if (!colourConfig.length) {
     return null;
   }
 
@@ -81,12 +81,12 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
           .map(
             ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
-${colorConfig
+${colourConfig
   .map(([key, itemConfig]) => {
-    const color =
+    const colour =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+      itemConfig.colour;
+    return colour ? `  --colour-${key}: ${colour};` : null;
   })
   .join("\n")}
 }
@@ -123,7 +123,7 @@ const ChartTooltipContent = React.forwardRef<
       labelFormatter,
       labelClassName,
       formatter,
-      color,
+      colour,
       nameKey,
       labelKey,
     },
@@ -186,14 +186,14 @@ const ChartTooltipContent = React.forwardRef<
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-            const indicatorColor = color || item.payload.fill || item.color;
+            const indicatorColor = colour || item.payload.fill || item.colour;
 
             return (
               <div
                 key={item.dataKey}
                 className={cn(
                   "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
-                  indicator === "dot" && "items-center",
+                  indicator === "dot" && "items-centre",
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
@@ -206,7 +206,7 @@ const ChartTooltipContent = React.forwardRef<
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                            "shrink-0 rounded-[2px] border-[--colour-border] bg-[--colour-bg]",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -217,8 +217,8 @@ const ChartTooltipContent = React.forwardRef<
                           )}
                           style={
                             {
-                              "--color-bg": indicatorColor,
-                              "--color-border": indicatorColor,
+                              "--colour-bg": indicatorColor,
+                              "--colour-border": indicatorColor,
                             } as React.CSSProperties
                           }
                         />
@@ -227,7 +227,7 @@ const ChartTooltipContent = React.forwardRef<
                     <div
                       className={cn(
                         "flex flex-1 justify-between leading-none",
-                        nestLabel ? "items-end" : "items-center",
+                        nestLabel ? "items-end" : "items-centre",
                       )}
                     >
                       <div className="grid gap-1.5">
@@ -278,7 +278,7 @@ const ChartLegendContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex items-center justify-center gap-4",
+          "flex items-centre justify-centre gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
           className,
         )}
@@ -291,7 +291,7 @@ const ChartLegendContent = React.forwardRef<
             <div
               key={item.value}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
+                "flex items-centre gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
@@ -300,7 +300,7 @@ const ChartLegendContent = React.forwardRef<
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
                   style={{
-                    backgroundColor: item.color,
+                    backgroundColor: item.colour,
                   }}
                 />
               )}

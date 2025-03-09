@@ -149,13 +149,13 @@ export default function EnhancedContentGenerator() {
   });
 
   // Analyze image mutation
-  const analyzeImageMutation = useMutation({
+  const analyseImageMutation = useMutation({
     mutationFn: async (file: File) => {
       setIsAnalyzingImage(true);
       try {
         const formData = new FormData();
         formData.append("image", file);
-        const res = await axios.post("/api/image/analyze", formData, {
+        const res = await axios.post("/api/image/analyse", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         return res.data;
@@ -167,13 +167,13 @@ export default function EnhancedContentGenerator() {
       setImageDescription(data.description);
       toast({
         title: "Image Analyzed",
-        description: "Your image has been analyzed successfully.",
+        description: "Your image has been analysed successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Analysis Failed",
-        description: "Failed to analyze the image.",
+        description: "Failed to analyse the image.",
         variant: "destructive",
       });
     },
@@ -264,13 +264,13 @@ export default function EnhancedContentGenerator() {
     if (!uploadedImage) {
       toast({
         title: "Image Required",
-        description: "Please upload an image to analyze",
+        description: "Please upload an image to analyse",
         variant: "destructive",
       });
       return;
     }
 
-    analyzeImageMutation.mutate(uploadedImage);
+    analyseImageMutation.mutate(uploadedImage);
   };
 
   // Handler for generating post from image
@@ -278,7 +278,7 @@ export default function EnhancedContentGenerator() {
     if (!imageDescription) {
       toast({
         title: "Analysis Required",
-        description: "Please analyze the image first",
+        description: "Please analyse the image first",
         variant: "destructive",
       });
       return;
@@ -313,8 +313,8 @@ export default function EnhancedContentGenerator() {
 
   // Render the navbar
   const renderNavbar = () => (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-2">
+    <div className="flex items-centre justify-between mb-6">
+      <div className="flex items-centre gap-2">
         <Link href="/dashboard">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-5 w-5" />
@@ -423,7 +423,7 @@ export default function EnhancedContentGenerator() {
             <TabsContent value="text-generator" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-centre gap-2">
                     <Sparkles className="h-5 w-5" />
                     Social Media Content Generator
                   </CardTitle>
@@ -442,7 +442,7 @@ export default function EnhancedContentGenerator() {
                         <SelectContent>
                           {platforms.map((p) => (
                             <SelectItem key={p.id} value={p.id}>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-centre gap-2">
                                 <p.icon className="h-4 w-4" />
                                 {p.label}
                               </div>
@@ -523,7 +523,7 @@ export default function EnhancedContentGenerator() {
                       </div>
                     </CardContent>
                     <CardFooter className="text-sm text-muted-foreground">
-                      Content optimized for{" "}
+                      Content optimised for{" "}
                       {platforms.find((p) => p.id === platform)?.label}
                     </CardFooter>
                   </Card>
@@ -533,7 +533,7 @@ export default function EnhancedContentGenerator() {
                       <CardHeader>
                         <CardTitle>Generated Image</CardTitle>
                       </CardHeader>
-                      <CardContent className="p-0 flex items-center justify-center">
+                      <CardContent className="p-0 flex items-centre justify-centre">
                         <div className="relative">
                           <img
                             src={generatedImageUrl}
@@ -560,7 +560,7 @@ export default function EnhancedContentGenerator() {
             <TabsContent value="image-generator" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-centre gap-2">
                     <ImageIcon className="h-5 w-5" />
                     AI Image Generator
                   </CardTitle>
@@ -597,7 +597,7 @@ export default function EnhancedContentGenerator() {
                   <CardHeader>
                     <CardTitle>Generated Image</CardTitle>
                   </CardHeader>
-                  <CardContent className="flex items-center justify-center p-4">
+                  <CardContent className="flex items-centre justify-centre p-4">
                     <div className="relative">
                       <img
                         src={generatedImageUrl}
@@ -638,7 +638,7 @@ export default function EnhancedContentGenerator() {
             <TabsContent value="image-to-text" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-centre gap-2">
                     <Upload className="h-5 w-5" />
                     Generate Content from Image
                   </CardTitle>
@@ -652,7 +652,7 @@ export default function EnhancedContentGenerator() {
                       <Label>Upload Image</Label>
                       <div className="flex flex-col gap-4">
                         <div
-                          className="border-2 border-dashed rounded-md p-4 text-center hover:bg-muted/50 transition-colors cursor-pointer"
+                          className="border-2 border-dashed rounded-md p-4 text-centre hover:bg-muted/50 transition-colours cursor-pointer"
                           onClick={() => document.getElementById("image-upload")?.click()}
                         >
                           <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
@@ -713,7 +713,7 @@ export default function EnhancedContentGenerator() {
                               <SelectContent>
                                 {platforms.map((p) => (
                                   <SelectItem key={p.id} value={p.id}>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-centre gap-2">
                                       <p.icon className="h-4 w-4" />
                                       {p.label}
                                     </div>
@@ -788,7 +788,7 @@ export default function EnhancedContentGenerator() {
             <TabsContent value="content-calendar" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-centre gap-2">
                     <Calendar className="h-5 w-5" />
                     Content Calendar
                   </CardTitle>
@@ -796,8 +796,8 @@ export default function EnhancedContentGenerator() {
                     Schedule and manage your social media content
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="min-h-[400px] flex items-center justify-center">
-                  <div className="text-center space-y-4">
+                <CardContent className="min-h-[400px] flex items-centre justify-centre">
+                  <div className="text-centre space-y-4">
                     <Calendar className="h-12 w-12 mx-auto text-muted-foreground" />
                     <h3 className="text-lg font-medium">Content Calendar</h3>
                     <p className="text-muted-foreground max-w-md">

@@ -6,9 +6,9 @@ import { Brain, Camera, Utensils, Award } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <div className="relative min-h-[700px] flex items-center">
+    <div className="relative min-h-[700px] flex items-centre">
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center grayscale"
+        className="absolute inset-0 z-0 bg-cover bg-centre grayscale"
         style={{
           backgroundImage:
             'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")', // Dramatic B&W gym environment with deep shadows
@@ -48,19 +48,19 @@ export default function HeroSection() {
           </div>
 
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <Brain className="text-primary h-6 w-6" />
               <span className="text-gray-300">AI workout planning</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <Camera className="text-primary h-6 w-6" />
               <span className="text-gray-300">Movement analysis</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <Utensils className="text-primary h-6 w-6" />
               <span className="text-gray-300">Nutrition guidance</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <Award className="text-primary h-6 w-6" />
               <span className="text-gray-300">Client management</span>
             </div>

@@ -36,11 +36,11 @@ export function UniversalSearch() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center w-full max-w-sm gap-2 h-9 rounded-md border border-input bg-background px-3 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent"
+        className="flex items-centre w-full max-w-sm gap-2 h-9 rounded-md border border-input bg-background px-3 text-sm text-muted-foreground shadow-sm transition-colours hover:bg-accent"
       >
         <Search className="h-4 w-4" />
         <span>Search...</span>
-        <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground opacity-100">
+        <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-centre gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground opacity-100">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>

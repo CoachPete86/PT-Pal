@@ -270,15 +270,15 @@ export default function WhiteLabelCustomization() {
 
                           <div className="grid gap-2">
                             <Label>Brand Logo</Label>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-centre gap-4">
                               <div
-                                className="w-16 h-16 border rounded-md flex items-center justify-center bg-muted"
+                                className="w-16 h-16 border rounded-md flex items-centre justify-centre bg-muted"
                                 style={{
                                   backgroundImage: logoPreview
                                     ? `url(${logoPreview})`
                                     : "none",
                                   backgroundSize: "contain",
-                                  backgroundPosition: "center",
+                                  backgroundPosition: "centre",
                                   backgroundRepeat: "no-repeat",
                                 }}
                               >
@@ -324,15 +324,15 @@ export default function WhiteLabelCustomization() {
 
                           <div className="grid gap-2">
                             <Label>Favicon</Label>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-centre gap-4">
                               <div
-                                className="w-10 h-10 border rounded-md flex items-center justify-center bg-muted"
+                                className="w-10 h-10 border rounded-md flex items-centre justify-centre bg-muted"
                                 style={{
                                   backgroundImage: faviconPreview
                                     ? `url(${faviconPreview})`
                                     : "none",
                                   backgroundSize: "contain",
-                                  backgroundPosition: "center",
+                                  backgroundPosition: "centre",
                                   backgroundRepeat: "no-repeat",
                                 }}
                               >
@@ -387,7 +387,7 @@ export default function WhiteLabelCustomization() {
                               />
                               <Input
                                 id="brandColor"
-                                type="color"
+                                type="colour"
                                 value={brandSettings.brandColor}
                                 onChange={(e) =>
                                   updateBrandSetting("brandColor", e.target.value)
@@ -415,7 +415,7 @@ export default function WhiteLabelCustomization() {
                               />
                               <Input
                                 id="accentColor"
-                                type="color"
+                                type="colour"
                                 value={brandSettings.accentColor}
                                 onChange={(e) =>
                                   updateBrandSetting("accentColor", e.target.value)
@@ -464,7 +464,7 @@ export default function WhiteLabelCustomization() {
                               />
                               <Input
                                 id="loginPageBgColor"
-                                type="color"
+                                type="colour"
                                 value={brandSettings.loginPageBgColor}
                                 onChange={(e) =>
                                   updateBrandSetting("loginPageBgColor", e.target.value)
@@ -526,7 +526,7 @@ export default function WhiteLabelCustomization() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-centre gap-2">
                               <div className="w-2 h-2 rounded-full bg-green-500" />
                               <span className="text-sm">Domain verification: Pending</span>
                             </div>
@@ -539,13 +539,13 @@ export default function WhiteLabelCustomization() {
                         <div className="bg-muted p-4 rounded-md">
                           <h4 className="text-sm font-medium mb-2">Current URLs</h4>
                           <div className="space-y-2">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-centre">
                               <span className="text-sm">Default URL:</span>
                               <code className="text-xs bg-muted/50 p-1 rounded">
                                 https://ptpal.app/trainer/12345
                               </code>
                             </div>
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-centre">
                               <span className="text-sm">Custom URL:</span>
                               <code className="text-xs bg-muted/50 p-1 rounded">
                                 https://{brandSettings.customDomain}
@@ -585,7 +585,7 @@ export default function WhiteLabelCustomization() {
                                 {brandSettings.emailSignature}
                               </div>
                               <Separator className="my-2" />
-                              <div className="flex items-center gap-2 mt-2">
+                              <div className="flex items-centre gap-2 mt-2">
                                 {logoPreview ? (
                                   <img
                                     src={logoPreview}
@@ -594,10 +594,10 @@ export default function WhiteLabelCustomization() {
                                   />
                                 ) : (
                                   <div
-                                    className="h-6 px-2 rounded flex items-center justify-center text-xs font-semibold"
+                                    className="h-6 px-2 rounded flex items-centre justify-centre text-xs font-semibold"
                                     style={{
                                       backgroundColor: brandSettings.brandColor,
-                                      color: "#fff",
+                                      colour: "#fff",
                                     }}
                                   >
                                     {brandSettings.businessName}
@@ -642,7 +642,7 @@ export default function WhiteLabelCustomization() {
               </CardContent>
               <CardFooter className="flex justify-between bg-muted/20 pt-2">
                 <div className="flex flex-col space-y-2">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-centre space-x-2">
                     <Switch
                       id="enable-custom-branding"
                       checked={brandSettings.enableCustomBranding}
@@ -654,7 +654,7 @@ export default function WhiteLabelCustomization() {
                       Enable Custom Branding
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-centre space-x-2">
                     <Switch
                       id="enable-white-label"
                       checked={brandSettings.enableWhiteLabel}
@@ -679,9 +679,9 @@ export default function WhiteLabelCustomization() {
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <CardTitle>Preview</CardTitle>
-                  <div className="flex items-center space-x-1 bg-muted rounded-md p-1">
+                  <div className="flex items-centre space-x-1 bg-muted rounded-md p-1">
                     <Button
                       variant={previewDevice === "desktop" ? "default" : "ghost"}
                       size="icon"
@@ -719,16 +719,16 @@ export default function WhiteLabelCustomization() {
                     overflow: "auto",
                   }}
                 >
-                  <div className="flex justify-center">
+                  <div className="flex justify-centre">
                     <div style={getPreviewStyle()}>
                       {/* App Header */}
                       <div
-                        className="p-4 border-b flex items-center justify-between"
+                        className="p-4 border-b flex items-centre justify-between"
                         style={{
                           backgroundColor: "#ffffff",
                         }}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-centre gap-2">
                           {logoPreview ? (
                             <img
                               src={logoPreview}
@@ -737,18 +737,18 @@ export default function WhiteLabelCustomization() {
                             />
                           ) : (
                             <div
-                              className="h-8 px-3 rounded flex items-center justify-center text-sm font-semibold"
+                              className="h-8 px-3 rounded flex items-centre justify-centre text-sm font-semibold"
                               style={{
                                 backgroundColor: brandSettings.brandColor,
-                                color: "#fff",
+                                colour: "#fff",
                               }}
                             >
                               {brandSettings.businessName}
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <div className="flex items-centre gap-2">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-centre justify-centre">
                             <User className="h-4 w-4" />
                           </div>
                         </div>
@@ -780,7 +780,7 @@ export default function WhiteLabelCustomization() {
                             />
                           </div>
                           <div
-                            className="p-3 rounded-md flex items-center justify-center font-medium text-white"
+                            className="p-3 rounded-md flex items-centre justify-centre font-medium text-white"
                             style={{
                               backgroundColor: brandSettings.brandColor,
                             }}
@@ -788,7 +788,7 @@ export default function WhiteLabelCustomization() {
                             Primary Button
                           </div>
                           <div
-                            className="p-3 rounded-md flex items-center justify-center font-medium text-white"
+                            className="p-3 rounded-md flex items-centre justify-centre font-medium text-white"
                             style={{
                               backgroundColor: brandSettings.accentColor,
                             }}

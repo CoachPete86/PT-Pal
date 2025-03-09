@@ -58,9 +58,9 @@ export default function PTpalDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-centre justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-centre gap-2">
           <Button variant="outline" size="sm">
             Last 30 Days
           </Button>
@@ -83,7 +83,7 @@ export default function PTpalDashboard() {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-centre justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Completed Sessions
                 </CardTitle>
@@ -103,7 +103,7 @@ export default function PTpalDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-centre justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Total Revenue
                 </CardTitle>
@@ -123,7 +123,7 @@ export default function PTpalDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-centre justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Active Clients
                 </CardTitle>
@@ -143,7 +143,7 @@ export default function PTpalDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-centre justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Upcoming Sessions
                 </CardTitle>
@@ -171,13 +171,13 @@ export default function PTpalDashboard() {
               </CardHeader>
               <CardContent className="pl-2">
                 {isLoadingPackages ? (
-                  <div className="flex h-80 items-center justify-center">
+                  <div className="flex h-80 items-centre justify-centre">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   </div>
                 ) : (
                   <div className="h-80 w-full">
                     {/* Chart component would go here */}
-                    <div className="flex h-full items-center justify-center">
+                    <div className="flex h-full items-centre justify-centre">
                       <p className="text-muted-foreground">
                         Revenue and session charts by month
                       </p>
@@ -195,12 +195,12 @@ export default function PTpalDashboard() {
               </CardHeader>
               <CardContent>
                 {isLoadingPackages ? (
-                  <div className="flex h-60 items-center justify-center">
+                  <div className="flex h-60 items-centre justify-centre">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   </div>
                 ) : (
                   <div className="space-y-8">
-                    <div className="flex items-center">
+                    <div className="flex items-centre">
                       <div className="space-y-1">
                         <p className="text-sm font-medium leading-none">
                           Session with Alex Morgan
@@ -210,7 +210,7 @@ export default function PTpalDashboard() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-centre">
                       <div className="space-y-1">
                         <p className="text-sm font-medium leading-none">
                           New booking from Chris Evans
@@ -220,7 +220,7 @@ export default function PTpalDashboard() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-centre">
                       <div className="space-y-1">
                         <p className="text-sm font-medium leading-none">
                           Payment received from Sarah Johnson
@@ -238,7 +238,7 @@ export default function PTpalDashboard() {
           
           {/* AI-Powered Features Section */}
           <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4 flex items-center">
+            <h3 className="text-xl font-semibold mb-4 flex items-centre">
               <Sparkles className="h-5 w-5 mr-2 text-primary" />
               AI-Powered Training Tools
             </h3>
@@ -246,12 +246,12 @@ export default function PTpalDashboard() {
               {/* Personalized Workout Generator */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <Dumbbell className="h-5 w-5 mr-2 text-primary" />
                     Workout Generator
                   </CardTitle>
                   <CardDescription>
-                    Create customized AI workouts based on client goals and fitness level
+                    Create customised AI workouts based on client goals and fitness level
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground pb-2">
@@ -267,7 +267,7 @@ export default function PTpalDashboard() {
               {/* Movement Analysis */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <Video className="h-5 w-5 mr-2 text-primary" />
                     Movement Analysis
                   </CardTitle>
@@ -288,7 +288,7 @@ export default function PTpalDashboard() {
               {/* Voice Coaching */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <VolumeIcon className="h-5 w-5 mr-2 text-primary" />
                     Voice Coaching
                   </CardTitle>
@@ -309,7 +309,7 @@ export default function PTpalDashboard() {
               {/* Workout Mascot */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <Bot className="h-5 w-5 mr-2 text-primary" />
                     Motivation Coach
                   </CardTitle>
@@ -330,7 +330,7 @@ export default function PTpalDashboard() {
               {/* Nutrition Analysis */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <Utensils className="h-5 w-5 mr-2 text-primary" />
                     Nutrition Analysis
                   </CardTitle>
@@ -351,7 +351,7 @@ export default function PTpalDashboard() {
               {/* Content Generator */}
               <Card className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
+                  <CardTitle className="text-lg flex items-centre">
                     <Smartphone className="h-5 w-5 mr-2 text-primary" />
                     Social Content
                   </CardTitle>

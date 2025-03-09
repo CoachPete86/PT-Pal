@@ -68,10 +68,10 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
-  const analyzeMutation = useMutation({
+  const analyseMutation = useMutation({
     mutationFn: async (base64Image: string) => {
       try {
-        const res = await apiRequest("POST", "/api/analyze-food", {
+        const res = await apiRequest("POST", "/api/analyse-food", {
           image: base64Image,
         });
         const data = await res.json();
@@ -80,13 +80,13 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
         }
         return JSON.parse(data.analysis) as AnalysisResult;
       } catch (error: any) {
-        throw new Error(error.message || "Failed to analyze food image");
+        throw new Error(error.message || "Failed to analyse food image");
       }
     },
     onSuccess: (data) => {
       toast({
         title: "Analysis Complete",
-        description: "Your food image has been analyzed successfully.",
+        description: "Your food image has been analysed successfully.",
       });
       if (onAnalyzed) {
         onAnalyzed(data);
@@ -145,22 +145,22 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
     if (!preview) {
       toast({
         title: "No image selected",
-        description: "Please select an image to analyze",
+        description: "Please select an image to analyse",
         variant: "destructive",
       });
       return;
     }
-    analyzeMutation.mutate(preview);
+    analyseMutation.mutate(preview);
   };
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="grid w-full max-w-sm items-center gap-1.5">
+        <div className="grid w-full max-w-sm items-centre gap-1.5">
           <label htmlFor="food-image" className="relative cursor-pointer">
             <div
               className={`h-48 rounded-lg border-2 border-dashed border-muted-foreground/25 ${
-                !preview ? "flex items-center justify-center" : ""
+                !preview ? "flex items-centre justify-centre" : ""
               }`}
             >
               {preview ? (
@@ -170,7 +170,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                   className="h-full w-full rounded-lg object-cover"
                 />
               ) : (
-                <div className="text-center">
+                <div className="text-centre">
                   <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
                   <p className="mt-2 text-sm text-muted-foreground">
                     Click to upload food image
@@ -192,10 +192,10 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
         {preview && (
           <Button
             onClick={handleAnalyze}
-            disabled={analyzeMutation.isPending}
+            disabled={analyseMutation.isPending}
             className="w-full"
           >
-            {analyzeMutation.isPending ? (
+            {analyseMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyzing...
@@ -206,19 +206,19 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
           </Button>
         )}
 
-        {analyzeMutation.data && (
+        {analyseMutation.data && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>{analyzeMutation.data.mealName}</CardTitle>
+              <CardTitle>{analyseMutation.data.mealName}</CardTitle>
               <CardDescription>
-                {analyzeMutation.data.mealType} -{" "}
-                {analyzeMutation.data.servingSize}
+                {analyseMutation.data.mealType} -{" "}
+                {analyseMutation.data.servingSize}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="text-center">
+              <div className="text-centre">
                 <div className="text-4xl font-bold text-primary">
-                  {analyzeMutation.data.calories}
+                  {analyseMutation.data.calories}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
                   Estimated Calories
@@ -236,19 +236,19 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                   <TableRow>
                     <TableCell className="font-medium">Protein</TableCell>
                     <TableCell>
-                      {analyzeMutation.data.macros.protein.total}
+                      {analyseMutation.data.macros.protein.total}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Carbohydrates</TableCell>
                     <TableCell>
-                      {analyzeMutation.data.macros.carbs.total}
+                      {analyseMutation.data.macros.carbs.total}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Fats</TableCell>
                     <TableCell>
-                      {analyzeMutation.data.macros.fats.total}
+                      {analyseMutation.data.macros.fats.total}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -262,7 +262,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full flex items-center justify-between"
+                    className="w-full flex items-centre justify-between"
                   >
                     <span>Detailed Analysis</span>
                     {isDetailsOpen ? (
@@ -285,7 +285,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                       <CardContent>
                         <Code className="text-sm">
                           {Object.entries(
-                            analyzeMutation.data.macros.protein.sources,
+                            analyseMutation.data.macros.protein.sources,
                           ).map(([source, amount]) => (
                             <div key={source} className="flex justify-between">
                               <span>{source}:</span>
@@ -307,18 +307,18 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                             <div className="flex justify-between font-medium">
                               <span>Fiber:</span>
                               <span>
-                                {analyzeMutation.data.macros.carbs.fiber}
+                                {analyseMutation.data.macros.carbs.fiber}
                               </span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Sugar:</span>
                               <span>
-                                {analyzeMutation.data.macros.carbs.sugar}
+                                {analyseMutation.data.macros.carbs.sugar}
                               </span>
                             </div>
                             <div className="border-t pt-2">
                               {Object.entries(
-                                analyzeMutation.data.macros.carbs.sources,
+                                analyseMutation.data.macros.carbs.sources,
                               ).map(([source, amount]) => (
                                 <div
                                   key={source}
@@ -345,18 +345,18 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                             <div className="flex justify-between font-medium">
                               <span>Saturated:</span>
                               <span>
-                                {analyzeMutation.data.macros.fats.saturated}
+                                {analyseMutation.data.macros.fats.saturated}
                               </span>
                             </div>
                             <div className="flex justify-between font-medium">
                               <span>Unsaturated:</span>
                               <span>
-                                {analyzeMutation.data.macros.fats.unsaturated}
+                                {analyseMutation.data.macros.fats.unsaturated}
                               </span>
                             </div>
                             <div className="border-t pt-2">
                               {Object.entries(
-                                analyzeMutation.data.macros.fats.sources,
+                                analyseMutation.data.macros.fats.sources,
                               ).map(([source, amount]) => (
                                 <div
                                   key={source}
@@ -378,7 +378,7 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                     <h4 className="font-medium mb-2">Ingredients:</h4>
                     <Code className="text-sm">
                       <ul className="list-disc pl-4 space-y-1">
-                        {analyzeMutation.data.ingredients.map(
+                        {analyseMutation.data.ingredients.map(
                           (ingredient, index) => (
                             <li key={index}>{ingredient}</li>
                           ),
@@ -388,12 +388,12 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                   </div>
 
                   {/* Brand Names */}
-                  {analyzeMutation.data.brandNames.length > 0 && (
+                  {analyseMutation.data.brandNames.length > 0 && (
                     <div className="rounded-lg border bg-muted/50 p-4">
                       <h4 className="font-medium mb-2">Brands:</h4>
                       <Code className="text-sm">
                         <div className="flex flex-wrap gap-2">
-                          {analyzeMutation.data.brandNames.map(
+                          {analyseMutation.data.brandNames.map(
                             (brand, index) => (
                               <span
                                 key={index}
@@ -413,12 +413,12 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                     <h4 className="font-medium mb-2">
                       Goals Analysis
                       <span className="ml-2 text-sm text-muted-foreground">
-                        (Health Score: {analyzeMutation.data.healthScore}/10)
+                        (Health Score: {analyseMutation.data.healthScore}/10)
                       </span>
                     </h4>
                     <Code className="text-sm">
                       <ul className="list-disc pl-4 space-y-1">
-                        {analyzeMutation.data.clientGoalsAnalysis.map(
+                        {analyseMutation.data.clientGoalsAnalysis.map(
                           (analysis, index) => (
                             <li key={index} className="text-muted-foreground">
                               {analysis}
@@ -430,13 +430,13 @@ export function FoodAnalysis({ onAnalyzed }: FoodAnalysisProps) {
                   </div>
 
                   {/* Analysis Notes */}
-                  {analyzeMutation.data.notes &&
-                    analyzeMutation.data.notes.length > 0 && (
+                  {analyseMutation.data.notes &&
+                    analyseMutation.data.notes.length > 0 && (
                       <div className="rounded-lg border bg-muted/50 p-4">
                         <h4 className="font-medium mb-2">Analysis Notes:</h4>
                         <Code className="text-sm">
                           <ul className="list-disc pl-4 space-y-1">
-                            {analyzeMutation.data.notes.map((note, index) => (
+                            {analyseMutation.data.notes.map((note, index) => (
                               <li key={index} className="text-muted-foreground">
                                 {note}
                               </li>

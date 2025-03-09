@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-12">
         {/* Newsletter / CTA Section */}
         <div className="mb-12 p-8 bg-primary/5 rounded-lg border border-primary/20">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-centre">
             <div>
               <h3 className="text-2xl font-bold mb-2">Get Expert Fitness Business Tips</h3>
               <p className="text-muted-foreground">
@@ -28,13 +28,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mb-8 flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center gap-2 text-2xl font-bold mb-4 md:mb-0">
+        <div className="mb-8 flex flex-col md:flex-row items-centre justify-between">
+          <div className="flex items-centre gap-2 text-2xl font-bold mb-4 md:mb-0">
             <BarChart className="h-8 w-8 text-primary" />
             <span>PTpal</span>
           </div>
           
-          <p className="text-muted-foreground text-center md:text-right max-w-md">
+          <p className="text-muted-foreground text-centre md:text-right max-w-md">
             The ultimate AI-powered platform for fitness professionals to manage clients, 
             create custom programs, and grow their business.
           </p>
@@ -48,15 +48,15 @@ export default function Footer() {
               client experiences and build successful businesses.
             </p>
             <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
+              <div className="flex items-centre gap-2">
                 <Mail className="h-4 w-4 text-primary" />
                 <span>contact@ptpal.io</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-centre gap-2">
                 <Phone className="h-4 w-4 text-primary" />
                 <span>+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-centre gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
                 <span>New York, NY</span>
               </div>
@@ -175,7 +175,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-centre text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} PTpal. All rights reserved.</p>
           
           <div className="flex gap-6 mt-4 md:mt-0">

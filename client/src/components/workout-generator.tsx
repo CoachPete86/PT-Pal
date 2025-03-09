@@ -534,7 +534,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
           {/* Participants Section */}
           <div className="space-y-4 rounded-lg bg-secondary/10 p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <h3 className="font-medium">Participant Setup</h3>
               <HelpTooltip
                 character="coach"
@@ -602,7 +602,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             <div className="mt-4 pt-3 border-t border-muted">
               <h4 className="text-sm font-medium mb-2">Class Dynamics</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <Checkbox
                     checked={stationRotation}
                     onCheckedChange={(val) => setStationRotation(!!val)}
@@ -620,7 +620,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <Checkbox
                     checked={restBetweenStations}
                     onCheckedChange={(val) => setRestBetweenStations(!!val)}
@@ -635,7 +635,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <Checkbox
                     checked={mixedEquipmentStations}
                     onCheckedChange={(val) => setMixedEquipmentStations(!!val)}
@@ -656,11 +656,11 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
           {/* Equipment Selection */}
           <div className="border p-4 rounded-lg space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <h3 className="font-medium">Gym Equipment Available</h3>
               <HelpTooltip
                 character="gym-buddy"
-                content="Select the equipment available in your commercial gym for this workout. The workout plan will be customized based on your equipment selection."
+                content="Select the equipment available in your commercial gym for this workout. The workout plan will be customised based on your equipment selection."
               >
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </HelpTooltip>
@@ -745,7 +745,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
               {equipmentOptions.map((item) => (
-                <div key={item} className="flex items-center space-x-2">
+                <div key={item} className="flex items-centre space-x-2">
                   <Checkbox
                     checked={selectedEquipment.includes(item)}
                     onCheckedChange={(checked) => {
@@ -778,8 +778,8 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
           {/* Class Formats */}
           <div className="space-y-4 border p-4 rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-centre sm:justify-between gap-2">
+              <div className="flex items-centre gap-2">
                 <h3 className="font-medium">Workout Structure</h3>
                 <HelpTooltip
                   character="coach"
@@ -789,7 +789,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 </HelpTooltip>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-centre gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -817,7 +817,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </div>
 
             {classFormats.length === 0 ? (
-              <div className="text-center text-sm text-muted-foreground p-6 border border-dashed rounded-md">
+              <div className="text-centre text-sm text-muted-foreground p-6 border border-dashed rounded-md">
                 No workout structures defined yet. Add a custom format or select
                 a template.
               </div>
@@ -877,7 +877,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-3">
-          <div className="text-sm text-muted-foreground w-full text-center pb-2">
+          <div className="text-sm text-muted-foreground w-full text-centre pb-2">
             This will generate a complete group workout plan with warmup, main
             exercises, and cooldown
           </div>
@@ -952,7 +952,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           </AlertDialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-centre gap-2 mb-1.5">
                 <Label>Format Type</Label>
                 <HelpTooltip
                   character="gym-buddy"
@@ -979,7 +979,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-centre gap-2 mb-1">
                   <Label>Rounds</Label>
                   <HelpTooltip
                     character="coach"
@@ -997,7 +997,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-centre gap-2 mb-1">
                   <Label>Work Interval (s)</Label>
                   <HelpTooltip
                     character="scientist"
@@ -1015,7 +1015,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-centre gap-2 mb-1">
                   <Label>Rest Interval (s)</Label>
                   <HelpTooltip
                     character="physio"
@@ -1033,7 +1033,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-centre gap-2 mb-1">
                   <Label>Description</Label>
                   <HelpTooltip
                     character="nutritionist"
@@ -1095,7 +1095,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     onValueChange={(val) => setPlanType(val as PlanType)}
                     className="flex flex-col space-y-2 mt-2"
                   >
-                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colors">
+                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colours">
                       <RadioGroupItem
                         value="oneoff"
                         id="oneoff"
@@ -1110,7 +1110,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colors">
+                    <div className="flex items-start space-x-2 p-3 border rounded-md hover:bg-muted/20 transition-colours">
                       <RadioGroupItem
                         value="program"
                         id="program"
@@ -1193,7 +1193,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-centre gap-2">
                     <Label>Client Goals</Label>
                     <HelpTooltip
                       character="coach"
@@ -1211,7 +1211,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-centre gap-2">
                     <Label>Exercise Experience</Label>
                     <HelpTooltip
                       character="coach"
@@ -1248,7 +1248,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-centre gap-2">
                     <Label>Health Considerations</Label>
                     <HelpTooltip
                       character="physiotherapist"
@@ -1271,7 +1271,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           {personalStep === 2 && (
             <div className="space-y-4">
               <div className="bg-muted/20 p-4 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium text-lg">Training Environment</h3>
                   <HelpTooltip
                     character="coach"
@@ -1305,7 +1305,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
               </div>
 
               <div className="border p-4 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium">Available Equipment</h3>
                   <HelpTooltip
                     character="gym-buddy"
@@ -1377,7 +1377,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           {personalStep === 3 && (
             <div className="space-y-4">
               <div className="bg-muted/20 p-4 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium text-lg">Session Focus</h3>
                   <HelpTooltip
                     character="coach"
@@ -1438,7 +1438,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                       "Cardio",
                       "Mobility",
                     ].map((area) => (
-                      <div key={area} className="flex items-center space-x-2">
+                      <div key={area} className="flex items-centre space-x-2">
                         <Checkbox
                           id={`area-${area.toLowerCase().replace(/\s+/g, "-")}`}
                           onCheckedChange={(checked) => {
@@ -1459,7 +1459,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
               </div>
 
               <div className="border p-4 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium">Session Structure</h3>
                   <HelpTooltip
                     character="coach"
@@ -1524,7 +1524,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     ].map((component) => (
                       <div
                         key={component.id}
-                        className="flex items-center space-x-2"
+                        className="flex items-centre space-x-2"
                       >
                         <Checkbox
                           id={`component-${component.id}`}
@@ -1551,7 +1551,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
           {personalStep === 4 && (
             <div className="space-y-4">
               <div className="bg-muted/20 p-4 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium text-lg">Training Methodology</h3>
                   <HelpTooltip
                     character="scientist"
@@ -1610,7 +1610,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                       return (
                         <div
                           key={ct.id}
-                          className="flex items-start space-x-2 p-2 border rounded hover:bg-secondary/5 transition-colors"
+                          className="flex items-start space-x-2 p-2 border rounded hover:bg-secondary/5 transition-colours"
                         >
                           <Checkbox
                             id={`circuit-${ct.id}`}
@@ -1648,7 +1648,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
               </div>
 
               <div className="border p-4 rounded-lg">
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <h3 className="font-medium">Additional Notes</h3>
                   <HelpTooltip
                     character="coach"
@@ -2077,7 +2077,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
 
     return (
       <div className="mt-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-centre mb-4">
           <h2 className="text-2xl font-bold">Session Plan Template</h2>
           <Button variant="outline" onClick={() => setShowNewTemplate(false)}>
             Back to Generator
@@ -2110,7 +2110,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
   return (
     <div className="relative space-y-6">
       {isGenerating && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-centre justify-centre z-50">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="mt-2 text-lg">Generating Plan...</p>
         </div>
@@ -2120,7 +2120,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
       {!selectedPlan && !showNewTemplate && (
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <CardTitle>Workout Plan Type</CardTitle>
               <HelpTooltip
                 character="coach"
@@ -2143,9 +2143,9 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                   onValueChange={(val) => setSessionType(val as SessionType)}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
-                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colours">
+                    <div className="flex items-centre justify-between">
+                      <div className="flex items-centre space-x-2">
                         <RadioGroupItem value="personal" id="personal-option" />
                         <FormLabel
                           htmlFor="personal-option"
@@ -2156,7 +2156,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                       </div>
                       <HelpTooltip
                         character="physio"
-                        content="Personal training plans are customized for individual clients. These workouts are tailored to specific goals, limitations, and equipment availability."
+                        content="Personal training plans are customised for individual clients. These workouts are tailored to specific goals, limitations, and equipment availability."
                         side="top"
                       >
                         <InfoIcon className="h-4 w-4 text-muted-foreground" />
@@ -2168,9 +2168,9 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
                     </p>
                   </div>
 
-                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                  <div className="flex flex-col space-y-2 px-4 py-3 border rounded-md bg-secondary/5 hover:bg-secondary/10 transition-colours">
+                    <div className="flex items-centre justify-between">
+                      <div className="flex items-centre space-x-2">
                         <RadioGroupItem value="group" id="group-option" />
                         <FormLabel
                           htmlFor="group-option"
@@ -2401,7 +2401,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
       {selectedPlan && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex justify-between items-center w-full">
+            <CardTitle className="flex justify-between items-centre w-full">
               <span>Generated Plan</span>
               <Button variant="outline" size="sm" onClick={handleDownload}>
                 {selectedPlan.id ? (
@@ -2553,7 +2553,7 @@ export default function WorkoutGenerator({ clientId }: { clientId?: number }) {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end space-x-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-centre gap-2">
               <HelpTooltip
                 character="yoga-instructor"
                 content="Generate a detailed session template with warmup, main exercise blocks, cooldown, and equipment guidance. Perfect for sharing with clients!"

@@ -83,11 +83,11 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-centre justify-between">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex space-x-4">
             <Button
-              className="flex items-center space-x-2"
+              className="flex items-centre space-x-2"
               aria-label="Add New Client"
             >
               <UserPlus /> <span>Add Client</span>
@@ -180,12 +180,12 @@ export default function DashboardPage() {
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold mb-4">Client Management</h2>
                 {isLoadingClients ? (
-                  <p className="text-muted-foreground text-center">Loading clients...</p>
+                  <p className="text-muted-foreground text-centre">Loading clients...</p>
                 ) : clients && clients.length > 0 ? (
                   clients.map((client) => (
                     <div
                       key={client.id}
-                      className="flex justify-between items-center p-3 border-b hover:bg-muted/50 transition rounded-lg"
+                      className="flex justify-between items-centre p-3 border-b hover:bg-muted/50 transition rounded-lg"
                     >
                       <div className="flex-1">
                         <h3 className="text-lg font-medium">
@@ -203,7 +203,7 @@ export default function DashboardPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-muted-foreground text-center">No clients found.</p>
+                  <p className="text-muted-foreground text-centre">No clients found.</p>
                 )}
               </CardContent>
             </Card>

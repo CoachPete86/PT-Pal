@@ -106,7 +106,7 @@ export default function ContentGenerator() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-centre gap-2">
             <Sparkles className="h-5 w-5" />
             Social Media Content Generator
           </CardTitle>
@@ -126,7 +126,7 @@ export default function ContentGenerator() {
                 <SelectContent>
                   {platforms.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-centre gap-2">
                         <p.icon className="h-4 w-4" />
                         {p.label}
                       </div>
@@ -206,7 +206,7 @@ export default function ContentGenerator() {
             </div>
           </CardContent>
           <CardFooter className="text-sm text-muted-foreground">
-            Content optimized for{" "}
+            Content optimised for{" "}
             {platforms.find((p) => p.id === platform)?.label}
           </CardFooter>
         </Card>

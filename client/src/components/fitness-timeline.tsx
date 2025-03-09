@@ -34,7 +34,7 @@ export default function FitnessTimeline() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48">
+      <div className="flex items-centre justify-centre h-48">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -71,7 +71,7 @@ export default function FitnessTimeline() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: index * 0.1 + 0.2 }}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow"
+              className="flex h-10 w-10 shrink-0 items-centre justify-centre rounded-full bg-primary text-primary-foreground shadow"
             >
               <Icon className="h-5 w-5" />
             </motion.div>
@@ -84,7 +84,7 @@ export default function FitnessTimeline() {
             >
               <Card>
                 <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <CardTitle className="text-lg">{milestone.title}</CardTitle>
                     <Badge
                       variant={

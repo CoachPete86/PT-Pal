@@ -39,7 +39,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
 
   if (isLoadingClient) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex items-centre justify-centre h-96">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -47,7 +47,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
 
   if (!client) {
     return (
-      <div className="flex flex-col items-center justify-center h-96">
+      <div className="flex flex-col items-centre justify-centre h-96">
         <p className="text-muted-foreground">Client not found</p>
       </div>
     );
@@ -55,8 +55,8 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex items-centre justify-between">
+        <div className="flex items-centre gap-4">
           {onClose && (
             <Button variant="outline" size="sm" onClick={onClose}>
               Back to Client List
@@ -73,15 +73,15 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center">
+            <div className="flex items-centre">
               <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
               <span>{client.email}</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-centre">
               <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
               <span>{client.phone || "Not provided"}</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-centre">
               <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
               <span>Member since {format(new Date(client.createdAt), "MMM d, yyyy")}</span>
             </div>
@@ -118,7 +118,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
             {client.sessionPackages && client.sessionPackages.length > 0 ? (
               <div className="space-y-2">
                 {client.sessionPackages.map((pkg, index) => (
-                  <div key={index} className="flex justify-between items-center border-b pb-2">
+                  <div key={index} className="flex justify-between items-centre border-b pb-2">
                     <div>
                       <p className="font-medium">{pkg.name}</p>
                       <p className="text-sm text-muted-foreground">
@@ -163,7 +163,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
             <CardContent>
               <div className="space-y-8">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label>Workout Attendance</Label>
                     <span className="text-sm font-medium">78%</span>
                   </div>
@@ -171,7 +171,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-centre justify-between">
                     <Label>Goal Progress</Label>
                     <span className="text-sm font-medium">45%</span>
                   </div>
@@ -212,7 +212,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
             </CardHeader>
             <CardContent>
               {isLoadingPlans ? (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-centre py-8">
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : workoutPlans && workoutPlans.length > 0 ? (
@@ -220,7 +220,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
                   {workoutPlans.map((plan, index) => (
                     <Card key={index}>
                       <CardHeader className="pb-2">
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-centre">
                           <CardTitle className="text-base">{plan.name}</CardTitle>
                           <Badge>{plan.type}</Badge>
                         </div>
@@ -238,7 +238,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
                   ))}
                 </div>
               ) : (
-                <div className="text-center p-12">
+                <div className="text-centre p-12">
                   <Dumbbell className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No workout plans assigned yet</p>
                   <Button onClick={() => setShowWorkoutGenerator(true)}>
@@ -257,7 +257,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
               <CardDescription>Body measurements and performance metrics</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center p-12">
+              <div className="text-centre p-12">
                 <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground mb-4">No progress data recorded yet</p>
                 <Button>Record Measurements</Button>
@@ -277,7 +277,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="note-1">
                     <AccordionTrigger>
-                      <div className="flex items-center">
+                      <div className="flex items-centre">
                         <span>April 15, 2023</span>
                         <Badge className="ml-2" variant="outline">
                           HIIT Session
@@ -290,7 +290,7 @@ export default function ClientProfile({ clientId, onClose }: { clientId: number,
                   </AccordionItem>
                   <AccordionItem value="note-2">
                     <AccordionTrigger>
-                      <div className="flex items-center">
+                      <div className="flex items-centre">
                         <span>April 8, 2023</span>
                         <Badge className="ml-2" variant="outline">
                           Strength Training

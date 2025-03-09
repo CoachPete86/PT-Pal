@@ -165,7 +165,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
+        <div className="text-centre mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Simple, Transparent Pricing</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Choose a plan that works for your fitness business, whether you're just starting out or managing multiple clients.
@@ -201,7 +201,7 @@ export default function PricingPage() {
             <motion.div key={index} variants={itemVariants}>
               <Card className={`h-full flex flex-col overflow-hidden ${plan.highlight ? 'border-primary shadow-lg' : ''}`}>
                 {plan.highlight && (
-                  <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-medium">
+                  <div className="bg-primary text-primary-foreground text-centre py-2 text-sm font-medium">
                     Most Popular
                   </div>
                 )}
@@ -254,7 +254,7 @@ export default function PricingPage() {
         </motion.div>
 
         <div className="mt-24">
-          <h2 className="text-3xl font-bold mb-12 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold mb-12 text-centre">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
@@ -291,12 +291,12 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="mt-24 text-center">
+        <div className="mt-24 text-centre">
           <h2 className="text-3xl font-bold mb-6">Not sure which plan is right for you?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Start with a free account and upgrade as your business grows, or schedule a demo to see all features in action.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Link href="/auth">
               <Button size="lg" className="px-8">Start for Free</Button>
             </Link>

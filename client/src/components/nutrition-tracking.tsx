@@ -119,7 +119,7 @@ export default function NutritionTracking() {
 
           <TabsContent value="weekly-overview" className="space-y-4">
             <div className="bg-card p-4 rounded-lg border mb-4">
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex justify-between items-centre mb-2">
                 <h3 className="font-semibold">Weekly Nutrition Summary</h3>
                 <Select defaultValue="current">
                   <SelectTrigger className="w-[140px]">
@@ -207,7 +207,7 @@ export default function NutritionTracking() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-2xl font-bold">2,050</div>
                     <p className="text-xs text-muted-foreground">
                       Avg. Daily Calories
@@ -217,7 +217,7 @@ export default function NutritionTracking() {
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-2xl font-bold">130g</div>
                     <p className="text-xs text-muted-foreground">
                       Avg. Daily Protein
@@ -227,7 +227,7 @@ export default function NutritionTracking() {
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-2xl font-bold">188g</div>
                     <p className="text-xs text-muted-foreground">
                       Avg. Daily Carbs
@@ -237,7 +237,7 @@ export default function NutritionTracking() {
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-2xl font-bold">70g</div>
                     <p className="text-xs text-muted-foreground">
                       Avg. Daily Fat
@@ -358,7 +358,7 @@ export default function NutritionTracking() {
                       {foodEntries.map((entry) => (
                         <div
                           key={entry.id}
-                          className="flex items-center justify-between border-b pb-2"
+                          className="flex items-centre justify-between border-b pb-2"
                         >
                           <div>
                             <div className="font-medium">{entry.name}</div>
@@ -379,7 +379,7 @@ export default function NutritionTracking() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-muted-foreground">
+                    <div className="text-centre py-8 text-muted-foreground">
                       No food entries today. Start by logging your meals.
                     </div>
                   )}
@@ -396,7 +396,7 @@ export default function NutritionTracking() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <h3 className="font-medium">Available Meal Plans</h3>
                     <Button variant="outline" size="sm">
                       Create New Plan
@@ -404,7 +404,7 @@ export default function NutritionTracking() {
                   </div>
 
                   <div className="rounded-lg border divide-y">
-                    <div className="p-4 flex justify-between items-center">
+                    <div className="p-4 flex justify-between items-centre">
                       <div>
                         <div className="font-medium">
                           High Protein Meal Plan
@@ -417,7 +417,7 @@ export default function NutritionTracking() {
                         View
                       </Button>
                     </div>
-                    <div className="p-4 flex justify-between items-center">
+                    <div className="p-4 flex justify-between items-centre">
                       <div>
                         <div className="font-medium">Weight Loss Plan</div>
                         <div className="text-sm text-muted-foreground">

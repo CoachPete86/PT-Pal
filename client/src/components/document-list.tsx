@@ -117,7 +117,7 @@ export default function DocumentList({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48">
+      <div className="flex items-centre justify-centre h-48">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -125,7 +125,7 @@ export default function DocumentList({
 
   if (!documents?.length) {
     return (
-      <div className="text-center p-4">
+      <div className="text-centre p-4">
         <p className="text-sm text-muted-foreground mb-4">
           No saved documents yet
         </p>
@@ -164,12 +164,12 @@ export default function DocumentList({
               <div
                 key={template.id}
                 className={cn(
-                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colors text-left",
+                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colours text-left",
                   selectedId === template.id && "bg-muted border-primary",
                 )}
                 onClick={() => handleTemplateSelect(template.id)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <span className="text-sm font-medium">{template.title}</span>
                   <span className="text-xs text-muted-foreground">
                     Template
@@ -236,7 +236,7 @@ export default function DocumentList({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-centre">
         <Button
           variant="outline"
           size="sm"
@@ -278,12 +278,12 @@ export default function DocumentList({
               <div
                 key={template.id}
                 className={cn(
-                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colors text-left",
+                  "p-2 rounded-md border cursor-pointer hover:bg-muted transition-colours text-left",
                   selectedId === template.id && "bg-muted border-primary",
                 )}
                 onClick={() => handleTemplateSelect(template.id)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-centre justify-between">
                   <span className="text-sm font-medium">{template.title}</span>
                   <span className="text-xs text-muted-foreground">
                     Template

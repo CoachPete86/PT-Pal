@@ -79,7 +79,7 @@ const features = [
   {
     title: "Content Generator",
     description:
-      "AI-powered social media content creation for fitness professionals. Generate engaging posts optimized for any platform.",
+      "AI-powered social media content creation for fitness professionals. Generate engaging posts optimised for any platform.",
     icon: MessageSquare,
     image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113",
     path: "/services#content-generator",
@@ -106,7 +106,7 @@ const features = [
   {
     title: "White-Label Branding",
     description:
-      "Present a professional, branded experience to your clients with customizable colors, logos, and messaging.",
+      "Present a professional, branded experience to your clients with customizable colours, logos, and messaging.",
     icon: Award,
     image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc",
     tag: "Business",
@@ -139,7 +139,7 @@ export default function ServicesSection() {
   return (
     <section id="services" className="py-20 bg-background border-t">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <div className="text-centre mb-12">
           <h2 className="text-4xl font-bold mb-4">Powerful Features for Fitness Professionals</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Our comprehensive platform combines AI-powered tools with essential business management 
@@ -158,7 +158,7 @@ export default function ServicesSection() {
               <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border">
                 <Link href={feature.path}>
                   <div
-                    className="h-48 bg-cover bg-center relative cursor-pointer"
+                    className="h-48 bg-cover bg-centre relative cursor-pointer"
                     style={{ backgroundImage: `url(${feature.image})` }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -172,7 +172,7 @@ export default function ServicesSection() {
                   </div>
                 </Link>
                 <CardHeader className="relative pb-2">
-                  <CardTitle className="flex items-center gap-2 text-xl">
+                  <CardTitle className="flex items-centre gap-2 text-xl">
                     <feature.icon className="h-5 w-5 text-primary" />
                     {feature.title}
                   </CardTitle>
@@ -194,7 +194,7 @@ export default function ServicesSection() {
           ))}
         </motion.div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-centre">
           <Link href="/services">
             <Button variant="outline" size="lg" className="gap-2">
               <span>View All Features</span>
