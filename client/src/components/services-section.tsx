@@ -4,7 +4,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Brain,
   ChartBar,
@@ -12,109 +14,206 @@ import {
   MessageSquare,
   Calendar,
   FileText,
-  Zap,
+  Dumbbell,
   Settings,
+  Camera,
+  Utensils,
+  Award,
+  Smartphone,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 const features = [
   {
-    title: "Intelligent Workout Planning",
+    title: "AI Workout Generator",
     description:
-      "Create professional workout plans in minutes with our advanced programme generator. Customise templates and scale your training programmes efficiently.",
-    icon: Zap,
+      "Create personalized workout plans in seconds with our AI engine. Specify equipment, duration, and goals for tailored programs.",
+    icon: Brain,
     image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155",
-    premium: true,
+    tag: "Popular",
+    path: "/services#ai-workout-generator",
+    learnMoreLink: "/services",
+  },
+  {
+    title: "Movement Analysis",
+    description:
+      "Upload videos for AI-powered form analysis. Receive blueprint-style visualization and personalized feedback on technique.",
+    icon: Camera,
+    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5",
+    tag: "New",
+    path: "/services#movement-analysis",
+    learnMoreLink: "/services",
+  },
+  {
+    title: "Meal Plan Generator",
+    description:
+      "Create custom nutrition plans tailored to client goals and preferences. Generate complete meal plans with grocery lists.",
+    icon: Utensils,
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
+    tag: "New",
+    path: "/services#meal-planning",
+    learnMoreLink: "/services",
   },
   {
     title: "Client Management",
     description:
-      "Manage your client base effectively with profiles, progress tracking, and automated check-ins. Keep all client information organised in one place.",
+      "Manage clients with comprehensive profiles, progress tracking, and secure document storage. Keep everything organized.",
     icon: Users,
     image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1",
-    path: "/dashboard",
+    path: "/services#client-management",
+    learnMoreLink: "/services",
   },
   {
-    title: "Business Analytics",
+    title: "Interactive Workout Tools",
     description:
-      "Track your business growth with detailed analytics. Monitor client retention, revenue, and programme effectiveness.",
-    icon: ChartBar,
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-    path: "/dashboard",
+      "Enhance client experience with voice-activated workout assistance and interactive mascot for guided sessions.",
+    icon: Dumbbell,
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b",
+    tag: "New",
+    path: "/services#workout-tools",
+    learnMoreLink: "/services",
   },
   {
     title: "Content Generator",
     description:
-      "Create engaging social media content for your fitness business with one click. Generate professional posts optimized for different platforms.",
+      "AI-powered social media content creation for fitness professionals. Generate engaging posts optimized for any platform.",
     icon: MessageSquare,
-    image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5",
-    path: "/content-generator",
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113",
+    path: "/services#content-generator",
+    learnMoreLink: "/services",
   },
   {
-    title: "Scheduling Tools",
+    title: "Progress Tracking",
     description:
-      "Streamline your booking process with our integrated calendar. Manage sessions, classes, and availability in one place.",
+      "Comprehensive metrics and visualization tools to track client progress. Customizable metrics for any fitness goal.",
+    icon: ChartBar,
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
+    path: "/services#progress-tracking",
+    learnMoreLink: "/services",
+  },
+  {
+    title: "Session Management",
+    description:
+      "Track session packages, collect digital signatures, and maintain complete records of all client interactions.",
     icon: Calendar,
-    image: "https://images.unsplash.com/photo-1574680096145-d05b474e2155",
-    path: "/dashboard",
+    image: "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9",
+    path: "/services#session-management",
+    learnMoreLink: "/services",
   },
   {
-    title: "Document Management",
+    title: "White-Label Branding",
     description:
-      "Create and manage workout plans, nutrition guides, and waivers. Use templates to save time and maintain consistency.",
-    icon: FileText,
+      "Present a professional, branded experience to your clients with customizable colors, logos, and messaging.",
+    icon: Award,
     image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc",
-    path: "/dashboard",
+    tag: "Business",
+    path: "/services#white-label",
+    learnMoreLink: "/services",
   },
 ];
 
 export default function ServicesSection() {
   const { user } = useAuth();
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1
+    }
+  };
+
   return (
-    <section id="services" className="py-20 bg-zinc-50">
+    <section id="services" className="py-20 bg-background border-t">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Platform Features</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to manage and grow your fitness business, all in
-            one powerful platform.
+          <h2 className="text-4xl font-bold mb-4">Powerful Features for Fitness Professionals</h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Our comprehensive platform combines AI-powered tools with essential business management 
+            features to help you deliver exceptional service and grow your fitness business.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <Card
-              key={feature.title}
-              className="overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg border-zinc-200"
-            >
-              <Link href={user && feature.path ? feature.path : "/auth"}>
-                <div
-                  className="h-48 bg-cover bg-center relative grayscale hover:grayscale-0 transition-all duration-500 cursor-pointer"
-                  style={{ backgroundImage: `url(${feature.image})` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  {feature.premium && (
-                    <div className="absolute top-4 right-4 bg-zinc-900 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      Premium
-                    </div>
-                  )}
-                </div>
-              </Link>
-              <CardHeader className="relative">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <feature.icon className="h-5 w-5" />
-                  {feature.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+        <motion.div 
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {features.slice(0, 6).map((feature) => (
+            <motion.div key={feature.title} variants={itemVariants}>
+              <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border">
+                <Link href={feature.path}>
+                  <div
+                    className="h-48 bg-cover bg-center relative cursor-pointer"
+                    style={{ backgroundImage: `url(${feature.image})` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {feature.tag && (
+                      <div className="absolute top-4 right-4">
+                        <Badge variant={feature.tag === "New" ? "default" : "outline"} className="font-medium">
+                          {feature.tag}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                <CardHeader className="relative pb-2">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <feature.icon className="h-5 w-5 text-primary" />
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pb-4 flex-grow">
+                  <CardDescription className="text-sm text-foreground/80">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+                <CardFooter className="pt-0">
+                  <Link href={feature.learnMoreLink}>
+                    <Button variant="outline" size="sm">
+                      Learn More
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            </motion.div>
           ))}
+        </motion.div>
+
+        <div className="mt-12 text-center">
+          <Link href="/services">
+            <Button variant="outline" size="lg" className="gap-2">
+              <span>View All Features</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
