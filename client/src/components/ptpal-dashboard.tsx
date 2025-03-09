@@ -54,7 +54,7 @@ export default function PTpalDashboard() {
   });
 
   // Process session data for charts
-  const sessionData = transformSessionData(sessionPackages || []);
+  const sessionData = transformSessionData(Array.isArray(sessionPackages) ? sessionPackages : []);
 
   return (
     <div className="space-y-6">
