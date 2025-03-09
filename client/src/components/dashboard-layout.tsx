@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { NotificationCenter } from "./notification-center";
 import { UniversalSearch } from "./universal-search";
 import {
+  Apple,
   BarChart,
   Home,
   UserCircle,
@@ -107,6 +108,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           href: "/workout-features",
           icon: Utensils,
           active: false,
+        },
+        {
+          title: "Meal Plan Generator",
+          href: "/meal-plan",
+          icon: Apple,
+          active: location === "/meal-plan",
         },
       ],
     },

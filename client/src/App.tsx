@@ -46,6 +46,10 @@ function Router() {
           path="/movement-analysis"
           component={() => <MovementAnalysisPage />}
         />
+        <ProtectedRoute
+          path="/meal-plan"
+          component={() => <MealPlanPage />}
+        />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
