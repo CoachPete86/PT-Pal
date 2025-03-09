@@ -1,62 +1,37 @@
-import { db } from "./db";
-import { users } from "@shared/schema";
-import { eq } from "drizzle-orm";
+// Generic trainer account setup utility
+// Use this script to create default trainer accounts if needed
+
+import { storage } from "./storage";
 import { hashPassword } from "./auth";
 
-async function updateCoachCredentials() {
+async function setupDefaultTrainer() {
   try {
-    console.log("Updating coach credentials...");
-    
-    // Hash the password
-    const hashedPassword = await hashPassword("123456789");
-    
-    // Check if the user already exists
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, "coachpete@86.com"))
-      .limit(1);
-    
-    if (existingUser.length > 0) {
-      // Update existing user
-      await db
-        .update(users)
-        .set({
-          email: "coachpete@86.com",
-          username: "CoachPete",
-          password: hashedPassword,
-          fullName: "Coach Pete Ryan",
-          role: "trainer",
-          subscriptionTier: "premium",
-          subscriptionStatus: "active",
-          onboardingStatus: "completed",
-        })
-        .where(eq(users.id, existingUser[0].id));
-      
-      console.log(`Updated coach account with ID: ${existingUser[0].id}`);
-    } else {
-      // Create new user
-      const result = await db.insert(users).values({
-        email: "coachpete@86.com",
-        username: "CoachPete",
+    const defaultTrainerEmail = "trainer@ptpal.com";
+    const existingTrainer = await storage.getUserByEmail(defaultTrainerEmail);
+
+    if (!existingTrainer) {
+      console.log("Creating default trainer account...");
+
+      const hashedPassword = await hashPassword("change_this_password");
+
+      await storage.createUser({
+        email: defaultTrainerEmail,
+        username: "trainer",
         password: hashedPassword,
-        fullName: "Coach Pete Ryan",
+        fullName: "Demo Trainer",
         role: "trainer",
         subscriptionTier: "premium",
         subscriptionStatus: "active",
-        onboardingStatus: "completed",
-        createdAt: new Date(),
-        lastActive: new Date(),
         status: "active",
-      }).returning({ id: users.id });
-      
-      console.log(`Created new coach account with ID: ${result[0].id}`);
+      });
+
+      console.log("Default trainer account created successfully");
+    } else {
+      console.log("Default trainer account already exists");
     }
-    
-    console.log("Coach credentials updated successfully!");
   } catch (error) {
-    console.error("Error updating coach credentials:", error);
+    console.error("Error setting up default trainer:", error);
   }
 }
 
-updateCoachCredentials().catch(console.error);
+setupDefaultTrainer().catch(console.error);

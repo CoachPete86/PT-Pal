@@ -1,24 +1,46 @@
-import { scrypt, randomBytes } from "crypto";
-import { promisify } from "util";
-import { db } from "./db";
-import { users } from "@shared/schema";
-import { eq } from "drizzle-orm";
 
-const scryptAsync = promisify(scrypt);
+// Generic password reset utility
+// This script can be used to reset a user's password
 
-async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
+import { storage } from "./storage";
+import { hashPassword } from "./auth";
+import readline from "readline";
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+async function resetUserPassword() {
+  try {
+    const email = await new Promise(resolve => {
+      rl.question("Enter user email to reset password: ", resolve);
+    });
+    
+    const user = await storage.getUserByEmail(email as string);
+    
+    if (!user) {
+      console.log("User not found with that email");
+      rl.close();
+      return;
+    }
+    
+    const newPassword = await new Promise(resolve => {
+      rl.question("Enter new password: ", resolve);
+    });
+    
+    const hashedPassword = await hashPassword(newPassword as string);
+    
+    await storage.updateUser(user.id, {
+      password: hashedPassword
+    });
+    
+    console.log("Password updated successfully");
+    rl.close();
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    rl.close();
+  }
 }
 
-async function updateCoachPassword() {
-  const hashedPassword = await hashPassword(process.env.COACH_PASSWORD!);
-  await db
-    .update(users)
-    .set({ password: hashedPassword })
-    .where(eq(users.username, "coach_pete"));
-  console.log("Coach password updated successfully");
-}
-
-updateCoachPassword().catch(console.error);
+resetUserPassword().catch(console.error);

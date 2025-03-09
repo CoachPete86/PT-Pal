@@ -1,59 +1,28 @@
-import { db } from "./db";
-import { users } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { storage } from "./storage";
 
-async function fixCoachEmail() {
+export async function setupAdminUser() {
   try {
-    console.log("Fixing coach email case sensitivity...");
-    
-    // Check if the user exists with original capitalization
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, "Coachpete@86.com"))
-      .limit(1);
-    
-    if (existingUser.length > 0) {
-      // Update to lowercase email
-      await db
-        .update(users)
-        .set({
-          email: "coachpete@86.com",
-        })
-        .where(eq(users.id, existingUser[0].id));
-      
-      console.log(`Updated coach email for ID: ${existingUser[0].id}`);
-      console.log("Coach email fixed successfully!");
+    const adminExists = await storage.getUserByEmail("admin@ptpal.com");
+
+    if (!adminExists) {
+      console.log("Creating default admin user...");
+      // Create an admin user with default credentials
+      // In production, you would want to use environment variables for these values
+      await storage.createUser({
+        email: "admin@ptpal.com",
+        username: "admin",
+        password: "CHANGE_THIS_PASSWORD", // Should be changed immediately after first login
+        fullName: "System Administrator",
+        role: "admin",
+        subscriptionTier: "enterprise",
+        subscriptionStatus: "active",
+        status: "active",
+      });
+      console.log("Default admin user created successfully");
     } else {
-      console.log("Coach account not found with email 'Coachpete@86.com'");
-      
-      // Try to find by username as fallback
-      const userByUsername = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, "CoachPete"))
-        .limit(1);
-        
-      if (userByUsername.length > 0) {
-        console.log(`Found coach by username, ID: ${userByUsername[0].id}, current email: ${userByUsername[0].email}`);
-        
-        // Update email to lowercase version
-        await db
-          .update(users)
-          .set({
-            email: "coachpete@86.com",
-          })
-          .where(eq(users.id, userByUsername[0].id));
-          
-        console.log(`Updated coach email for ID: ${userByUsername[0].id}`);
-        console.log("Coach email fixed successfully!");
-      } else {
-        console.log("Coach account not found by username 'CoachPete' either");
-      }
+      console.log("Admin user already exists");
     }
   } catch (error) {
-    console.error("Error fixing coach email:", error);
+    console.error("Error setting up admin user:", error);
   }
 }
-
-fixCoachEmail().catch(console.error);
