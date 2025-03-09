@@ -38,13 +38,19 @@ import { cn } from "@/lib/utils";
 import { NotificationCenter } from "./notification-center";
 import { UniversalSearch } from "./universal-search";
 
-const mainNavItems = [
+// Public navigation items visible to all users
+const publicNavItems = [
   { href: "/#services", label: "Services" },
   { href: "/#about", label: "About" },
+];
+
+// Navigation items only visible to authenticated users
+const authenticatedNavItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/content-generator", label: "Content" },
   { href: "/movement-analysis", label: "Movement Analysis" },
   { href: "/workout-features", label: "Workout Tools" },
+  { href: "/meal-plan", label: "Meal Plans" },
 ];
 
 export default function Navbar() {
@@ -90,107 +96,48 @@ export default function Navbar() {
 
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="gap-6">
-              {mainNavItems.map((item) => (
-                <NavigationMenuItem key={item.href}>
-                  <a
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href)}
-                    className="text-sm font-medium transition-colors hover:text-primary"
-                  >
-                    {item.label}
-                  </a>
-                </NavigationMenuItem>
-              ))}
+              {user 
+                ? [...publicNavItems, ...authenticatedNavItems].map((item) => (
+                    <NavigationMenuItem key={item.href}>
+                      <a
+                        href={item.href}
+                        onClick={(e) => handleNavClick(e, item.href)}
+                        className="text-sm font-medium transition-colors hover:text-primary"
+                      >
+                        {item.label}
+                      </a>
+                    </NavigationMenuItem>
+                  ))
+                : publicNavItems.map((item) => (
+                    <NavigationMenuItem key={item.href}>
+                      <a
+                        href={item.href}
+                        onClick={(e) => handleNavClick(e, item.href)}
+                        className="text-sm font-medium transition-colors hover:text-primary"
+                      >
+                        {item.label}
+                      </a>
+                    </NavigationMenuItem>
+                  ))
+              }
             </NavigationMenuList>
           </NavigationMenu>
 
           <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <div className="hidden md:flex items-center gap-4">
-                  <UniversalSearch />
-                  <NotificationCenter />
-                  <Link href="/dashboard">
-                    <Button variant="outline" size="sm">
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-2">
-                        <User className="h-4 w-4" />
-                        <span className="hidden sm:inline">
-                          {user.username}
-                        </span>
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuItem asChild>
-                        <Link href="/profile">
-                          <div className="flex items-center cursor-pointer">
-                            <User className="mr-2 h-4 w-4" />
-                            Profile
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/settings">
-                          <div className="flex items-center cursor-pointer">
-                            <Settings className="mr-2 h-4 w-4" />
-                            Settings
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/documents">
-                          <div className="flex items-center cursor-pointer">
-                            <BookOpen className="mr-2 h-4 w-4" />
-                            Documents
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/movement-analysis">
-                          <div className="flex items-center cursor-pointer">
-                            <Activity className="mr-2 h-4 w-4" />
-                            Movement Analysis
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/workout-features">
-                          <div className="flex items-center cursor-pointer">
-                            <Activity className="mr-2 h-4 w-4" />
-                            Workout Tools
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => logoutMutation.mutate()}
-                        disabled={logoutMutation.isPending}
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                  <SheetTrigger asChild className="md:hidden">
-                    <Button variant="ghost" size="icon">
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-80">
-                    <SheetHeader>
-                      <SheetTitle>Menu</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-6 space-y-4">
-                      {mainNavItems.map((item) => (
+            {/* Mobile menu button - always visible */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-4">
+                  {user 
+                    ? [...publicNavItems, ...authenticatedNavItems].map((item) => (
                         <a
                           key={item.href}
                           href={item.href}
@@ -202,7 +149,23 @@ export default function Navbar() {
                         >
                           {item.label}
                         </a>
-                      ))}
+                      ))
+                    : publicNavItems.map((item) => (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          className="flex items-center py-2 text-sm font-medium"
+                          onClick={(e) => {
+                            handleNavClick(e, item.href);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {item.label}
+                        </a>
+                      ))
+                  }
+                  {user ? (
+                    <>
                       <Link href="/dashboard">
                         <div
                           className="flex items-center py-2 text-sm font-medium text-primary cursor-pointer"
@@ -229,14 +192,100 @@ export default function Navbar() {
                       >
                         Logout
                       </button>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </>
+                    </>
+                  ) : (
+                    <Link href="/auth">
+                      <div
+                        className="flex items-center py-2 text-sm font-medium text-primary cursor-pointer"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Get Started
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+                
+            {/* Desktop navigation for authenticated users */}
+            {user ? (
+              <div className="hidden md:flex items-center gap-4">
+                <UniversalSearch />
+                <NotificationCenter />
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm">
+                    Dashboard
+                  </Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline">
+                        {user.username}
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">
+                        <div className="flex items-center cursor-pointer">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings">
+                        <div className="flex items-center cursor-pointer">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/documents">
+                        <div className="flex items-center cursor-pointer">
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Documents
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/movement-analysis">
+                        <div className="flex items-center cursor-pointer">
+                          <Activity className="mr-2 h-4 w-4" />
+                          Movement Analysis
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/workout-features">
+                        <div className="flex items-center cursor-pointer">
+                          <Activity className="mr-2 h-4 w-4" />
+                          Workout Tools
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => logoutMutation.mutate()}
+                      disabled={logoutMutation.isPending}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <Link href="/auth">
-                <Button size="sm">Get Started</Button>
-              </Link>
+              <div className="hidden md:block">
+                <Link href="/auth">
+                  <Button size="sm">Get Started</Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
