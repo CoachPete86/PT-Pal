@@ -26,15 +26,9 @@ function Router() {
     >
       <Switch>
         <Route path="/">
-          {/* Auto-redirect to dashboard for development convenience */}
-          {window.location.pathname === "/" &&
-            (window.location.href = "/dashboard")}
           <HomePage />
         </Route>
         <Route path="/auth">
-          {/* Auto-redirect to dashboard for development convenience */}
-          {window.location.pathname === "/auth" &&
-            (window.location.href = "/dashboard")}
           <AuthPage />
         </Route>
         <ProtectedRoute path="/dashboard" component={() => <DashboardPage />} />
