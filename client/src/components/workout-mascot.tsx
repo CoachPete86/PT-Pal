@@ -27,7 +27,7 @@ interface WorkoutMascotProps {
     | "bottom-right"
     | "bottom-left"
     | "top-left"
-    | "center";
+    | "centre";
   onAnimationComplete?: () => void;
 }
 
@@ -52,7 +52,7 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
     "bottom-right": "bottom-4 right-4",
     "bottom-left": "bottom-4 left-4",
     "top-left": "top-4 left-4",
-    center: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    centre: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
   };
 
   // Size styling
@@ -113,8 +113,8 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
     scientist: [
       "Your metabolic rate is increasing with every rep!",
       "Muscle hypertrophy occurs during recovery, not during exercise!",
-      "Proper form activates 23% more muscle fibers!",
-      "Maintaining consistent tempo optimizes time under tension!",
+      "Proper form activates 23% more muscle fibres!",
+      "Maintaining consistent tempo optimises time under tension!",
       "Your ATP production is at optimal levels now!",
     ],
     "zen-master": [
@@ -160,10 +160,10 @@ const WorkoutMascot: React.FC<WorkoutMascotProps> = ({
     <div className={`fixed ${positionClasses[position]} z-50`}>
       <AnimatePresence>
         {isVisible && (
-          <div className="flex flex-col items-center" key={animationKey}>
+          <div className="flex flex-col items-centre" key={animationKey}>
             {/* Mascot Character */}
             <motion.div
-              className={`${sizeClasses[size]} bg-primary/20 rounded-full flex items-center justify-center text-4xl shadow-lg mb-2`}
+              className={`${sizeClasses[size]} bg-primary/20 rounded-full flex items-centre justify-centre text-4xl shadow-lg mb-2`}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, rotate: 180 }}

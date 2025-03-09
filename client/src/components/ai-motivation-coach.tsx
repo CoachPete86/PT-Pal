@@ -258,7 +258,7 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-centre justify-between">
           <div>
             <CardTitle>AI Workout Coach</CardTitle>
             <CardDescription>
@@ -273,7 +273,7 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
 
       <CardContent className="space-y-4">
         {/* Current Phase Indicator */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-centre">
           <span className="text-sm font-medium">Current Phase:</span>
           <Badge variant="secondary" className="capitalize">
             {phase.replace("-", " ")}
@@ -281,13 +281,13 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
         </div>
 
         {/* Current Message */}
-        <div className="bg-muted/50 p-3 rounded-md min-h-[80px] flex items-center justify-center text-center">
+        <div className="bg-muted/50 p-3 rounded-md min-h-[80px] flex items-centre justify-centre text-centre">
           {currentMessage || "Activate your coach to receive motivation"}
         </div>
 
         {/* Voice Controls */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-centre justify-between">
             <Label htmlFor="enable-speech">Voice Guidance</Label>
             <Switch
               id="enable-speech"
@@ -300,7 +300,7 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
           {enableSpeech && (
             <>
               <div className="space-y-1">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <Label htmlFor="speech-volume" className="text-xs">
                     Volume
                   </Label>
@@ -317,7 +317,7 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <Label htmlFor="speech-rate" className="text-xs">
                     Speech Rate
                   </Label>
@@ -338,7 +338,7 @@ const AIMotivationCoach: React.FC<AIMotivationCoachProps> = ({
 
         {/* Frequency Control */}
         <div className="space-y-1">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-centre">
             <Label htmlFor="message-frequency" className="text-xs">
               Message Frequency
             </Label>

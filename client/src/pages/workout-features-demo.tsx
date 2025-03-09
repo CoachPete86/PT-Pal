@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Volume2 } from "lucide-react";
 
 export default function WorkoutFeaturesDemo() {
-  // Mascot demo states
+  // Mascot demonstration states
   const [selectedCharacter, setSelectedCharacter] =
     useState<MascotCharacter>("coach");
   const [showMascot, setShowMascot] = useState(false);
@@ -298,41 +298,41 @@ export default function WorkoutFeaturesDemo() {
                             setSelectedCharacter(value as MascotCharacter)
                           }
                         >
-                          <div className="flex items-center space-x-2 border rounded-md p-2">
+                          <div className="flex items-centre space-x-2 border rounded-md p-2">
                             <RadioGroupItem value="coach" id="coach" />
                             <Label
                               htmlFor="coach"
-                              className="flex items-center"
+                              className="flex items-centre"
                             >
                               <span className="text-xl mr-2">🏋️‍♂️</span> Coach
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2">
+                          <div className="flex items-centre space-x-2 border rounded-md p-2">
                             <RadioGroupItem value="gym-buddy" id="gym-buddy" />
                             <Label
                               htmlFor="gym-buddy"
-                              className="flex items-center"
+                              className="flex items-centre"
                             >
                               <span className="text-xl mr-2">💪</span> Gym Buddy
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2">
+                          <div className="flex items-centre space-x-2 border rounded-md p-2">
                             <RadioGroupItem value="scientist" id="scientist" />
                             <Label
                               htmlFor="scientist"
-                              className="flex items-center"
+                              className="flex items-centre"
                             >
                               <span className="text-xl mr-2">🧪</span> Scientist
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-2 border rounded-md p-2">
+                          <div className="flex items-centre space-x-2 border rounded-md p-2">
                             <RadioGroupItem
                               value="zen-master"
                               id="zen-master"
                             />
                             <Label
                               htmlFor="zen-master"
-                              className="flex items-center"
+                              className="flex items-centre"
                             >
                               <span className="text-xl mr-2">🧘‍♀️</span> Zen
                               Master
@@ -416,41 +416,41 @@ export default function WorkoutFeaturesDemo() {
                           setSelectedCharacter(value as MascotCharacter)
                         }
                       >
-                        <div className="flex items-center space-x-2 border rounded-md p-2">
+                        <div className="flex items-centre space-x-2 border rounded-md p-2">
                           <RadioGroupItem value="coach" id="mascot-coach" />
                           <Label
                             htmlFor="mascot-coach"
-                            className="flex items-center"
+                            className="flex items-centre"
                           >
                             <span className="text-xl mr-2">🏋️‍♂️</span> Coach
                           </Label>
                         </div>
-                        <div className="flex items-center space-x-2 border rounded-md p-2">
+                        <div className="flex items-centre space-x-2 border rounded-md p-2">
                           <RadioGroupItem value="gym-buddy" id="mascot-buddy" />
                           <Label
                             htmlFor="mascot-buddy"
-                            className="flex items-center"
+                            className="flex items-centre"
                           >
                             <span className="text-xl mr-2">😄</span> Gym Buddy
                           </Label>
                         </div>
-                        <div className="flex items-center space-x-2 border rounded-md p-2">
+                        <div className="flex items-centre space-x-2 border rounded-md p-2">
                           <RadioGroupItem
                             value="scientist"
                             id="mascot-scientist"
                           />
                           <Label
                             htmlFor="mascot-scientist"
-                            className="flex items-center"
+                            className="flex items-centre"
                           >
                             <span className="text-xl mr-2">🧪</span> Scientist
                           </Label>
                         </div>
-                        <div className="flex items-center space-x-2 border rounded-md p-2">
+                        <div className="flex items-centre space-x-2 border rounded-md p-2">
                           <RadioGroupItem value="zen-master" id="mascot-zen" />
                           <Label
                             htmlFor="mascot-zen"
-                            className="flex items-center"
+                            className="flex items-centre"
                           >
                             <span className="text-xl mr-2">🧘‍♀️</span> Zen Master
                           </Label>
@@ -498,7 +498,7 @@ export default function WorkoutFeaturesDemo() {
                 </div>
               </div>
 
-              <div className="relative h-96 bg-muted rounded-lg flex items-center justify-center">
+              <div className="relative h-96 bg-muted rounded-lg flex items-centre justify-centre">
                 <p className="text-muted-foreground">Mascot display area</p>
 
                 {/* Mascot will be positioned absolutely over this area */}
@@ -508,7 +508,7 @@ export default function WorkoutFeaturesDemo() {
                     message={mascotMessage}
                     mood="encouraging"
                     size="lg"
-                    position="center"
+                    position="centre"
                     isAnimating={true}
                     onAnimationComplete={() => {
                       // Hide mascot after animation completes
