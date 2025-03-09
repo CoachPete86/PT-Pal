@@ -27,31 +27,23 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/#services">
-                  <a className="text-muted-foreground hover:text-primary">
-                    Features
-                  </a>
+                <Link className="text-muted-foreground hover:text-primary" href="/#services">
+                  Features
                 </Link>
               </li>
               <li>
-                <Link href="/#about">
-                  <a className="text-muted-foreground hover:text-primary">
-                    About
-                  </a>
+                <Link className="text-muted-foreground hover:text-primary" href="/#about">
+                  About
                 </Link>
               </li>
               <li>
-                <Link href="/pricing">
-                  <a className="text-muted-foreground hover:text-primary">
-                    Pricing
-                  </a>
+                <Link className="text-muted-foreground hover:text-primary" href="/pricing">
+                  Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/auth">
-                  <a className="text-muted-foreground hover:text-primary">
-                    Sign Up
-                  </a>
+                <Link className="text-muted-foreground hover:text-primary" href="/auth">
+                  Sign Up
                 </Link>
               </li>
             </ul>

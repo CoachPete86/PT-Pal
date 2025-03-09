@@ -51,7 +51,8 @@ export default function AuthPage() {
   const handleLogin = async (data: any) => {
     try {
       await loginMutation.mutateAsync(data);
-      setLocation("/dashboard");
+      // Redirect to dashboard after successful login
+      window.location.href = "/dashboard";
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -67,15 +68,21 @@ export default function AuthPage() {
   const handleRegistration = async (data: any) => {
     try {
       await registerMutation.mutateAsync(data);
-      setLocation("/dashboard");
-    } catch (error) {
+      // Redirect to dashboard after successful registration
+      window.location.href = "/dashboard";
+    } catch (error: any) {
       console.error("Registration error:", error);
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.error || "Failed to create account. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   // Redirect if already authenticated
   if (user) {
-    setLocation("/dashboard");
+    window.location.href = "/dashboard";
     return null;
   }
 

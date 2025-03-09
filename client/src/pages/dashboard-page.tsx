@@ -3,8 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-  Search,
-  Bell,
   UserPlus,
   BarChart,
   Users,
@@ -15,12 +13,13 @@ import {
   Heart,
   Dumbbell,
   Trophy,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
-import { Loader2 } from "lucide-react";
 import PTpalDashboard from "@/components/ptpal-dashboard";
+import { DashboardLayout } from "@/components/dashboard-layout";
 
 interface SessionPackage {
   id: number;
@@ -82,87 +81,57 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
-        <div className="p-4">
-          {tabItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setSelectedTab(item.id)}
-              className={`flex items-center space-x-2 w-full p-2 rounded-lg transition-colors ${
-                selectedTab === item.id
-                  ? "bg-primary text-white"
-                  : "hover:bg-gray-100"
-              }`}
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <div className="flex space-x-4">
+            <Button
+              className="flex items-center space-x-2"
+              aria-label="Add New Client"
             >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </button>
-          ))}
+              <UserPlus /> <span>Add Client</span>
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 overflow-auto">
         {selectedTab === "workouts" ? (
           <PTpalDashboard />
         ) : (
-          <div className="p-6 space-y-4">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-gray-800">
-                Welcome, {user?.fullName || user?.username} 👋
-              </h1>
-              <div className="flex space-x-4">
-                <button aria-label="Search">
-                  <Search className="cursor-pointer" />
-                </button>
-                <button aria-label="Notifications">
-                  <Bell className="cursor-pointer" />
-                </button>
-                <Button
-                  className="flex items-center space-x-2"
-                  aria-label="Add New Client"
-                >
-                  <UserPlus /> <span>Add Client</span>
-                </Button>
-              </div>
-            </div>
-
+          <div className="space-y-6">
             {/* Stats Section */}
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-8">
-              <Card className="shadow-lg border border-gray-300">
+              <Card className="shadow-sm">
                 <CardContent className="p-4">
                   <h2 className="text-lg font-semibold">Today's Sessions</h2>
                   {isLoadingPackages ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <p className="text-gray-700 text-xl">
+                    <p className="text-xl font-bold">
                       {todaySessions?.length || 0}
                     </p>
                   )}
                 </CardContent>
               </Card>
-              <Card className="shadow-lg border border-gray-300">
+              <Card className="shadow-sm">
                 <CardContent className="p-4">
                   <h2 className="text-lg font-semibold">Active Programs</h2>
                   {isLoadingPlans ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <p className="text-gray-700 text-xl">
+                    <p className="text-xl font-bold">
                       {activePrograms?.length || 0}
                     </p>
                   )}
                 </CardContent>
               </Card>
-              <Card className="bg-red-200 shadow-lg border border-gray-300">
+              <Card className="shadow-sm border-red-200">
                 <CardContent className="p-4">
                   <h2 className="text-lg font-semibold">Payments Due</h2>
                   {isLoadingPackages ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <p className="text-gray-700 text-xl">
+                    <p className="text-xl font-bold text-red-500">
                       {
                         sessionPackages.filter(
                           (pkg) => pkg.paymentStatus === "pending",
@@ -172,13 +141,13 @@ export default function DashboardPage() {
                   )}
                 </CardContent>
               </Card>
-              <Card className="bg-yellow-200 shadow-lg border border-gray-300">
+              <Card className="shadow-sm border-yellow-200">
                 <CardContent className="p-4">
                   <h2 className="text-lg font-semibold">Expiring Packages</h2>
                   {isLoadingPackages ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <p className="text-gray-700 text-xl">
+                    <p className="text-xl font-bold text-amber-500">
                       {
                         sessionPackages.filter((pkg) => {
                           const thirtyDaysFromNow = new Date();
@@ -192,13 +161,13 @@ export default function DashboardPage() {
                   )}
                 </CardContent>
               </Card>
-              <Card className="bg-green-200 shadow-lg border border-gray-300">
+              <Card className="shadow-sm border-green-200">
                 <CardContent className="p-4">
                   <h2 className="text-lg font-semibold">Active Clients</h2>
                   {isLoadingClients ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <p className="text-gray-700 text-xl">
+                    <p className="text-xl font-bold text-green-500">
                       {clients?.length || 0}
                     </p>
                   )}
@@ -207,38 +176,40 @@ export default function DashboardPage() {
             </div>
 
             {/* Client Management */}
-            <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-              <h2 className="text-xl font-bold mb-4">Client Management</h2>
-              {isLoadingClients ? (
-                <p className="text-gray-600 text-center">Loading clients...</p>
-              ) : clients && clients.length > 0 ? (
-                clients.map((client) => (
-                  <div
-                    key={client.id}
-                    className="flex justify-between items-center p-3 border-b hover:bg-gray-200 transition rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium">
-                        {client.fullName || client.username}
-                      </h3>
-                      <p className="text-gray-600">{client.email}</p>
-                      <Progress value={75} className="mt-2" />
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="border-gray-600 text-gray-800 hover:bg-gray-300 transition"
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-bold mb-4">Client Management</h2>
+                {isLoadingClients ? (
+                  <p className="text-muted-foreground text-center">Loading clients...</p>
+                ) : clients && clients.length > 0 ? (
+                  clients.map((client) => (
+                    <div
+                      key={client.id}
+                      className="flex justify-between items-center p-3 border-b hover:bg-muted/50 transition rounded-lg"
                     >
-                      View Profile
-                    </Button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600 text-center">No clients found.</p>
-              )}
-            </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-medium">
+                          {client.fullName || client.username}
+                        </h3>
+                        <p className="text-muted-foreground">{client.email}</p>
+                        <Progress value={75} className="mt-2" />
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="ml-4"
+                      >
+                        View Profile
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground text-center">No clients found.</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
