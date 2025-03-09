@@ -13,7 +13,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { NotificationCenter } from "./notification-centre";
+import { NotificationCenter } from "./notification-center";
 import { UniversalSearch } from "./universal-search";
 import {
   Apple,
