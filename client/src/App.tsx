@@ -10,6 +10,7 @@ import ContentGeneratorPage from "@/pages/content-generator-page";
 import SettingsPage from "@/pages/settings-page";
 import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
 import MovementAnalysisPage from "@/pages/movement-analysis-page";
+import MealPlanPage from "@/pages/meal-plan-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";

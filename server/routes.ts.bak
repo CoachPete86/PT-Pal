@@ -878,20 +878,6 @@ The response must be a valid JSON object with this exact structure:
   });
 
   // Nutrition AI endpoints
-  // Check if Anthropic API is properly configured
-  app.get("/api/check-anthropic-api", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return res.status(500).json({
-        error: "API key missing",
-        details: "Anthropic API key is not configured",
-      });
-    }
-    
-    return res.json({ status: "configured" });
-  });
-
   app.post("/api/nutrition/generate-meal-plan", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
@@ -909,8 +895,8 @@ The response must be a valid JSON object with this exact structure:
         dietaryRestrictions,
         goals,
         nutritionRatios,
-        duration = 7, // days
-        mealsPerDay = 3,
+        duration, // days
+        mealsPerDay,
       } = req.body;
 
       // Build the prompt for Claude
@@ -938,8 +924,8 @@ Nutrition Ratios:
 - Carbs: ${nutritionRatios?.carbs || "50%"}
 - Fats: ${nutritionRatios?.fats || "25%"}
 
-Duration: ${duration} days
-Meals Per Day: ${mealsPerDay}
+Duration: ${duration || 7} days
+Meals Per Day: ${mealsPerDay || 3}
 
 Please create a structured meal plan with the following:
 1. Daily caloric target
@@ -949,65 +935,64 @@ Please create a structured meal plan with the following:
 
 Present the meal plan in JSON format.`;
 
-      const response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 4000,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      });
-
-      const responseText = response.content[0].text;
-      
-      // Extract JSON from Claude's response
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
-        responseText.match(/```\n([\s\S]*?)```/) ||
-        responseText.match(/json\n([\s\S]*?)```/) ||
-        responseText.match(/presentjson\n([\s\S]*?)```/);
-        
-      if (!jsonMatch || !jsonMatch[1]) {
-        return res.status(500).json({
-          error: "Failed to parse meal plan",
-          details: "The AI response did not contain valid JSON data",
-        });
-      }
-      
       try {
-        const mealPlanData = JSON.parse(jsonMatch[1].trim());
-        
-        // Save meal plan to database as a document (using existing functionality)
-        const doc = await storage.createDocument({
-          trainerId: req.user.id,
-          clientId: req.body.clientId || req.user.id,
-          workspaceId: req.body.workspaceId || 1,
-          title: `Meal Plan (${duration} days)`,
-          content: JSON.stringify(mealPlanData),
-          type: "nutrition_plan",
+        const response = await anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 4000,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
         });
+
+        const responseText = response.content[0].text;
         
-        res.json({ 
-          success: true,
-          mealPlan: mealPlanData, 
-          id: doc.id 
-        });
-      } catch (parseError) {
-        console.error("Failed to parse meal plan JSON:", parseError);
+        // Extract JSON from Claude's response
+        const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
+          responseText.match(/```\n([\s\S]*?)```/) ||
+          responseText.match(/json\n([\s\S]*?)```/) ||
+          responseText.match(/presentjson\n([\s\S]*?)```/);
+          
+        if (!jsonMatch || !jsonMatch[1]) {
+          return res.status(500).json({
+            error: "Failed to parse meal plan",
+            details: "The AI response did not contain valid JSON data",
+          });
+        }
+        
+        try {
+          const mealPlanData = JSON.parse(jsonMatch[1].trim());
+          
+          // Save meal plan to database
+          const mealPlan = await storage.createMealPlan({
+            trainerId: req.user.id,
+            clientId: req.body.clientId || req.user.id,
+            workspaceId: req.body.workspaceId || 1,
+            title: `Meal Plan (${duration || 7} days)`,
+            content: JSON.stringify(mealPlanData),
+            startDate: new Date(),
+            endDate: new Date(Date.now() + (duration || 7) * 24 * 60 * 60 * 1000),
+            type: "nutrition_plan",
+          });
+          
+          res.json({ mealPlan: mealPlanData, id: mealPlan.id });
+        } catch (parseError) {
+          console.error("Failed to parse meal plan JSON:", parseError);
+          res.status(500).json({
+            error: "Invalid meal plan format",
+            details: parseError.message,
+          });
+        }
+      } catch (error) {
+        console.error("Error generating meal plan:", error);
         res.status(500).json({
-          error: "Invalid meal plan format",
-          details: parseError instanceof Error ? parseError.message : String(parseError),
+          error: "Failed to generate meal plan",
+          details: error.message,
         });
       }
-    } catch (error) {
-      console.error("Error generating meal plan:", error);
-      res.status(500).json({
-        error: "Failed to generate meal plan",
-        details: error instanceof Error ? error.message : String(error),
-      });
-    }
-  });
+    });
     
   // Create HTTP server
   const server = createServer(app);
