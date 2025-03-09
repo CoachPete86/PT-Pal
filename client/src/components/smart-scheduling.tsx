@@ -296,7 +296,7 @@ export default function SmartScheduling() {
                   </Label>
                   <div className="col-span-3 flex">
                     <span className="inline-flex items-centre px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                      $
+                      £
                     </span>
                     <Input
                       id="price"

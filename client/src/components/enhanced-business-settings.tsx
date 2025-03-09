@@ -91,9 +91,9 @@ const subscriptionTiers = [
 ];
 
 const currencies = [
+  { code: "GBP", symbol: "£", name: "British Pound" },
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "EUR", symbol: "€", name: "Euro" },
-  { code: "GBP", symbol: "£", name: "British Pound" },
   { code: "AUD", symbol: "A$", name: "Australian Dollar" },
   { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
   { code: "JPY", symbol: "¥", name: "Japanese Yen" },
@@ -173,8 +173,8 @@ export default function EnhancedBusinessSettings() {
       primaryColor: branding?.primaryColor || "#4c7bea",
       secondaryColor: branding?.secondaryColor || "#10b981",
       fontFamily: branding?.fontFamily || "Inter",
-      currency: branding?.currency || "USD",
-      currencySymbol: branding?.currencySymbol || "$",
+      currency: branding?.currency || "GBP",
+      currencySymbol: branding?.currencySymbol || "£",
       logoUrl: branding?.logoUrl || "",
       welcomeMessage: branding?.welcomeMessage || "",
     },
