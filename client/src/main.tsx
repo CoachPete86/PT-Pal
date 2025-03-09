@@ -1,5 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+
+import './components/ui/layout-fixes.css';
+
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import App from "./App";

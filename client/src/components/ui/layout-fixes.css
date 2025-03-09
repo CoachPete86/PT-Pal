@@ -1,0 +1,51 @@
+
+/* Global layout corrections */
+.responsive-container {
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.flex-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.text-card {
+  @apply p-6 h-full flex flex-col;
+}
+
+.text-card-content {
+  @apply flex-grow;
+}
+
+/* Fix alignment for cards and panels */
+.card, 
+.panel {
+  @apply overflow-hidden;
+}
+
+/* Typography spacing fixes */
+h1, h2, h3, h4, h5, h6 {
+  @apply mb-4;
+}
+
+ul, ol {
+  @apply pl-6 mb-4;
+}
+
+/* Table alignment fixes */
+table {
+  @apply w-full text-left border-collapse;
+}
+
+th, td {
+  @apply p-2 border border-border;
+}
+
+/* Form element alignment */
+input, select, textarea {
+  @apply block w-full;
+}
+
+/* Button alignment */
+.button-group {
+  @apply flex flex-wrap gap-2;
+}
