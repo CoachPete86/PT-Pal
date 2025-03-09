@@ -40,7 +40,7 @@ export default function HeroSection() {
               <Link href="/auth">
                 <Button
                   size="lg"
-                  className="text-lg"
+                  className="text-lg bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Start Free Trial
                 </Button>
@@ -49,7 +49,7 @@ export default function HeroSection() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-lg border-2 hover:bg-white/10 transition-all duration-300"
+                  className="text-lg border-2 border-slate-800 dark:border-slate-200 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-all duration-300"
                 >
                   View Pricing
                 </Button>
