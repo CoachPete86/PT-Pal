@@ -18,14 +18,26 @@ export default function Navbar() {
 
   const closeSheet = () => setIsOpen(false);
 
-  const navItems = [
+  // Different navigation options based on authentication status
+  const publicNavItems = [
     { title: "Features", path: "/features" },
-    { title: "Solutions", path: "/solutions" },
+    { title: "Services", path: "/services" },
     { title: "Pricing", path: "/pricing" },
-    { title: "How It Works", path: "/how-it-works" },
-    { title: "Resources", path: "/resources" },
-    { title: "Support", path: "/support" },
+    { title: "Demo", path: "/demo" },
   ];
+  
+  const authenticatedNavItems = [
+    { title: "Dashboard", path: "/dashboard" },
+    { title: "Clients", path: "/clients" },
+    { title: "Workouts", path: "/workout-features" },
+    { title: "Movement Analysis", path: "/movement-analysis" },
+    { title: "Meal Plans", path: "/meal-plan" },
+    { title: "Content", path: "/content-generator" },
+    { title: "Settings", path: "/settings" },
+  ];
+  
+  // Use the appropriate navigation items based on authentication status
+  const navItems = isAuthenticated ? authenticatedNavItems : publicNavItems;
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b">
@@ -57,10 +69,10 @@ export default function Navbar() {
             </Link>
           ) : (
             <>
-              <Link href="/login">
+              <Link href="/auth?tab=login">
                 <Button variant="ghost">Log In</Button>
               </Link>
-              <Link href="/signup">
+              <Link href="/auth?tab=register">
                 <Button variant="default">Sign Up</Button>
               </Link>
             </>
@@ -98,12 +110,12 @@ export default function Navbar() {
                   </Link>
                 ) : (
                   <>
-                    <Link href="/login" onClick={closeSheet}>
+                    <Link href="/auth?tab=login" onClick={closeSheet}>
                       <Button className="w-full" variant="outline">
                         Log In
                       </Button>
                     </Link>
-                    <Link href="/signup" onClick={closeSheet}>
+                    <Link href="/auth?tab=register" onClick={closeSheet}>
                       <Button className="w-full" variant="default">
                         Sign Up
                       </Button>

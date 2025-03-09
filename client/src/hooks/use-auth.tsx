@@ -9,6 +9,7 @@ interface AuthContextType {
   registerMutation: any;
   logoutMutation: any;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -118,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         registerMutation,
         logoutMutation,
         isLoading,
+        isAuthenticated: !!user,
       }}
     >
       {children}

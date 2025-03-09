@@ -31,18 +31,18 @@ export default function HeroSection() {
             generate meal plans—all powered by AI.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/signup">
-              <Button size="lg" className="rounded-full px-8">
-                Start free trial
+            <Link href="/auth">
+              <Button size="lg" className="rounded-full px-8 bg-blue-600 text-white hover:bg-blue-700 font-semibold shadow-lg">
+                Start Free Trial
               </Button>
             </Link>
             <Link href="/features">
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full px-8 text-white border-white hover:bg-white/10"
+                className="rounded-full px-8 text-white border-white bg-transparent hover:bg-white/20 font-semibold"
               >
-                Explore features
+                Explore Features
               </Button>
             </Link>
           </div>
