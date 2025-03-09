@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +18,15 @@ import {
   Calendar,
   TrendingUp,
   Loader2,
+  Dumbbell,
+  Smartphone,
+  Activity,
+  Brain,
+  Utensils,
+  Video,
+  VolumeIcon,
+  Sparkles,
+  Bot,
 } from "lucide-react";
 
 // Transform session data function
@@ -223,6 +234,141 @@ export default function PTpalDashboard() {
                 )}
               </CardContent>
             </Card>
+          </div>
+          
+          {/* AI-Powered Features Section */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4 flex items-center">
+              <Sparkles className="h-5 w-5 mr-2 text-primary" />
+              AI-Powered Training Tools
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Personalized Workout Generator */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Dumbbell className="h-5 w-5 mr-2 text-primary" />
+                    Workout Generator
+                  </CardTitle>
+                  <CardDescription>
+                    Create customized AI workouts based on client goals and fitness level
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Intelligent workout creation with adaption to client history, preferences and goals.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/workout-features">
+                    <Button variant="outline" size="sm">Try It</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+              
+              {/* Movement Analysis */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Video className="h-5 w-5 mr-2 text-primary" />
+                    Movement Analysis
+                  </CardTitle>
+                  <CardDescription>
+                    Analyze client movement patterns with AI-generated feedback
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Upload videos to get detailed form analysis and visual comparisons with ideal form.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/movement-analysis">
+                    <Button variant="outline" size="sm">Analyze Form</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+              
+              {/* Voice Coaching */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <VolumeIcon className="h-5 w-5 mr-2 text-primary" />
+                    Voice Coaching
+                  </CardTitle>
+                  <CardDescription>
+                    Voice-activated workout assistant with interactive features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Hands-free coaching with voice commands and real-time guidance during workouts.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/workout-features">
+                    <Button variant="outline" size="sm">Voice Coach</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+              
+              {/* Workout Mascot */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Bot className="h-5 w-5 mr-2 text-primary" />
+                    Motivation Coach
+                  </CardTitle>
+                  <CardDescription>
+                    Interactive mascot system for client motivation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Customizable AI mascot characters that provide motivation and guidance during workouts.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/workout-features">
+                    <Button variant="outline" size="sm">Try Mascot</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+              
+              {/* Nutrition Analysis */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Utensils className="h-5 w-5 mr-2 text-primary" />
+                    Nutrition Analysis
+                  </CardTitle>
+                  <CardDescription>
+                    AI-powered nutrition tracking and meal planning
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Analyze client nutrition, generate meal plans, and provide personalized recommendations.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/workout-features">
+                    <Button variant="outline" size="sm">Nutrition Tools</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+              
+              {/* Content Generator */}
+              <Card className="overflow-hidden hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Smartphone className="h-5 w-5 mr-2 text-primary" />
+                    Social Content
+                  </CardTitle>
+                  <CardDescription>
+                    Create fitness content for social media platforms
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground pb-2">
+                  Generate professional fitness content tailored to different platforms and audiences.
+                </CardContent>
+                <CardFooter>
+                  <Link href="/content-generator">
+                    <Button variant="outline" size="sm">Create Content</Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

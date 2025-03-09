@@ -44,6 +44,7 @@ const mainNavItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/content-generator", label: "Content" },
   { href: "/movement-analysis", label: "Movement Analysis" },
+  { href: "/workout-features", label: "Workout Tools" },
 ];
 
 export default function Navbar() {
@@ -154,6 +155,14 @@ export default function Navbar() {
                           <div className="flex items-center cursor-pointer">
                             <Activity className="mr-2 h-4 w-4" />
                             Movement Analysis
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/workout-features">
+                          <div className="flex items-center cursor-pointer">
+                            <Activity className="mr-2 h-4 w-4" />
+                            Workout Tools
                           </div>
                         </Link>
                       </DropdownMenuItem>
