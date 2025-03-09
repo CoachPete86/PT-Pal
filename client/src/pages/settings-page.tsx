@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Navbar from "@/components/navbar";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import WorkspaceSettings from "@/components/workspace-settings";
 import {
   Card,
@@ -21,7 +21,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState({
-    businessName: user?.businessName || "",
+    businessName: (user as any)?.businessName || "",
     email: user?.email || "",
   });
 
@@ -53,20 +53,12 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto p-4 lg:p-8 space-y-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight flex items-center gap-2">
-              <Settings className="h-8 w-8" />
-              Settings
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your account and workspace settings
-            </p>
-          </div>
-        </div>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
+        <p className="text-muted-foreground">
+          Manage your account and workspace settings
+        </p>
 
         <Tabs defaultValue="workspace" className="space-y-6">
           <TabsList>
@@ -127,7 +119,7 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

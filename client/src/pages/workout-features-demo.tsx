@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout } from "@/components/layout";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import WorkoutMascot, { MascotCharacter } from "@/components/workout-mascot";
 import AIMotivationCoach from "@/components/ai-motivation-coach";
 import VoiceActivatedWorkout from "@/components/voice-activated-workout";
@@ -178,10 +178,10 @@ export default function WorkoutFeaturesDemo() {
   const [selectedWorkout, setSelectedWorkout] = useState(workoutPlans[0]);
 
   return (
-    <Layout>
-      <div className="container mx-auto py-6 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-6">AI-Powered Workout Features</h1>
-        <p className="text-lg mb-8">
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold tracking-tight">AI-Powered Workout Features</h2>
+        <p className="text-lg mb-6">
           Explore our new AI-powered workout features designed to make your
           fitness experience more interactive, engaging, and effective.
         </p>
@@ -523,6 +523,6 @@ export default function WorkoutFeaturesDemo() {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 }

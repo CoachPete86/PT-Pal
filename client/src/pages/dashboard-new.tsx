@@ -1,16 +1,16 @@
 import PTpalDashboard from "@/components/ptpal-dashboard";
-import Navbar from "@/components/navbar";
+import { DashboardLayout } from "@/components/dashboard-layout";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function DashboardPage() {
   const { user } = useAuth();
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mx-auto py-4">
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <PTpalDashboard />
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
