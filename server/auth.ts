@@ -36,15 +36,17 @@ export function setupAuth(app: Express) {
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: storage.sessionStore,
     cookie: {
-      secure: app.get("env") === "production",
+      secure: false, // Set to true only in production with HTTPS
       httpOnly: true,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: "/",
     },
+    name: "ptpal.sid", // Custom name for better security
   };
 
   // Trust first proxy if in production
@@ -213,7 +215,7 @@ export function setupAuth(app: Express) {
           console.error("Session destruction error:", err);
           return next(err);
         }
-        res.clearCookie("connect.sid");
+        res.clearCookie("ptpal.sid", { path: "/" });
         res.sendStatus(200);
       });
     });

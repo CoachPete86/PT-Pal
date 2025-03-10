@@ -8,13 +8,11 @@ const app = express();
 // Configure CORS early in the middleware chain
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? "https://YOUR_PRODUCTION_DOMAIN" // This will be replaced with actual domain
-        : ["http://localhost:5000", "http://localhost:5001", "http://localhost:5002"],
+    origin: true, // Allow any origin with credentials
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["Set-Cookie"],
   }),
 );
 
