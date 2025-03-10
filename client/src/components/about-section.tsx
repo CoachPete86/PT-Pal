@@ -22,7 +22,7 @@ export default function AboutSection() {
 
             <div className="grid grid-cols-3 gap-4">
               <Card>
-                <CardContent className="p-6 text-centre">
+                <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
                     <span className="text-sm">Personal Trainer</span>
                   </div>
@@ -30,7 +30,7 @@ export default function AboutSection() {
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6 text-centre">
+                <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
                     <span className="text-sm">AI Powered</span>
                   </div>
@@ -38,7 +38,7 @@ export default function AboutSection() {
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6 text-centre">
+                <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
                     <span className="text-sm">Results Focused</span>
                   </div>
@@ -49,7 +49,7 @@ export default function AboutSection() {
           </div>
 
           <div
-            className="aspect-square rounded-lg bg-cover bg-centre shadow-2xl"
+            className="aspect-square rounded-lg bg-cover bg-center shadow-2xl"
             style={{
               backgroundImage:
                 'url("https://images.unsplash.com/photo-1576678927484-cc907957088c")',

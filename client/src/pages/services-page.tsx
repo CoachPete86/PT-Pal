@@ -124,7 +124,7 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-centre mb-16">
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Comprehensive Features for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Discover our powerful suite of tools designed specifically for personal trainers and fitness coaches to optimise their business and enhance client experiences.
@@ -159,12 +159,12 @@ export default function ServicesPage() {
           ))}
         </motion.div>
 
-        <div className="mt-24 text-centre">
+        <div className="mt-24 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your fitness business?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Join thousands of fitness professionals who have elevated their coaching experience with our comprehensive platform.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/pricing">
               <Button size="lg" className="px-8">View Pricing Plans</Button>
             </Link>
