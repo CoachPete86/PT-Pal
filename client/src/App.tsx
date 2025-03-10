@@ -26,6 +26,7 @@ import SolutionsPage from "@/pages/solutions-page";
 import HowItWorksPage from "@/pages/how-it-works-page";
 import ResourcesPage from "@/pages/resources-page";
 import SupportPage from "@/pages/support-page";
+import AboutPage from "@/pages/about-page";
 
 
 function Router() {
@@ -58,6 +59,11 @@ function Router() {
         <ProtectedRoute path="/meal-plan" component={MealPlanPage} />
         <ProtectedRoute path="/communication-hub" component={CommunicationHubPage} />
         <ProtectedRoute path="/group-session" component={GroupSessionPage} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/solutions" component={SolutionsPage} />
+        <Route path="/how-it-works" component={HowItWorksPage} />
+        <Route path="/resources" component={ResourcesPage} />
+        <Route path="/support" component={SupportPage} />
         <Route path="/:rest*" component={NotFound} />
       </Switch>
     </Suspense>
