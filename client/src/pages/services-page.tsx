@@ -141,7 +141,7 @@ export default function ServicesPage() {
             <motion.div key={index} variants={itemVariants}>
               <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex items-centre gap-3">
+                  <div className="flex items-center gap-3">
                     {feature.icon}
                     <CardTitle>{feature.title}</CardTitle>
                   </div>

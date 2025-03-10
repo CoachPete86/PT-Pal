@@ -73,7 +73,7 @@ export default function SolutionsPage() {
           {solutions.map((solution, index) => (
             <Card key={index} className="flex flex-col h-full">
               <CardHeader>
-                <div className="flex items-centre gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-3">
                   {solution.icon}
                   <CardTitle>{solution.title}</CardTitle>
                 </div>

@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -77,7 +76,7 @@ export default function ResourcesPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-centre mb-16">
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Resources for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Explore our collection of guides, case studies, and insights to help you grow your fitness business and enhance your coaching practices.
@@ -85,14 +84,14 @@ export default function ResourcesPage() {
         </div>
 
         <Tabs defaultValue="blog" className="mb-16">
-          <div className="flex justify-centre mb-8">
+          <div className="flex justify-center mb-8">
             <TabsList>
               <TabsTrigger value="blog">Blog</TabsTrigger>
               <TabsTrigger value="caseStudies">Case Studies</TabsTrigger>
               <TabsTrigger value="guides">Guides & Templates</TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value="blog">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogPosts.map((post, index) => (
@@ -101,7 +100,7 @@ export default function ResourcesPage() {
                     <img src={post.image} alt={post.title} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" />
                   </div>
                   <CardHeader>
-                    <div className="flex justify-between items-centre mb-2">
+                    <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-primary font-medium">{post.category}</span>
                       <span className="text-xs text-muted-foreground">{post.date}</span>
                     </div>
@@ -119,13 +118,13 @@ export default function ResourcesPage() {
                 </Card>
               ))}
             </div>
-            <div className="text-centre mt-8">
+            <div className="text-center mt-8">
               <Link href="/blog">
                 <Button variant="outline">View all articles</Button>
               </Link>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="caseStudies">
             <div className="grid md:grid-cols-2 gap-8">
               {caseStudies.map((study, index) => (
@@ -134,7 +133,7 @@ export default function ResourcesPage() {
                     <img src={study.image} alt={study.title} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" />
                   </div>
                   <CardHeader>
-                    <div className="flex justify-between items-centre mb-2">
+                    <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-primary font-medium">{study.type}</span>
                       <span className="text-sm font-semibold">{study.results}</span>
                     </div>
@@ -152,13 +151,13 @@ export default function ResourcesPage() {
               ))}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="guides">
             <div className="grid md:grid-cols-3 gap-8">
               {guides.map((guide, index) => (
                 <Card key={index} className="flex flex-col h-full">
                   <CardHeader>
-                    <div className="flex items-centre gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2">
                       {guide.icon}
                       <span className="text-sm text-muted-foreground">{guide.type}</span>
                     </div>
@@ -178,7 +177,7 @@ export default function ResourcesPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="bg-muted rounded-lg p-8 text-centre">
+        <div className="bg-muted rounded-lg p-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Subscribe to Our Newsletter</h2>
           <p className="mb-6 max-w-2xl mx-auto">
             Get the latest industry insights, business growth tips, and PTpal updates delivered directly to your inbox.
