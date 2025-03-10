@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
@@ -51,9 +51,16 @@ export default function AuthPage() {
   const handleLogin = async (data: any) => {
     try {
       console.log("Login attempt with:", data);
-      await loginMutation.mutateAsync(data);
-      // Redirect to dashboard after successful login
-      window.location.href = "/dashboard";
+      // Normalize email to lowercase to ensure case-insensitive login
+      const normalizedData = {
+        ...data,
+        email: data.email.toLowerCase()
+      };
+      console.log("Normalized login data:", normalizedData);
+      
+      await loginMutation.mutateAsync(normalizedData);
+      // Redirect to dashboard after successful login using wouter
+      setLocation("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
@@ -67,9 +74,16 @@ export default function AuthPage() {
   const handleRegistration = async (data: any) => {
     try {
       console.log("Registration attempt with:", data);
-      await registerMutation.mutateAsync(data);
-      // Redirect to dashboard after successful registration
-      window.location.href = "/dashboard";
+      // Normalize email to lowercase to ensure case-insensitive registration
+      const normalizedData = {
+        ...data,
+        email: data.email.toLowerCase()
+      };
+      console.log("Normalized registration data:", normalizedData);
+      
+      await registerMutation.mutateAsync(normalizedData);
+      // Redirect to dashboard after successful registration using wouter
+      setLocation("/dashboard");
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({
@@ -81,10 +95,11 @@ export default function AuthPage() {
   };
 
   // Redirect if already authenticated
-  if (user) {
-    window.location.href = "/dashboard";
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      setLocation("/dashboard");
+    }
+  }, [user, setLocation]);
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
