@@ -1,3 +1,4 @@
+
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -17,56 +18,54 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 py-12">
+      <motion.div
+        className="container relative z-10 mx-auto px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-3xl">
-          <Badge className="mb-4 text-sm py-1 font-heading">
-            Trusted by fitness professionals worldwide
-          </Badge>
-          <h1 className="hero-text text-white mb-6">
-            AI-powered platform for fitness professionals
-          </h1>
-          <p className="hero-subtitle text-gray-300 mb-8">
-            Streamline your coaching business with our comprehensive suite of
-            tools. Create personalised workout plans, analyse movement form, and
-            generate meal plans—all powered by AI.
-          </p>
-          <div className="flex flex-wrap gap-4 items-center justify-start">
-            <Link href="/auth">
-              <Button size="lg" className="rounded-full px-8 bg-blue-600 text-white hover:bg-blue-700 font-heading font-bold shadow-lg tracking-wide h-12">
-                Start Free Trial
-              </Button>
-            </Link>
-            <Link href="/features">
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-full px-8 text-white border-white bg-transparent hover:bg-white/20 font-heading font-bold tracking-wide h-12"
-              >
-                Explore Features
-              </Button>
-            </Link>
-          </div>v>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Badge className="mb-4" variant="outline">
+              Personal Training Software
+            </Badge>
+          </motion.div>
+          <motion.h1
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            The Smart Way to Manage Your Fitness Business
+          </motion.h1>
+          <motion.p
+            className="text-xl text-gray-300 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            All-in-one platform for fitness professionals to create workouts, manage clients, and grow their business.
+          </motion.p>
 
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex items-center gap-2">
-              <Brain className="text-primary h-6 w-6" />
-              <span className="text-gray-300 font-heading font-medium tracking-wide text-sm">AI WORKOUT PLANNING</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Camera className="text-primary h-6 w-6" />
-              <span className="text-gray-300 font-heading font-medium tracking-wide text-sm">MOVEMENT ANALYSIS</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Utensils className="text-primary h-6 w-6" />
-              <span className="text-gray-300 font-heading font-medium tracking-wide text-sm">NUTRITION GUIDANCE</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Award className="text-primary h-6 w-6" />
-              <span className="text-gray-300 font-heading font-medium tracking-wide text-sm">CLIENT MANAGEMENT</span>
-            </div>
-          </div>
+          <motion.div
+            className="flex flex-wrap gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <Button size="lg" asChild>
+              <Link href="/signup">Get Started Free</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/about">Learn More</Link>
+            </Button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
