@@ -28,6 +28,7 @@ import ResourcesPage from "@/pages/resources-page";
 import SupportPage from "@/pages/support-page";
 import AboutPage from "@/pages/about-page";
 import LoginTest from "@/pages/login-test";
+import MascotPage from "@/pages/mascot-page"; // Assumed mascot page
 
 
 function Router() {
@@ -66,6 +67,7 @@ function Router() {
         <Route path="/how-it-works" component={HowItWorksPage} />
         <Route path="/resources" component={ResourcesPage} />
         <Route path="/support" component={SupportPage} />
+        <Route path="/mascot" component={MascotPage} /> {/* Added route for mascot */}
         <Route path="/:rest*" component={NotFound} />
       </Switch>
     </Suspense>
