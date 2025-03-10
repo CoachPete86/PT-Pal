@@ -11,7 +11,7 @@ export default function HeroSection() {
         className="absolute inset-0 z-0 bg-cover bg-center grayscale"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")', // Dramatic B&W gym environment with deep shadows
+            'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")' // Dramatic B&W gym environment with deep shadows
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
