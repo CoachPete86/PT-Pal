@@ -16,6 +16,7 @@ import PricingPage from "@/pages/pricing-page";
 import FeaturesPage from "@/pages/features-page";
 import DemoPage from "@/pages/demo-page";
 import CommunicationHubPage from "@/pages/communication-hub-page";
+import GroupSessionPage from "@/pages/group-session-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -56,6 +57,7 @@ function Router() {
         <ProtectedRoute path="/movement-analysis" component={MovementAnalysisPage} />
         <ProtectedRoute path="/meal-plan" component={MealPlanPage} />
         <ProtectedRoute path="/communication-hub" component={CommunicationHubPage} />
+        <ProtectedRoute path="/group-session" component={GroupSessionPage} />
         <Route path="/:rest*" component={NotFound} />
       </Switch>
     </Suspense>
