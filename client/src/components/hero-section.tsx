@@ -15,7 +15,30 @@ export default function HeroSection() {
             'url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48")' // Dramatic B&W gym environment with deep shadows
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/95 to-black/80" />
+      </div>
+      
+      <div className="container relative z-10 mx-auto px-4">
+        <Badge variant="outline" className="bg-primary/10 text-primary-foreground mb-4 py-1 px-4 text-sm">
+          Personal Training Software
+        </Badge>
+        
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 max-w-3xl font-heading tracking-tight">
+          The Smart Way to Grow Your Fitness Business
+        </h1>
+        
+        <p className="text-xl text-white/80 max-w-2xl mb-8">
+          All-in-one platform for fitness professionals to manage clients, and grow their business.
+        </p>
+        
+        <div className="flex flex-wrap gap-4">
+          <Button size="lg" className="py-6 px-8 flex items-center justify-center">
+            <span className="text-center">Get Started Free</span>
+          </Button>
+          <Button variant="outline" size="lg" className="py-6 px-8 bg-white flex items-center justify-center">
+            <span className="text-center">Learn More</span>
+          </Button>
+        </div>
       </div>
 
       <motion.div

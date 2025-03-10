@@ -49,3 +49,18 @@ input, select, textarea {
 .button-group {
   @apply flex flex-wrap gap-2;
 }
+
+/* Ensure button text is always centered */
+button, 
+.button,
+[class*="btn"],
+[role="button"] {
+  @apply flex items-center justify-center;
+}
+
+/* Ensure text inside buttons is centered */
+button span, 
+.button span,
+[class*="btn"] span {
+  @apply text-center;
+}

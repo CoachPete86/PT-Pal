@@ -28,8 +28,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mb-8 flex flex-col md:flex-row items-centre justify-between">
-          <div className="flex items-centre gap-2 text-2xl font-bold mb-4 md:mb-0">
+        <div className="mb-8 flex flex-col md:flex-row items-center justify-between">
+          <div className="flex items-center gap-2 text-2xl font-bold mb-4 md:mb-0">
             <BarChart className="h-8 w-8 text-primary" />
             <span className="font-heading tracking-tight">PTpal</span>
           </div>
