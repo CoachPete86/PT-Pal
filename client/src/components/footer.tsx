@@ -34,7 +34,7 @@ export default function Footer() {
             <span className="font-heading tracking-tight">PTpal</span>
           </div>
           
-          <p className="text-muted-foreground text-centre md:text-right max-w-md hero-subtitle">
+          <p className="text-muted-foreground text-center md:text-right max-w-md hero-subtitle">
             The ultimate AI-powered platform for fitness professionals to manage clients, 
             create custom programs, and grow their business.
           </p>
@@ -48,15 +48,15 @@ export default function Footer() {
               client experiences and build successful businesses.
             </p>
             <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-centre gap-2">
+              <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
                 <span>contact@ptpal.io</span>
               </div>
-              <div className="flex items-centre gap-2">
+              <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-primary" />
                 <span>+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-centre gap-2">
+              <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
                 <span>New York, NY</span>
               </div>
@@ -175,7 +175,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-centre text-sm text-muted-foreground">
+        <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} PTpal. All rights reserved.</p>
           
           <div className="flex gap-6 mt-4 md:mt-0">
