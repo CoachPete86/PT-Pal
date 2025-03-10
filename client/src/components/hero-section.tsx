@@ -56,11 +56,11 @@ export default function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
           >
-            <Button size="lg" asChild>
-              <Link href="/signup">Get Started Free</Link>
+            <Button size="lg" asChild className="flex items-center justify-center h-12 px-6">
+              <Link href="/signup" className="flex items-center justify-center w-full">Get Started Free</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/about">Learn More</Link>
+            <Button size="lg" variant="outline" asChild className="flex items-center justify-center h-12 px-6">
+              <Link href="/about" className="flex items-center justify-center w-full">Learn More</Link>
             </Button>
           </motion.div>
         </div>

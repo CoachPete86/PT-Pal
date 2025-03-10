@@ -64,16 +64,16 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
-            <Link href="/dashboard">
-              <Button variant="default" className="font-heading font-medium tracking-wide">Dashboard</Button>
+            <Link href="/dashboard" className="flex">
+              <Button variant="default" className="font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4">Dashboard</Button>
             </Link>
           ) : (
             <>
-              <Link href="/auth?tab=login">
-                <Button variant="ghost" className="font-heading font-medium tracking-wide">Log In</Button>
+              <Link href="/auth?tab=login" className="flex">
+                <Button variant="ghost" className="font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4">Log In</Button>
               </Link>
-              <Link href="/auth?tab=register">
-                <Button variant="default" className="font-heading font-medium tracking-wide">Sign Up</Button>
+              <Link href="/auth?tab=register" className="flex">
+                <Button variant="default" className="font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4">Sign Up</Button>
               </Link>
             </>
           )}
@@ -103,20 +103,20 @@ export default function Navbar() {
                   </Link>
                 ))}
                 {isAuthenticated ? (
-                  <Link href="/dashboard" onClick={closeSheet}>
-                    <Button className="w-full font-heading font-medium tracking-wide" variant="default">
+                  <Link href="/dashboard" onClick={closeSheet} className="flex">
+                    <Button className="w-full font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4" variant="default">
                       Dashboard
                     </Button>
                   </Link>
                 ) : (
                   <>
-                    <Link href="/auth?tab=login" onClick={closeSheet}>
-                      <Button className="w-full font-heading font-medium tracking-wide" variant="outline">
+                    <Link href="/auth?tab=login" onClick={closeSheet} className="flex">
+                      <Button className="w-full font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4" variant="outline">
                         Log In
                       </Button>
                     </Link>
-                    <Link href="/auth?tab=register" onClick={closeSheet}>
-                      <Button className="w-full font-heading font-medium tracking-wide" variant="default">
+                    <Link href="/auth?tab=register" onClick={closeSheet} className="flex">
+                      <Button className="w-full font-heading font-medium tracking-wide flex items-center justify-center h-10 px-4" variant="default">
                         Sign Up
                       </Button>
                     </Link>

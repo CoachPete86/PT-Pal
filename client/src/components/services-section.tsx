@@ -183,8 +183,8 @@ export default function ServicesSection() {
                   </CardDescription>
                 </CardContent>
                 <CardFooter className="pt-0">
-                  <Link href={feature.learnMoreLink}>
-                    <Button variant="outline" size="sm">
+                  <Link href={feature.learnMoreLink} className="flex">
+                    <Button variant="outline" size="sm" className="flex items-center justify-center h-9 px-4">
                       Learn More
                     </Button>
                   </Link>
@@ -195,8 +195,8 @@ export default function ServicesSection() {
         </motion.div>
 
         <div className="mt-12 text-center">
-          <Link href="/services">
-            <Button variant="outline" size="lg" className="gap-2 font-heading font-medium tracking-wide">
+          <Link href="/services" className="inline-flex">
+            <Button variant="outline" size="lg" className="gap-2 font-heading font-medium tracking-wide flex items-center justify-center h-12 px-6">
               <span>View All Features</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

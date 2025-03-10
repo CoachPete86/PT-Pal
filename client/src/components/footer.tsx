@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-12">
         {/* Newsletter / CTA Section */}
         <div className="mb-12 p-8 bg-primary/5 rounded-lg border border-primary/20">
-          <div className="grid md:grid-cols-2 gap-8 items-centre">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-2xl font-bold mb-2 font-heading tracking-tight">Get Expert Fitness Business Tips</h3>
               <p className="text-muted-foreground hero-subtitle">
@@ -21,7 +21,7 @@ export default function Footer() {
                 placeholder="Enter your email" 
                 className="px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary flex-grow"
               />
-              <Button className="whitespace-nowrap">
+              <Button className="whitespace-nowrap flex items-center justify-center h-10 px-4">
                 Subscribe
               </Button>
             </div>
