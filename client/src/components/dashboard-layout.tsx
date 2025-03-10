@@ -86,6 +86,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           active: location === "/workout-features",
         },
         {
+          title: "Group Sessions",
+          href: "/group-session",
+          icon: Users,
+          active: location === "/group-session",
+        },
+        {
           title: "Movement Analysis",
           href: "/movement-analysis",
           icon: Video,
