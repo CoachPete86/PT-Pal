@@ -50,6 +50,7 @@ export default function AuthPage() {
   // Handle form submissions
   const handleLogin = async (data: any) => {
     try {
+      console.log("Login attempt with:", data);
       await loginMutation.mutateAsync(data);
       // Redirect to dashboard after successful login
       window.location.href = "/dashboard";
@@ -57,9 +58,7 @@ export default function AuthPage() {
       console.error("Login error:", error);
       toast({
         title: "Login Failed",
-        description:
-          error.response?.data?.error ||
-          "Failed to login. Please check your credentials.",
+        description: error.message || "Failed to login. Please check your credentials.",
         variant: "destructive",
       });
     }
@@ -67,6 +66,7 @@ export default function AuthPage() {
 
   const handleRegistration = async (data: any) => {
     try {
+      console.log("Registration attempt with:", data);
       await registerMutation.mutateAsync(data);
       // Redirect to dashboard after successful registration
       window.location.href = "/dashboard";
@@ -74,7 +74,7 @@ export default function AuthPage() {
       console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: error.response?.data?.error || "Failed to create account. Please try again.",
+        description: error.message || "Failed to create account. Please try again.",
         variant: "destructive",
       });
     }

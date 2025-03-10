@@ -39,21 +39,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
+      console.log("Login mutation with credentials:", credentials);
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
         credentials: "include",
       });
+      
+      console.log("Login response status:", res.status);
+      
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Login failed");
+        const errorData = await res.json();
+        console.log("Login error data:", errorData);
+        throw new Error(errorData.error || "Invalid email or password");
       }
+      
       const data = await res.json();
+      console.log("Login successful, user data:", data);
       setUser(data);
       return data;
     },
     onError: (error: Error) => {
+      console.error("Login mutation error:", error);
       toast({
         title: "Login Failed",
         description: error.message,
@@ -69,21 +77,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: string;
       fullName: string;
     }) => {
+      console.log("Registration mutation with data:", userData);
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
         credentials: "include",
       });
+      
+      console.log("Registration response status:", res.status);
+      
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Registration failed");
+        const errorData = await res.json();
+        console.log("Registration error data:", errorData);
+        throw new Error(errorData.error || "Registration failed");
       }
+      
       const data = await res.json();
+      console.log("Registration successful, user data:", data);
       setUser(data);
       return data;
     },
     onError: (error: Error) => {
+      console.error("Registration mutation error:", error);
       toast({
         title: "Registration Failed",
         description: error.message,
