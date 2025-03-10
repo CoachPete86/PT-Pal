@@ -41,17 +41,17 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b">
-      <div className="container flex h-16 items-centre justify-between">
-        <div className="flex items-centre gap-6">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6">
           <Link href="/" className="font-bold text-xl mr-6 font-heading tracking-tight">
             PTpal
           </Link>
-          <nav className="hidden md:flex items-centre gap-6">
+          <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.title}
                 href={item.path}
-                className={`text-sm font-medium transition-colours hover:text-primary ${
+                className={`text-sm font-medium transition-colors hover:text-primary ${
                   location === item.path
                     ? "text-foreground font-heading tracking-tight"
                     : "text-muted-foreground"
@@ -62,7 +62,7 @@ export default function Navbar() {
             ))}
           </nav>
         </div>
-        <div className="flex items-centre gap-4">
+        <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <Link href="/dashboard">
               <Button variant="default" className="font-heading font-medium tracking-wide">Dashboard</Button>
@@ -93,7 +93,7 @@ export default function Navbar() {
                     key={item.title}
                     href={item.path}
                     onClick={closeSheet}
-                    className={`text-lg font-medium transition-colours hover:text-primary ${
+                    className={`text-lg font-medium transition-colors hover:text-primary ${
                       location === item.path
                         ? "text-foreground font-heading tracking-tight"
                         : "text-muted-foreground"
