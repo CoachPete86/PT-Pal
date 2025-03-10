@@ -140,8 +140,8 @@ export default function ServicesSection() {
     <section id="services" className="py-20 bg-background border-t">
       <div className="container mx-auto px-4">
         <div className="text-centre mb-12">
-          <h2 className="text-4xl font-bold mb-4">Powerful Features for Fitness Professionals</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <h2 className="font-heading text-4xl font-bold mb-4 tracking-tight">Powerful Features for Fitness Professionals</h2>
+          <p className="hero-subtitle text-muted-foreground max-w-3xl mx-auto">
             Our comprehensive platform combines AI-powered tools with essential business management 
             features to help you deliver exceptional service and grow your fitness business.
           </p>
@@ -164,7 +164,7 @@ export default function ServicesSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     {feature.tag && (
                       <div className="absolute top-4 right-4">
-                        <Badge variant={feature.tag === "New" ? "default" : "outline"} className="font-medium">
+                        <Badge variant={feature.tag === "New" ? "default" : "outline"} className="font-heading font-medium tracking-wide text-xs">
                           {feature.tag}
                         </Badge>
                       </div>
@@ -172,7 +172,7 @@ export default function ServicesSection() {
                   </div>
                 </Link>
                 <CardHeader className="relative pb-2">
-                  <CardTitle className="flex items-center gap-2 text-xl">
+                  <CardTitle className="flex items-center gap-2 text-xl font-heading tracking-tight">
                     <feature.icon className="h-5 w-5 text-primary" />
                     {feature.title}
                   </CardTitle>
@@ -196,7 +196,7 @@ export default function ServicesSection() {
 
         <div className="mt-12 text-centre">
           <Link href="/services">
-            <Button variant="outline" size="lg" className="gap-2">
+            <Button variant="outline" size="lg" className="gap-2 font-heading font-medium tracking-wide">
               <span>View All Features</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

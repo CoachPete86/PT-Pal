@@ -6,15 +6,15 @@ export default function AboutSection() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Why Choose Our Platform?</h2>
-            <p className="text-muted-foreground">
+            <h2 className="text-3xl font-bold font-heading tracking-tight">Why Choose Our Platform?</h2>
+            <p className="text-muted-foreground hero-subtitle">
               Built by fitness professionals for fitness professionals, our
               platform combines cutting-edge technology with deep industry
               knowledge. We understand the unique challenges of running a
               fitness business and have created tools that make a real
               difference.
             </p>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground hero-subtitle">
               From automated workout generation to comprehensive client
               management, we provide everything you need to scale your business
               while maintaining the personal touch your clients value.
