@@ -1,14 +1,13 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
+import { Route } from "wouter";
 
-export function ProtectedRoute({
-  path,
-  component: Component,
-}: {
+type ProtectedRouteProps = {
   path: string;
-  component: () => React.JSX.Element | null;
-}) {
+  component: () => React.ReactElement | null;
+};
+
+export function ProtectedRoute({ path, component: Component }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
 
   return (
@@ -18,7 +17,7 @@ export function ProtectedRoute({
         // While checking authentication status, show loading spinner
         if (isLoading) {
           return (
-            <div className="h-screen w-screen flex items-centre justify-centre">
+            <div className="h-screen w-screen flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           );
@@ -26,7 +25,7 @@ export function ProtectedRoute({
 
         // If user is not authenticated, redirect to login
         if (!user) {
-          window.location.href = "/auth";
+          window.location.href = "/login";
           return null;
         }
 

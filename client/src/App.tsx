@@ -15,6 +15,7 @@ import ServicesPage from "@/pages/services-page";
 import PricingPage from "@/pages/pricing-page";
 import FeaturesPage from "@/pages/features-page";
 import DemoPage from "@/pages/demo-page";
+import CommunicationHubPage from "@/pages/communication-hub-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -30,7 +31,7 @@ function Router() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen w-full items-centre justify-centre">
+        <div className="flex h-screen w-full items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }
@@ -48,25 +49,14 @@ function Router() {
         <Route path="/resources" component={ResourcesPage} />
         <Route path="/support" component={SupportPage} />
         <Route path="/demo" component={DemoPage} />
-        <Route path="/dashboard">
-          <ProtectedRoute component={DashboardPage} />
-        </Route>
-        <Route path="/content-generator">
-          <ProtectedRoute component={ContentGeneratorPage} />
-        </Route>
-        <Route path="/settings">
-          <ProtectedRoute component={SettingsPage} />
-        </Route>
-        <Route path="/workout-features">
-          <ProtectedRoute component={WorkoutFeaturesDemo} />
-        </Route>
-        <Route path="/movement-analysis">
-          <ProtectedRoute component={MovementAnalysisPage} />
-        </Route>
-        <Route path="/meal-plan">
-          <ProtectedRoute component={MealPlanPage} />
-        </Route>
-        <Route component={NotFound} />
+        <ProtectedRoute path="/dashboard" component={DashboardPage} />
+        <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
+        <ProtectedRoute path="/settings" component={SettingsPage} />
+        <ProtectedRoute path="/workout-features" component={WorkoutFeaturesDemo} />
+        <ProtectedRoute path="/movement-analysis" component={MovementAnalysisPage} />
+        <ProtectedRoute path="/meal-plan" component={MealPlanPage} />
+        <ProtectedRoute path="/communication-hub" component={CommunicationHubPage} />
+        <Route path="/:rest*" component={NotFound} />
       </Switch>
     </Suspense>
   );

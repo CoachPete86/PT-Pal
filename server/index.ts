@@ -11,7 +11,7 @@ app.use(
     origin:
       process.env.NODE_ENV === "production"
         ? "https://YOUR_PRODUCTION_DOMAIN" // This will be replaced with actual domain
-        : "http://localhost:5000",
+        : ["http://localhost:5000", "http://localhost:5001", "http://localhost:5002"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -75,25 +75,25 @@ const startServer = async () => {
     // Function to try binding to a port
     const tryPort = async (port: number): Promise<number> => {
       return new Promise((resolve, reject) => {
-        server.once("error", (err: NodeJS.ErrnoException) => {
+        const tempServer = server;
+        
+        tempServer.once("error", (err: NodeJS.ErrnoException) => {
           if (err.code === "EADDRINUSE") {
             log(`Port ${port} is in use, trying next port...`);
-            if (port >= 5010) {
-              reject(
-                new Error("No available ports found between 5000 and 5010"),
-              );
-            } else {
-              resolve(tryPort(port + 1));
-            }
+            tempServer.removeAllListeners("error");
+            tempServer.removeAllListeners("listening");
+            resolve(tryPort(port + 1));
           } else {
             reject(err);
           }
         });
 
-        server.listen(port, "0.0.0.0", () => {
+        tempServer.once("listening", () => {
           log(`Server started successfully on port ${port}`);
           resolve(port);
         });
+
+        tempServer.listen(port, "0.0.0.0");
       });
     };
 

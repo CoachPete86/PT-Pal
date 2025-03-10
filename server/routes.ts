@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { generateSocialContent } from "./openai";
 import { generatePersonalizedWorkout } from "./routes/personalized-workout";
 import { uploadAndAnalyzeMovement, analyzeDemo } from "./routes/movement-analysis";
+import { getClients, getMessages, sendMessage } from "./routes/communication";
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
@@ -1008,6 +1009,11 @@ Present the meal plan in JSON format.`;
       });
     }
   });
+    
+  // Communication Hub Endpoints
+  app.get('/api/clients', getClients);
+  app.get('/api/messages/:clientId', getMessages);
+  app.post('/api/messages', sendMessage);
     
   // Create HTTP server
   const server = createServer(app);
