@@ -4,7 +4,7 @@ export default function AboutSection() {
   return (
     <section id="about" className="py-24 bg-white border-t">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 items-centre">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Why Choose Our Platform?</h2>
             <p className="text-muted-foreground">

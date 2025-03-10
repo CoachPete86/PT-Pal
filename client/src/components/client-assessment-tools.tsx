@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   ClipboardCheck,
@@ -17,6 +16,7 @@ import {
   Camera,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Aperture,
   Upload,
   RefreshCcw,
@@ -219,7 +219,7 @@ export default function ClientAssessmentTools() {
       case "readiness":
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-centre">
+            <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Client Readiness Questionnaire</h3>
               <Badge variant={assessment.status === "completed" ? "default" : "outline"}>
                 {assessment.status === "completed"
@@ -285,7 +285,7 @@ export default function ClientAssessmentTools() {
       case "movement":
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-centre">
+            <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Movement Screening Assessment</h3>
               <Badge variant="default">Completed</Badge>
             </div>
@@ -377,9 +377,9 @@ export default function ClientAssessmentTools() {
                   <CardTitle className="text-base">Assessment Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-centre mb-6">
+                  <div className="text-center mb-6">
                     <div
-                      className="inline-flex items-centre justify-centre h-24 w-24 rounded-full border-4"
+                      className="inline-flex items-center justify-center h-24 w-24 rounded-full border-4"
                       style={{
                         borderColor:
                           movementScreeningData.totalScore >= 17
@@ -389,7 +389,7 @@ export default function ClientAssessmentTools() {
                             : "red",
                       }}
                     >
-                      <div className="text-centre">
+                      <div className="text-center">
                         <div className="text-3xl font-bold">
                           {movementScreeningData.totalScore}
                         </div>
@@ -441,7 +441,7 @@ export default function ClientAssessmentTools() {
       case "comprehensive":
         return (
           <div className="space-y-6">
-            <div className="flex justify-between items-centre">
+            <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Initial Fitness Assessment</h3>
               <Badge variant="default">Completed</Badge>
             </div>
@@ -486,12 +486,12 @@ export default function ClientAssessmentTools() {
                   </Table>
                 </div>
 
-                <div className="flex items-centre justify-centre gap-4">
-                  <Button size="sm" variant="outline" className="flex items-centre gap-1">
+                <div className="flex items-center justify-center gap-4">
+                  <Button size="sm" variant="outline" className="flex items-center gap-1">
                     <Camera className="h-4 w-4" />
                     Add Progress Photos
                   </Button>
-                  <Button size="sm" variant="outline" className="flex items-centre gap-1">
+                  <Button size="sm" variant="outline" className="flex items-center gap-1">
                     <RefreshCcw className="h-4 w-4" />
                     Update Measurements
                   </Button>
@@ -589,21 +589,21 @@ export default function ClientAssessmentTools() {
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <Label className="text-sm">Sit & Reach</Label>
-                        <div className="flex items-centre mt-1">
+                        <div className="flex items-center mt-1">
                           <Progress value={60} className="h-2 flex-1" />
                           <span className="text-sm font-medium ml-2">+3 cm</span>
                         </div>
                       </div>
                       <div>
                         <Label className="text-sm">Shoulder Flexibility</Label>
-                        <div className="flex items-centre mt-1">
+                        <div className="flex items-center mt-1">
                           <Progress value={40} className="h-2 flex-1" />
                           <span className="text-sm font-medium ml-2">Fair</span>
                         </div>
                       </div>
                       <div>
                         <Label className="text-sm">Ankle Mobility</Label>
-                        <div className="flex items-centre mt-1">
+                        <div className="flex items-center mt-1">
                           <Progress value={75} className="h-2 flex-1" />
                           <span className="text-sm font-medium ml-2">Good</span>
                         </div>
@@ -819,17 +819,17 @@ export default function ClientAssessmentTools() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-centre gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Client Assessment Tools</h1>
           <p className="text-muted-foreground">
             Track client progress and collect important health and fitness data
           </p>
         </div>
-        <div className="flex items-centre gap-3">
+        <div className="flex items-center gap-3">
           <Dialog open={showNewAssessmentDialog} onOpenChange={setShowNewAssessmentDialog}>
             <DialogTrigger asChild>
-              <Button className="flex items-centre gap-2">
+              <Button className="flex items-center gap-2">
                 <ClipboardCheck className="h-4 w-4" />
                 New Assessment
               </Button>
@@ -842,7 +842,7 @@ export default function ClientAssessmentTools() {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-centre gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="client" className="text-right">
                     Client
                   </Label>
@@ -865,7 +865,7 @@ export default function ClientAssessmentTools() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-centre gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="assessment-type" className="text-right">
                     Assessment Type
                   </Label>
@@ -885,7 +885,7 @@ export default function ClientAssessmentTools() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-centre gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="date" className="text-right">
                     Date
                   </Label>
@@ -897,8 +897,8 @@ export default function ClientAssessmentTools() {
                     onChange={(e) => handleInputChange("date", e.target.value)}
                   />
                 </div>
-                <div className="grid grid-cols-4 items-centre gap-4">
-                  <div className="col-start-2 col-span-3 flex items-centre space-x-2">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <div className="col-start-2 col-span-3 flex items-center space-x-2">
                     <Checkbox id="notify-client" />
                     <Label htmlFor="notify-client">Send client preparation instructions</Label>
                   </div>
@@ -910,7 +910,7 @@ export default function ClientAssessmentTools() {
             </DialogContent>
           </Dialog>
 
-          <Button className="flex items-centre gap-2" variant="outline">
+          <Button className="flex items-center gap-2" variant="outline">
             <BarChart3 className="h-4 w-4" />
             Analysis Tools
           </Button>
@@ -952,12 +952,12 @@ export default function ClientAssessmentTools() {
                       {mockAssessments.map((assessment) => (
                         <div
                           key={assessment.id}
-                          className="flex flex-col sm:flex-row sm:items-centre justify-between p-4 border rounded-lg hover:border-primary/50 cursor-pointer transition-colours"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:border-primary/50 cursor-pointer transition-colours"
                           onClick={() => setSelectedAssessment(assessment.id)}
                         >
                           <div className="flex items-start gap-3">
                             <div
-                              className={`h-10 w-10 rounded-full flex items-centre justify-centre ${
+                              className={`h-10 w-10 rounded-full flex items-center justify-center ${
                                 assessment.type === "comprehensive"
                                   ? "bg-blue-100 text-blue-600"
                                   : assessment.type === "readiness"
@@ -979,7 +979,7 @@ export default function ClientAssessmentTools() {
                             </div>
                             <div>
                               <h4 className="font-medium">{assessment.name}</h4>
-                              <div className="flex items-centre text-sm text-muted-foreground mt-1">
+                              <div className="flex items-center text-sm text-muted-foreground mt-1">
                                 {assessment.lastCompleted ? (
                                   <span>Last used: {assessment.lastCompleted}</span>
                                 ) : (
@@ -997,7 +997,7 @@ export default function ClientAssessmentTools() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-centre gap-2 mt-3 sm:mt-0">
+                          <div className="flex items-center gap-2 mt-3 sm:mt-0">
                             <Badge variant="outline">
                               {assessment.type === "comprehensive"
                                 ? "Full Assessment"
@@ -1064,19 +1064,19 @@ export default function ClientAssessmentTools() {
                   <div className="mt-6 pt-4 border-t">
                     <h3 className="font-medium mb-2">Assessment Settings</h3>
                     <div className="space-y-3">
-                      <div className="flex items-centre justify-between">
+                      <div className="flex items-center justify-between">
                         <Label htmlFor="client-access" className="text-sm">
                           Client self-assessments
                         </Label>
                         <Switch id="client-access" />
                       </div>
-                      <div className="flex items-centre justify-between">
+                      <div className="flex items-center justify-between">
                         <Label htmlFor="auto-reminders" className="text-sm">
                           Automated reminders
                         </Label>
                         <Switch id="auto-reminders" defaultChecked />
                       </div>
-                      <div className="flex items-centre justify-between">
+                      <div className="flex items-center justify-between">
                         <Label htmlFor="progress-reports" className="text-sm">
                           Monthly progress reports
                         </Label>
@@ -1186,12 +1186,12 @@ export default function ClientAssessmentTools() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-6">
-                <div className="flex flex-col items-centre justify-centre border-2 border-dashed rounded-md p-12">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-12">
                   <div className="mb-4 rounded-full bg-primary/10 p-3">
                     <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold mb-1">Upload Movement Video</h3>
-                  <p className="text-sm text-muted-foreground text-centre mb-4 max-w-md">
+                  <p className="text-sm text-muted-foreground text-center mb-4 max-w-md">
                     Record your client performing key movements and upload for AI analysis. Supported
                     movements include: squat, deadlift, push-up, and lunge patterns.
                   </p>

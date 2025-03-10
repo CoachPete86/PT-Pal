@@ -719,7 +719,7 @@ export default function WhiteLabelCustomization() {
                     overflow: "auto",
                   }}
                 >
-                  <div className="flex justify-centre">
+                  <div className="flex justify-center">
                     <div style={getPreviewStyle()}>
                       {/* App Header */}
                       <div

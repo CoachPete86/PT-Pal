@@ -526,7 +526,7 @@ export default function NutritionIntegration() {
             </CardHeader>
             <CardContent>
               {foodEntriesQuery.isLoading ? (
-                <div className="flex justify-centre p-6">Loading entries...</div>
+                <div className="flex justify-center p-6">Loading entries...</div>
               ) : foodEntriesQuery.data && foodEntriesQuery.data.length > 0 ? (
                 <div className="space-y-4">
                   <div className="rounded-md border">

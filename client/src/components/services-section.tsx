@@ -158,7 +158,7 @@ export default function ServicesSection() {
               <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg border">
                 <Link href={feature.path}>
                   <div
-                    className="h-48 bg-cover bg-centre relative cursor-pointer"
+                    className="h-48 bg-cover bg-center relative cursor-pointer"
                     style={{ backgroundImage: `url(${feature.image})` }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -172,7 +172,7 @@ export default function ServicesSection() {
                   </div>
                 </Link>
                 <CardHeader className="relative pb-2">
-                  <CardTitle className="flex items-centre gap-2 text-xl">
+                  <CardTitle className="flex items-center gap-2 text-xl">
                     <feature.icon className="h-5 w-5 text-primary" />
                     {feature.title}
                   </CardTitle>
