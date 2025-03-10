@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function AboutSection() {
@@ -19,42 +20,41 @@ export default function AboutSection() {
               management, we provide everything you need to scale your business
               while maintaining the personal touch your clients value.
             </p>
-
-            <div className="grid grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    <span className="text-sm">Personal Trainer</span>
-                  </div>
-                  <div className="text-sm">Personalized Coaching</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    <span className="text-sm">AI Powered</span>
-                  </div>
-                  <div className="text-sm">Smart Workout Plans</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    <span className="text-sm">Results Focused</span>
-                  </div>
-                  <div className="text-sm">Achieve Your Goals</div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
-
-          <div
-            className="aspect-square rounded-lg bg-cover bg-center shadow-2xl"
-            style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1576678927484-cc907957088c")',
-            }}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-bold mb-2">Workout Generation</h3>
+                <p className="text-sm text-muted-foreground">
+                  AI-powered workout plans personalized for each client's needs and goals.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-bold mb-2">Client Management</h3>
+                <p className="text-sm text-muted-foreground">
+                  Streamlined tools to organize, track, and engage with your fitness clients.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-bold mb-2">Nutrition Tracking</h3>
+                <p className="text-sm text-muted-foreground">
+                  Comprehensive nutrition tools to help clients reach their dietary goals.
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-bold mb-2">Business Analytics</h3>
+                <p className="text-sm text-muted-foreground">
+                  Insights and metrics to grow your fitness business strategically.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </section>
