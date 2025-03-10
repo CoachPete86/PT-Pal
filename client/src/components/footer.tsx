@@ -10,8 +10,8 @@ export default function Footer() {
         <div className="mb-12 p-8 bg-primary/5 rounded-lg border border-primary/20">
           <div className="grid md:grid-cols-2 gap-8 items-centre">
             <div>
-              <h3 className="text-2xl font-bold mb-2">Get Expert Fitness Business Tips</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-2xl font-bold mb-2 font-heading tracking-tight">Get Expert Fitness Business Tips</h3>
+              <p className="text-muted-foreground hero-subtitle">
                 Subscribe to our newsletter for the latest updates, business growth strategies, and exclusive content.
               </p>
             </div>
@@ -31,10 +31,10 @@ export default function Footer() {
         <div className="mb-8 flex flex-col md:flex-row items-centre justify-between">
           <div className="flex items-centre gap-2 text-2xl font-bold mb-4 md:mb-0">
             <BarChart className="h-8 w-8 text-primary" />
-            <span>PTpal</span>
+            <span className="font-heading tracking-tight">PTpal</span>
           </div>
           
-          <p className="text-muted-foreground text-centre md:text-right max-w-md">
+          <p className="text-muted-foreground text-centre md:text-right max-w-md hero-subtitle">
             The ultimate AI-powered platform for fitness professionals to manage clients, 
             create custom programs, and grow their business.
           </p>
@@ -42,7 +42,7 @@ export default function Footer() {
 
         <div className="grid md:grid-cols-4 gap-8 md:gap-12">
           <div>
-            <h3 className="font-bold text-lg mb-4">About PTpal</h3>
+            <h3 className="font-bold text-lg mb-4 font-heading tracking-tight">About PTpal</h3>
             <p className="text-muted-foreground mb-4">
               Empowering fitness professionals with intelligent tools to deliver exceptional 
               client experiences and build successful businesses.
@@ -64,7 +64,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Platform</h4>
+            <h4 className="font-semibold mb-4 font-heading tracking-tight">Platform</h4>
             <ul className="space-y-2">
               <li>
                 <Link className="text-muted-foreground hover:text-primary" href="/services">
@@ -95,7 +95,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">AI Features</h4>
+            <h4 className="font-semibold mb-4 font-heading tracking-tight">AI Features</h4>
             <ul className="space-y-2">
               <li>
                 <Link className="text-muted-foreground hover:text-primary" href="/services#ai-workout-generator">
@@ -126,7 +126,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h4 className="font-semibold mb-4 font-heading tracking-tight">Resources</h4>
             <ul className="space-y-2 mb-6">
               <li>
                 <a href="#" className="text-muted-foreground hover:text-primary">Help Center</a>
@@ -142,7 +142,7 @@ export default function Footer() {
               </li>
             </ul>
             
-            <h4 className="font-semibold mb-4">Connect With Us</h4>
+            <h4 className="font-semibold mb-4 font-heading tracking-tight">Connect With Us</h4>
             <div className="flex gap-4">
               <a
                 href="https://instagram.com"

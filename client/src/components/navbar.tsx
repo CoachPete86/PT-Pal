@@ -43,7 +43,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-sm border-b">
       <div className="container flex h-16 items-centre justify-between">
         <div className="flex items-centre gap-6">
-          <Link href="/" className="font-bold text-xl mr-6">
+          <Link href="/" className="font-bold text-xl mr-6 font-heading tracking-tight">
             PTpal
           </Link>
           <nav className="hidden md:flex items-centre gap-6">
@@ -53,7 +53,7 @@ export default function Navbar() {
                 href={item.path}
                 className={`text-sm font-medium transition-colours hover:text-primary ${
                   location === item.path
-                    ? "text-foreground"
+                    ? "text-foreground font-heading tracking-tight"
                     : "text-muted-foreground"
                 }`}
               >
@@ -65,15 +65,15 @@ export default function Navbar() {
         <div className="flex items-centre gap-4">
           {isAuthenticated ? (
             <Link href="/dashboard">
-              <Button variant="default">Dashboard</Button>
+              <Button variant="default" className="font-heading font-medium tracking-wide">Dashboard</Button>
             </Link>
           ) : (
             <>
               <Link href="/auth?tab=login">
-                <Button variant="ghost">Log In</Button>
+                <Button variant="ghost" className="font-heading font-medium tracking-wide">Log In</Button>
               </Link>
               <Link href="/auth?tab=register">
-                <Button variant="default">Sign Up</Button>
+                <Button variant="default" className="font-heading font-medium tracking-wide">Sign Up</Button>
               </Link>
             </>
           )}
@@ -85,7 +85,7 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right">
               <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+                <SheetTitle className="font-heading tracking-tight">Menu</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-4 mt-6">
                 {navItems.map((item) => (
@@ -95,7 +95,7 @@ export default function Navbar() {
                     onClick={closeSheet}
                     className={`text-lg font-medium transition-colours hover:text-primary ${
                       location === item.path
-                        ? "text-foreground"
+                        ? "text-foreground font-heading tracking-tight"
                         : "text-muted-foreground"
                     }`}
                   >
@@ -104,19 +104,19 @@ export default function Navbar() {
                 ))}
                 {isAuthenticated ? (
                   <Link href="/dashboard" onClick={closeSheet}>
-                    <Button className="w-full" variant="default">
+                    <Button className="w-full font-heading font-medium tracking-wide" variant="default">
                       Dashboard
                     </Button>
                   </Link>
                 ) : (
                   <>
                     <Link href="/auth?tab=login" onClick={closeSheet}>
-                      <Button className="w-full" variant="outline">
+                      <Button className="w-full font-heading font-medium tracking-wide" variant="outline">
                         Log In
                       </Button>
                     </Link>
                     <Link href="/auth?tab=register" onClick={closeSheet}>
-                      <Button className="w-full" variant="default">
+                      <Button className="w-full font-heading font-medium tracking-wide" variant="default">
                         Sign Up
                       </Button>
                     </Link>
