@@ -62,7 +62,7 @@ export default function SolutionsPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-centre mb-16">
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Tailored Solutions for Fitness Professionals</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             PTpal adapts to your unique business model, providing specialised tools for different types of fitness professionals.

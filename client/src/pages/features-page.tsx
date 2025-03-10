@@ -402,12 +402,12 @@ export default function FeaturesPage() {
           </div>
         </div>
 
-        <div className="mt-24 text-centre">
+        <div className="mt-24 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to transform your fitness business?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Experience the difference a comprehensive platform can make for your coaching business and client results.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/pricing">
               <Button size="lg" className="px-8">View Pricing Plans</Button>
             </Link>
