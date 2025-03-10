@@ -291,12 +291,12 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="mt-24 text-centre">
+        <div className="mt-24 text-center">
           <h2 className="text-3xl font-bold mb-6">Not sure which plan is right for you?</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Start with a free account and upgrade as your business grows, or schedule a demo to see all features in action.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth">
               <Button size="lg" className="px-8">Start for Free</Button>
             </Link>

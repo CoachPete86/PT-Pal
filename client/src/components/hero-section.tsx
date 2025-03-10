@@ -30,9 +30,9 @@ export default function HeroSection() {
             tools. Create personalised workout plans, analyse movement form, and
             generate meal plans—all powered by AI.
           </p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 items-center justify-start">
             <Link href="/auth">
-              <Button size="lg" className="rounded-full px-8 bg-blue-600 text-white hover:bg-blue-700 font-heading font-bold shadow-lg tracking-wide">
+              <Button size="lg" className="rounded-full px-8 bg-blue-600 text-white hover:bg-blue-700 font-heading font-bold shadow-lg tracking-wide h-12">
                 Start Free Trial
               </Button>
             </Link>
@@ -40,12 +40,12 @@ export default function HeroSection() {
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full px-8 text-white border-white bg-transparent hover:bg-white/20 font-heading font-bold tracking-wide"
+                className="rounded-full px-8 text-white border-white bg-transparent hover:bg-white/20 font-heading font-bold tracking-wide h-12"
               >
                 Explore Features
               </Button>
             </Link>
-          </div>
+          </div>v>
 
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-2">

@@ -233,7 +233,7 @@ export default function AuthPage() {
             'url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e")',
         }}
       >
-        <div className="h-full w-full bg-black/50 p-12 flex items-centre">
+        <div className="h-full w-full bg-black/50 p-12 flex items-center">
           <div className="text-white">
             <h2 className="text-3xl font-bold mb-4">Grow Your PT Business</h2>
             <p className="text-lg">

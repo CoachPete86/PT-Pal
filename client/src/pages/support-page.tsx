@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,7 @@ export default function SupportPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-16">
-        <div className="text-centre mb-16">
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Support & Help Centre</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Find answers to common questions, access support resources, or contact our team for personalised assistance.
@@ -59,7 +58,7 @@ export default function SupportPage() {
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <Card className="flex flex-col h-full">
-            <CardHeader className="flex flex-row items-centre gap-3">
+            <CardHeader className="flex flex-row items-center gap-3">
               <MessageSquare className="h-6 w-6 text-primary" />
               <CardTitle>Live Chat</CardTitle>
             </CardHeader>
@@ -69,9 +68,9 @@ export default function SupportPage() {
               <Button className="w-full">Start Chat</Button>
             </CardContent>
           </Card>
-          
+
           <Card className="flex flex-col h-full">
-            <CardHeader className="flex flex-row items-centre gap-3">
+            <CardHeader className="flex flex-row items-center gap-3">
               <Mail className="h-6 w-6 text-primary" />
               <CardTitle>Email Support</CardTitle>
             </CardHeader>
@@ -81,9 +80,9 @@ export default function SupportPage() {
               <Button variant="outline" className="w-full">Send Email</Button>
             </CardContent>
           </Card>
-          
+
           <Card className="flex flex-col h-full">
-            <CardHeader className="flex flex-row items-centre gap-3">
+            <CardHeader className="flex flex-row items-center gap-3">
               <Phone className="h-6 w-6 text-primary" />
               <CardTitle>Phone Support</CardTitle>
             </CardHeader>
@@ -96,14 +95,14 @@ export default function SupportPage() {
         </div>
 
         <Tabs defaultValue="faq" className="mb-16">
-          <div className="flex justify-centre mb-8">
+          <div className="flex justify-center mb-8">
             <TabsList>
               <TabsTrigger value="faq">FAQs</TabsTrigger>
               <TabsTrigger value="guides">Getting Started</TabsTrigger>
               <TabsTrigger value="videos">Video Tutorials</TabsTrigger>
             </TabsList>
           </div>
-          
+
           <TabsContent value="faq">
             <div className="max-w-3xl mx-auto">
               <Accordion type="single" collapsible className="w-full">
@@ -114,18 +113,18 @@ export default function SupportPage() {
                   </AccordionItem>
                 ))}
               </Accordion>
-              <div className="text-centre mt-8">
+              <div className="text-center mt-8">
                 <Link href="/faqs">
                   <Button variant="outline">View all FAQs</Button>
                 </Link>
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="guides">
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               <Card>
-                <CardHeader className="flex flex-row items-centre gap-3">
+                <CardHeader className="flex flex-row items-center gap-3">
                   <FileText className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">Account Setup Guide</CardTitle>
                 </CardHeader>
@@ -134,9 +133,9 @@ export default function SupportPage() {
                   <Button variant="outline" size="sm">Read Guide</Button>
                 </CardContent>
               </Card>
-              
+
               <Card>
-                <CardHeader className="flex flex-row items-centre gap-3">
+                <CardHeader className="flex flex-row items-center gap-3">
                   <FileText className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">Client Management</CardTitle>
                 </CardHeader>
@@ -145,9 +144,9 @@ export default function SupportPage() {
                   <Button variant="outline" size="sm">Read Guide</Button>
                 </CardContent>
               </Card>
-              
+
               <Card>
-                <CardHeader className="flex flex-row items-centre gap-3">
+                <CardHeader className="flex flex-row items-center gap-3">
                   <FileText className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">AI Workout Creation</CardTitle>
                 </CardHeader>
@@ -156,9 +155,9 @@ export default function SupportPage() {
                   <Button variant="outline" size="sm">Read Guide</Button>
                 </CardContent>
               </Card>
-              
+
               <Card>
-                <CardHeader className="flex flex-row items-centre gap-3">
+                <CardHeader className="flex flex-row items-center gap-3">
                   <FileText className="h-5 w-5 text-primary" />
                   <CardTitle className="text-lg">Billing & Subscriptions</CardTitle>
                 </CardHeader>
@@ -169,7 +168,7 @@ export default function SupportPage() {
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="videos">
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               <Card>
@@ -183,7 +182,7 @@ export default function SupportPage() {
                   <p className="text-sm text-muted-foreground">5:42</p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <div className="aspect-video bg-muted relative rounded-t-lg overflow-hidden">
                   <div className="absolute inset-0 flex items-centre justify-centre">
@@ -195,7 +194,7 @@ export default function SupportPage() {
                   <p className="text-sm text-muted-foreground">7:15</p>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <div className="aspect-video bg-muted relative rounded-t-lg overflow-hidden">
                   <div className="absolute inset-0 flex items-centre justify-centre">
@@ -212,12 +211,12 @@ export default function SupportPage() {
         </Tabs>
 
         <div className="bg-muted rounded-lg p-8">
-          <div className="max-w-3xl mx-auto text-centre">
+          <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Need additional help?</h2>
             <p className="mb-6">
               Our support team is here to help you get the most out of PTpal. Don't hesitate to reach out with any questions.
             </p>
-            <div className="flex flex-wrap justify-centre gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <Button>Contact Support</Button>
               <Link href="/demo">
                 <Button variant="outline">Book a Demo</Button>

@@ -73,12 +73,12 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="bg-muted rounded-lg p-8">
-          <div className="max-w-3xl mx-auto text-centre">
+          <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to transform your coaching business?</h2>
             <p className="mb-6">
               Join thousands of fitness professionals who have streamlined their workflow and grown their business with PTpal.
             </p>
-            <div className="flex flex-wrap justify-centre gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <Link href="/signup">
                 <Button size="lg">Start Free Trial</Button>
               </Link>
