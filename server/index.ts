@@ -8,10 +8,13 @@ const app = express();
 // Configure CORS early in the middleware chain
 app.use(
   cors({
-    origin: true, // Allow any origin with credentials
+    origin: (origin, callback) => {
+      // Allow any origin while in development
+      callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie", "X-Requested-With"],
     exposedHeaders: ["Set-Cookie"],
   }),
 );

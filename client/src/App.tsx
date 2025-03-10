@@ -27,6 +27,7 @@ import HowItWorksPage from "@/pages/how-it-works-page";
 import ResourcesPage from "@/pages/resources-page";
 import SupportPage from "@/pages/support-page";
 import AboutPage from "@/pages/about-page";
+import LoginTest from "@/pages/login-test";
 
 
 function Router() {
@@ -51,6 +52,7 @@ function Router() {
         <Route path="/resources" component={ResourcesPage} />
         <Route path="/support" component={SupportPage} />
         <Route path="/demo" component={DemoPage} />
+        <Route path="/login-test" component={LoginTest} />
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
         <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
         <ProtectedRoute path="/settings" component={SettingsPage} />

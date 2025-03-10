@@ -25,7 +25,9 @@ export function ProtectedRoute({ path, component: Component }: ProtectedRoutePro
 
         // If user is not authenticated, redirect to login
         if (!user) {
-          window.location.href = "/login";
+          // Use window.location.pathname to get current location
+          const returnTo = encodeURIComponent(window.location.pathname);
+          window.location.href = `/login?returnTo=${returnTo}`;
           return null;
         }
 
