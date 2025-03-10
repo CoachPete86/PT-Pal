@@ -6,7 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Roboto', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        heading: ['Montserrat', 'sans-serif'],
       },
       typography: {
         DEFAULT: {
