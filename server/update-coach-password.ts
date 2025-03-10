@@ -1,46 +1,33 @@
-
-// Generic password reset utility
-// This script can be used to reset a user's password
-
-import { storage } from "./storage";
 import { hashPassword } from "./auth";
-import readline from "readline";
+import { storage } from "./storage";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-async function resetUserPassword() {
+async function updateCoachPassword() {
   try {
-    const email = await new Promise(resolve => {
-      rl.question("Enter user email to reset password: ", resolve);
-    });
-    
-    const user = await storage.getUserByEmail(email as string);
-    
+    // Get the user by email
+    const user = await storage.getUserByEmail("coachpete@86.com");
     if (!user) {
-      console.log("User not found with that email");
-      rl.close();
+      console.log("Coach user not found");
       return;
     }
+
+    console.log("Found user:", user);
+
+    // Hash the new password
+    const hashedPassword = await hashPassword("123456789");
     
-    const newPassword = await new Promise(resolve => {
-      rl.question("Enter new password: ", resolve);
-    });
-    
-    const hashedPassword = await hashPassword(newPassword as string);
-    
-    await storage.updateUser(user.id, {
+    // Update the user's password
+    const updatedUser = await storage.updateUser(user.id, {
       password: hashedPassword
     });
-    
-    console.log("Password updated successfully");
-    rl.close();
+
+    console.log("Coach password updated successfully:", {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      passwordUpdated: true,
+    });
   } catch (error) {
-    console.error("Error resetting password:", error);
-    rl.close();
+    console.error("Error updating coach password:", error);
   }
 }
 
-resetUserPassword().catch(console.error);
+updateCoachPassword();

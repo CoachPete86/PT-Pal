@@ -65,7 +65,10 @@ export function setupAuth(app: Express) {
       async (email, password, done) => {
         try {
           console.log(`Attempting login for email: ${email}`);
-          const user = await storage.getUserByEmail(email);
+          // Convert email to lowercase for case-insensitive comparison
+          const normalizedEmail = email.toLowerCase();
+          console.log(`Normalized email for lookup: ${normalizedEmail}`);
+          const user = await storage.getUserByEmail(normalizedEmail);
           if (!user) {
             console.log("User not found during login attempt");
             return done(null, false, {
@@ -125,7 +128,11 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res) => {
     try {
-      const { email, password, fullName } = req.body;
+      const { email: rawEmail, password, fullName } = req.body;
+      
+      // Normalize email to lowercase for consistency
+      const email = rawEmail.toLowerCase();
+      console.log(`Registering with normalized email: ${email}`);
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);

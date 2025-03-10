@@ -204,8 +204,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const results = await db.select().from(users).where(eq(users.email, email));
-    return results.length > 0 ? (results[0] as User) : undefined;
+    // Normalize email to lowercase for case-insensitive comparison
+    const normalizedEmail = email.toLowerCase();
+    console.log(`Storage: Looking up user with normalized email: ${normalizedEmail}`);
+    
+    const results = await db.select().from(users).where(eq(users.email, normalizedEmail));
+    
+    if (results.length === 0) {
+      console.log(`Storage: No user found with email: ${normalizedEmail}`);
+      return undefined;
+    }
+    
+    console.log(`Storage: Found user with email: ${normalizedEmail}`);
+    return results[0] as User;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
