@@ -28,7 +28,6 @@ import ResourcesPage from "@/pages/resources-page";
 import SupportPage from "@/pages/support-page";
 import AboutPage from "@/pages/about-page";
 import LoginTest from "@/pages/login-test";
-import WorkoutFeaturesDemo from "@/pages/workout-features-demo";
 
 
 function Router() {
