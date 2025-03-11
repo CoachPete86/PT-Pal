@@ -297,7 +297,7 @@ export default function PricingPage() {
             Start with a free account and upgrade as your business grows, or schedule a demo to see all features in action.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" className="px-8">Start for Free</Button>
             </Link>
             <Link href="/demo">

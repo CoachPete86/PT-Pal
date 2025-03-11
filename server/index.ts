@@ -2,6 +2,9 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
+import session from "express-session"; // Added for session management
+import authRoutes from "./routes/auth"; // Added for authentication routes
+
 
 const app = express();
 
@@ -22,6 +25,22 @@ app.use(
 // Increase limit for base64 encoded images
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+
+// Configure session middleware (added based on common practice)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "development_secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
+  })
+);
+
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -53,6 +72,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Mount authentication routes
+app.use("/api/auth", authRoutes);
+
+
 const startServer = async () => {
   try {
     // Register routes and get HTTP server
@@ -83,14 +106,14 @@ const startServer = async () => {
         process.exit(1);
       }
     });
-    
+
     server.on('listening', () => {
       const address = server.address();
       const port = typeof address === 'object' && address ? address.port : 5000;
       log(`Server started successfully on port ${port}`);
       log(`Server is running at http://0.0.0.0:${port}`);
     });
-    
+
     server.listen(5000, "0.0.0.0");
   } catch (error) {
     console.error("Server initialization failed:", error);

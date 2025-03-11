@@ -411,7 +411,7 @@ export default function FeaturesPage() {
             <Link href="/pricing">
               <Button size="lg" className="px-8">View Pricing Plans</Button>
             </Link>
-            <Link href="/auth">
+            <Link href="/signup">
               <Button size="lg" variant="outline" className="px-8">Sign Up Free</Button>
             </Link>
           </div>
