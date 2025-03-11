@@ -18,11 +18,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // If user is not authenticated, redirect to login
+  // If user is not authenticated, redirect to auth page
   if (!user) {
     // Use window.location.pathname to get current location
     const returnTo = encodeURIComponent(window.location.pathname);
-    window.location.href = `/login?returnTo=${returnTo}`;
+    window.location.href = `/auth?returnTo=${returnTo}`;
     return null;
   }
 

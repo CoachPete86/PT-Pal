@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
-  const { login, register, isLoading } = useAuth();
+  const { user, login, register, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
+  
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (user) {
+      setLocation("/dashboard");
+    }
+  }, [user, setLocation]);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -28,7 +35,13 @@ export default function AuthPage() {
 
     try {
       await login(loginEmail, loginPassword);
-      setLocation("/dashboard");
+      
+      // Get returnTo parameter from URL if it exists
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo');
+      
+      // Navigate to return URL or dashboard
+      setLocation(returnTo ? decodeURIComponent(returnTo) : "/dashboard");
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : "Login failed");
     }
@@ -44,7 +57,13 @@ export default function AuthPage() {
         password: registerPassword,
         fullName: registerFullName
       });
-      setLocation("/dashboard");
+      
+      // Get returnTo parameter from URL if it exists
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo');
+      
+      // Navigate to return URL or dashboard
+      setLocation(returnTo ? decodeURIComponent(returnTo) : "/dashboard");
     } catch (error) {
       setRegisterError(error instanceof Error ? error.message : "Registration failed");
     }
