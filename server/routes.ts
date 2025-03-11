@@ -292,7 +292,7 @@ The response must be a valid JSON object with this exact structure:
           : `Generate Week 1 of a 12-week progressive programme with ${programDetails?.sessionsPerWeek} sessions per week. Focus on proper periodisation and progressive overload.`;
 
       const response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-sonnet-20240229",
         system: baseSystemPrompt,
         messages: [
           {
@@ -964,7 +964,7 @@ Please create a structured meal plan with the following:
 Present the meal plan in JSON format.`;
 
       const response = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-sonnet-20240229",
         max_tokens: 4000,
         messages: [
           {

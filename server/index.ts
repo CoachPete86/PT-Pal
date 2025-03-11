@@ -33,20 +33,8 @@ if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
   console.error("This is a security risk. Please set SESSION_SECRET environment variable.");
 }
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || (process.env.NODE_ENV === "production" ? 
-      `temp_secret_${Date.now()}` : "development_secret"),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    },
-  })
-);
+// Don't initialize session here as it's being set up in auth.ts
+// This was causing duplicate session middleware
 
 
 app.use((req, res, next) => {

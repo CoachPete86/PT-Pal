@@ -36,11 +36,11 @@ export function setupAuth(app: Express) {
 
   const sessionSettings: session.SessionOptions = {
     secret: sessionSecret,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     store: storage.sessionStore,
     cookie: {
-      secure: false, // Set to true only in production with HTTPS
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
@@ -57,6 +57,17 @@ export function setupAuth(app: Express) {
   app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  // Debug middleware for session tracking
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      console.log(`Session DEBUG [${req.method} ${req.path}]: ID=${req.sessionID}, Auth=${req.isAuthenticated()}`);
+      if (req.isAuthenticated()) {
+        console.log(`User: ${req.user?.id} (${req.user?.email})`);
+      }
+    }
+    next();
+  });
 
   passport.use(
     new LocalStrategy(
