@@ -58,7 +58,7 @@ if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error("ANTHROPIC_API_KEY environment variable is not set");
 }
 
-// the newest Anthropic model is "claude-3-5-sonnet-20241022" which was released October 22, 2024
+// Using the latest stable Anthropic model available
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -977,20 +977,31 @@ Present the meal plan in JSON format.`;
       const responseText = response.content[0].text;
       
       // Extract JSON from Claude's response
+      // More robust JSON extraction with better error handling
       const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) ||
         responseText.match(/```\n([\s\S]*?)```/) ||
         responseText.match(/json\n([\s\S]*?)```/) ||
         responseText.match(/presentjson\n([\s\S]*?)```/);
         
       if (!jsonMatch || !jsonMatch[1]) {
+        console.error("Failed to find JSON in AI response:", responseText?.substring(0, 200) + "...");
         return res.status(500).json({
           error: "Failed to parse meal plan",
-          details: "The AI response did not contain valid JSON data",
+          details: "The AI response did not contain valid JSON data. Please try again.",
         });
       }
       
+      let mealPlanData;
       try {
-        const mealPlanData = JSON.parse(jsonMatch[1].trim());
+        const jsonContent = jsonMatch[1].trim();
+        // Attempt to clean any potential invalid characters
+        const cleanedJson = jsonContent.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+        mealPlanData = JSON.parse(cleanedJson);
+        
+        // Basic validation of parsed data
+        if (!mealPlanData || typeof mealPlanData !== 'object') {
+          throw new Error("Invalid meal plan structure");
+        }
         
         // Save meal plan to database as a document (using existing functionality)
         const doc = await storage.createDocument({

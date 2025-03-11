@@ -27,9 +27,16 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 // Configure session middleware (added based on common practice)
+// Ensure we have a proper session secret in production
+if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+  console.error("WARNING: SESSION_SECRET not set in production environment!");
+  console.error("This is a security risk. Please set SESSION_SECRET environment variable.");
+}
+
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "development_secret",
+    secret: process.env.SESSION_SECRET || (process.env.NODE_ENV === "production" ? 
+      `temp_secret_${Date.now()}` : "development_secret"),
     resave: false,
     saveUninitialized: false,
     cookie: {
