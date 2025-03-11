@@ -6,13 +6,15 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 
+// Direct import for ProtectedRoute to fix TypeScript errors
+import ProtectedRoute from "./lib/protected-route";
+
 // Lazy load components
 const HomePage = lazy(() => import("@/pages/home-page"));
 const DashboardPage = lazy(() => import("@/pages/dashboard-new")); //Corrected import path
 const AuthPage = lazy(() => import("@/pages/auth-page"));
 const LoginTest = lazy(() => import("@/pages/login-test"));
 const NotFound = lazy(() => import("@/pages/not-found"));
-const ProtectedRoute = lazy(() => import("./lib/protected-route"));
 const WorkoutFeaturesDemo = lazy(() => import("@/pages/workout-features-demo"));
 const ContentGeneratorPage = lazy(() => import("@/pages/content-generator-page"));
 const SettingsPage = lazy(() => import("@/pages/settings-page"));
@@ -63,51 +65,78 @@ function App() {
 
 
             {/* Protected routes */}
-            <Route path="/dashboard">
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/generate-content">
-              <ProtectedRoute>
-                <ContentGeneratorPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/workout-features-demo">
-              <ProtectedRoute>
-                <WorkoutFeaturesDemo />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/movement-analysis">
-              <ProtectedRoute>
-                <MovementAnalysisPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/meal-plan">
-              <ProtectedRoute>
-                <MealPlanPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/settings">
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/communication-hub">
-              <ProtectedRoute>
-                <CommunicationHubPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/group-session">
-              <ProtectedRoute>
-                <GroupSessionPage />
-              </ProtectedRoute>
-            </Route>
-            <Route path="/forms">
-              <ProtectedRoute>
-                <FormsPage />
-              </ProtectedRoute>
-            </Route>
+            <Route 
+              path="/dashboard" 
+              component={() => (
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/generate-content" 
+              component={() => (
+                <ProtectedRoute>
+                  <ContentGeneratorPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/workout-features-demo" 
+              component={() => (
+                <ProtectedRoute>
+                  <WorkoutFeaturesDemo />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/movement-analysis" 
+              component={() => (
+                <ProtectedRoute>
+                  <MovementAnalysisPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/meal-plan" 
+              component={() => (
+                <ProtectedRoute>
+                  <MealPlanPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/settings" 
+              component={() => (
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/communication-hub" 
+              component={() => (
+                <ProtectedRoute>
+                  <CommunicationHubPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/group-session" 
+              component={() => (
+                <ProtectedRoute>
+                  <GroupSessionPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/forms" 
+              component={() => (
+                <ProtectedRoute>
+                  <FormsPage />
+                </ProtectedRoute>
+              )} 
+            />
 
 
             {/* Catch-all for 404 */}
