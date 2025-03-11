@@ -8,21 +8,21 @@ import FeaturesPage from "@/pages/features-page";
 import ServicesPage from "@/pages/services-page";
 import PricingPage from "@/pages/pricing-page";
 import DashboardPage from "@/pages/dashboard-page";
-import ClientsPage from "@/pages/clients-page";
-import WorkoutsPage from "@/pages/workouts-page";
-import NewWorkoutPage from "@/pages/new-workout-page";
-import MascotPage from "@/pages/mascot-page";
-import VoiceWorkoutPage from "@/pages/voice-workout-page";
 import GroupSessionPage from "@/pages/group-session-page";
-import BusinessSettingsPage from "@/pages/business-settings-page";
 import NotFoundPage from "@/pages/not-found";
 import LoginPage from "@/pages/login-page";
 import SignupPage from "@/pages/signup-page";
 import RegisterPage from "@/pages/register-page";
+import SettingsPage from "@/pages/settings-page";
+import MovementAnalysisPage from "@/pages/movement-analysis-page";
+import MealPlanPage from "@/pages/meal-plan-page";
+import ContentGeneratorPage from "@/pages/content-generator-page";
+import FormsPage from "@/pages/forms-page";
+import CommunicationHubPage from "@/pages/communication-hub-page";
 import ProtectedRoute from "@/lib/protected-route";
-import { AuthProvider } from "@/context/auth-context";
-import { ThemeProvider } from "@/context/theme-context";
-import "./global.css";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ThemeProvider } from "@/hooks/use-theme";
+import "./index.css";
 
 const queryClient = new QueryClient();
 
@@ -46,29 +46,29 @@ export default function App() {
                 <DashboardPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/clients">
+            <Route path="/communication">
               <ProtectedRoute>
-                <ClientsPage />
+                <CommunicationHubPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/workouts">
+            <Route path="/forms">
               <ProtectedRoute>
-                <WorkoutsPage />
+                <FormsPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/workouts/new">
+            <Route path="/content-generator">
               <ProtectedRoute>
-                <NewWorkoutPage />
+                <ContentGeneratorPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/mascot">
+            <Route path="/meal-plan">
               <ProtectedRoute>
-                <MascotPage />
+                <MealPlanPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/voice-workout">
+            <Route path="/movement-analysis">
               <ProtectedRoute>
-                <VoiceWorkoutPage />
+                <MovementAnalysisPage />
               </ProtectedRoute>
             </Route>
             <Route path="/group-session">
@@ -76,9 +76,9 @@ export default function App() {
                 <GroupSessionPage />
               </ProtectedRoute>
             </Route>
-            <Route path="/business-settings">
+            <Route path="/settings">
               <ProtectedRoute>
-                <BusinessSettingsPage />
+                <SettingsPage />
               </ProtectedRoute>
             </Route>
             <Route component={NotFoundPage} />

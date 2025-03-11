@@ -2,7 +2,7 @@
 import express from "express";
 import { db } from "../db";
 import { hash, compare } from "bcrypt";
-import { users } from "../db/schema";
+import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { SUBSCRIPTION_PRICES, SubscriptionTier } from "../stripe";
 
