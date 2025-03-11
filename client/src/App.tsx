@@ -74,7 +74,39 @@ function App() {
               )} 
             />
             <Route 
+              path="/clients" 
+              component={() => (
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/sessions" 
+              component={() => (
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/workout-features" 
+              component={() => (
+                <ProtectedRoute>
+                  <WorkoutFeaturesDemo />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
               path="/generate-content" 
+              component={() => (
+                <ProtectedRoute>
+                  <ContentGeneratorPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/content-generator" 
               component={() => (
                 <ProtectedRoute>
                   <ContentGeneratorPage />
@@ -134,6 +166,14 @@ function App() {
               component={() => (
                 <ProtectedRoute>
                   <FormsPage />
+                </ProtectedRoute>
+              )} 
+            />
+            <Route 
+              path="/documents" 
+              component={() => (
+                <ProtectedRoute>
+                  <DashboardPage />
                 </ProtectedRoute>
               )} 
             />

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link as WouterLink, useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import {
   Sidebar,
@@ -156,12 +156,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex h-screen">
         <Sidebar collapsible="icon">
           <SidebarHeader className="border-b border-border/50 p-4">
-            <WouterLink href="/dashboard">
+            <Link href="/dashboard">
               <div className="flex cursor-pointer items-centre gap-2">
                 <BarChart className="h-6 w-6 text-primary" />
                 <span className="text-xl font-bold">PTpal</span>
               </div>
-            </WouterLink>
+            </Link>
           </SidebarHeader>
           <SidebarContent className="pt-4">
             <SidebarMenu>
