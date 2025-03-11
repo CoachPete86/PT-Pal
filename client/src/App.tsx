@@ -75,6 +75,7 @@ function Router() {
         <Route path="/resources" component={ResourcesPage} />
         <Route path="/support" component={SupportPage} />
         <Route path="/mascot" component={WorkoutFeaturesDemo} />
+        <Route path="/auth" component={LoginTest} />
         <Route path="/:rest*" component={NotFound} />
       </Switch>
     </Suspense>
