@@ -73,39 +73,25 @@ const startServer = async () => {
       serveStatic(app);
     }
 
-    // Function to try binding to a port
-    const tryPort = async (port: number): Promise<number> => {
-      return new Promise((resolve, reject) => {
-        const tempServer = server;
-        
-        tempServer.once("error", (err: NodeJS.ErrnoException) => {
-          if (err.code === "EADDRINUSE") {
-            log(`Port ${port} is in use, trying next port...`);
-            tempServer.removeAllListeners("error");
-            tempServer.removeAllListeners("listening");
-            resolve(tryPort(port + 1));
-          } else {
-            reject(err);
-          }
-        });
-
-        tempServer.once("listening", () => {
-          log(`Server started successfully on port ${port}`);
-          resolve(port);
-        });
-
-        tempServer.listen(port, "0.0.0.0");
-      });
-    };
-
-    // Start server with port finding logic
-    try {
-      const port = await tryPort(5000);
+    // Try to bind to port 5000 for Replit workflow compatibility
+    server.on('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        log(`Port 5000 is in use, using port 5002 instead...`);
+        server.listen(5002, "0.0.0.0");
+      } else {
+        console.error("Server error:", err);
+        process.exit(1);
+      }
+    });
+    
+    server.on('listening', () => {
+      const address = server.address();
+      const port = typeof address === 'object' && address ? address.port : 5000;
+      log(`Server started successfully on port ${port}`);
       log(`Server is running at http://0.0.0.0:${port}`);
-    } catch (error) {
-      console.error("Failed to start server:", error);
-      process.exit(1);
-    }
+    });
+    
+    server.listen(5000, "0.0.0.0");
   } catch (error) {
     console.error("Server initialization failed:", error);
     process.exit(1);

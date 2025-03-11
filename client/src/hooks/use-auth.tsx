@@ -146,5 +146,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+  
+  // Add helper functions directly on the context
+  const login = async (email: string, password: string) => {
+    return context.loginMutation.mutateAsync({ email, password });
+  };
+  
+  const register = async (userData: { email: string, password: string, fullName: string }) => {
+    return context.registerMutation.mutateAsync(userData);
+  };
+  
+  const logout = async () => {
+    return context.logoutMutation.mutateAsync();
+  };
+  
+  return {
+    ...context,
+    login,
+    register,
+    logout
+  };
 }
