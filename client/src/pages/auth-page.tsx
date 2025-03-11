@@ -57,7 +57,7 @@ export default function AuthPage() {
         email: data.email.toLowerCase()
       };
       console.log("Normalized login data:", normalizedData);
-      
+
       await loginMutation.mutateAsync(normalizedData);
       // Redirect to dashboard after successful login using wouter
       setLocation("/dashboard");
@@ -80,7 +80,7 @@ export default function AuthPage() {
         email: data.email.toLowerCase()
       };
       console.log("Normalized registration data:", normalizedData);
-      
+
       await registerMutation.mutateAsync(normalizedData);
       // Redirect to dashboard after successful registration using wouter
       setLocation("/dashboard");

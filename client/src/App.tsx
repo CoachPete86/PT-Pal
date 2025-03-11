@@ -1,8 +1,12 @@
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-new";
@@ -20,9 +24,7 @@ import GroupSessionPage from "@/pages/group-session-page";
 import FormsPage from "@/pages/forms-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
-import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
-// Importing new pages -  assuming these files exist or will be created.
+// Import for public pages
 import SolutionsPage from "@/pages/solutions-page";
 import HowItWorksPage from "@/pages/how-it-works-page";
 import ResourcesPage from "@/pages/resources-page";
@@ -30,36 +32,40 @@ import SupportPage from "@/pages/support-page";
 import AboutPage from "@/pages/about-page";
 import LoginTest from "@/pages/login-test";
 
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Toaster />
+        <Router />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
 
 function Router() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen w-full items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="h-screen w-full flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       }
     >
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/login" component={AuthPage} />
-        <Route path="/signup" component={AuthPage} />
-        <Route path="/reset-password" component={AuthPage} />
-        <Route path="/services" component={ServicesPage} />
-        <Route path="/features" component={FeaturesPage} />
-        <Route path="/solutions" component={SolutionsPage} />
-        <Route path="/pricing" component={PricingPage} />
-        <Route path="/how-it-works" component={HowItWorksPage} />
-        <Route path="/resources" component={ResourcesPage} />
-        <Route path="/support" component={SupportPage} />
-        <Route path="/demo" component={DemoPage} />
         <Route path="/login-test" component={LoginTest} />
         <ProtectedRoute path="/dashboard" component={DashboardPage} />
-        <ProtectedRoute path="/content-generator" component={ContentGeneratorPage} />
-        <ProtectedRoute path="/settings" component={SettingsPage} />
-        <ProtectedRoute path="/workout-features" component={WorkoutFeaturesDemo} />
+        <ProtectedRoute path="/generate-content" component={ContentGeneratorPage} />
+        <ProtectedRoute path="/workout-features-demo" component={WorkoutFeaturesDemo} />
         <ProtectedRoute path="/movement-analysis" component={MovementAnalysisPage} />
         <ProtectedRoute path="/meal-plan" component={MealPlanPage} />
+        <ProtectedRoute path="/settings" component={SettingsPage} />
+        <Route path="/services" component={ServicesPage} />
+        <Route path="/pricing" component={PricingPage} />
+        <Route path="/features" component={FeaturesPage} />
+        <Route path="/demo" component={DemoPage} />
         <ProtectedRoute path="/communication-hub" component={CommunicationHubPage} />
         <ProtectedRoute path="/group-session" component={GroupSessionPage} />
         <ProtectedRoute path="/forms" component={FormsPage} />
@@ -74,16 +80,3 @@ function Router() {
     </Suspense>
   );
 }
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-}
-
-export default App;
