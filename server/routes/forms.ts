@@ -11,12 +11,10 @@ import { z } from 'zod';
  */
 export async function getOnboardingForms(req: Request, res: Response) {
   try {
-    const workspaceId = Number(req.params.workspaceId || req.query.workspaceId);
+    // Allow fetching forms without specifying a workspace ID
+    // Default to 1 if not provided (assuming default workspace)
+    const workspaceId = Number(req.params.workspaceId || req.query.workspaceId || 1);
     
-    if (!workspaceId) {
-      return res.status(400).json({ error: 'Workspace ID is required' });
-    }
-
     const forms = await storage.getOnboardingForms(workspaceId);
     res.json(forms);
   } catch (error: any) {
@@ -36,7 +34,9 @@ export async function getOnboardingForm(req: Request, res: Response) {
       return res.status(400).json({ error: 'Form ID is required' });
     }
 
-    const forms = await storage.getOnboardingForms(0); // Get all forms, filter in memory
+    // Default to workspace ID 1 if not provided
+    const workspaceId = Number(req.query.workspaceId || 1);
+    const forms = await storage.getOnboardingForms(workspaceId);
     const form = forms.find(f => f.id === formId);
     
     if (!form) {
@@ -209,11 +209,8 @@ export async function updateFormResponse(req: Request, res: Response) {
  */
 export async function createFormTemplates(req: Request, res: Response) {
   try {
-    const workspaceId = Number(req.body.workspaceId);
-    
-    if (!workspaceId) {
-      return res.status(400).json({ error: 'Workspace ID is required' });
-    }
+    // Default to 1 if not provided
+    const workspaceId = Number(req.body.workspaceId || 1);
 
     // Create the PAR-Q form template
     const parqForm = await storage.createOnboardingForm({
