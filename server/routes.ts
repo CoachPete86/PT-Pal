@@ -13,6 +13,18 @@ import { generatePersonalizedWorkout } from "./routes/personalized-workout";
 import { uploadAndAnalyzeMovement, analyzeDemo } from "./routes/movement-analysis";
 import { getClients, getMessages, sendMessage } from "./routes/communication";
 import { generateGroupSessionPlan } from "./routes/group-session-plan";
+import { 
+  getOnboardingForms, 
+  getOnboardingForm, 
+  createOnboardingForm,
+  updateOnboardingForm,
+  deleteOnboardingForm,
+  getFormResponses,
+  getClientFormResponses,
+  createFormResponse,
+  updateFormResponse,
+  createFormTemplates
+} from "./routes/forms";
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
@@ -1018,6 +1030,20 @@ Present the meal plan in JSON format.`;
 
   // Group Session Plan Endpoint
   app.post('/api/group-session-plan', generateGroupSessionPlan);
+    
+  // Form routes
+  app.get('/api/forms', getOnboardingForms);
+  app.get('/api/forms/:formId', getOnboardingForm);
+  app.post('/api/forms', createOnboardingForm);
+  app.put('/api/forms/:formId', updateOnboardingForm);
+  app.delete('/api/forms/:formId', deleteOnboardingForm);
+  app.get('/api/forms/:formId/responses', getFormResponses);
+  app.get('/api/clients/:clientId/responses', getClientFormResponses);
+  app.post('/api/forms/responses', createFormResponse);
+  app.put('/api/forms/responses/:responseId', updateFormResponse);
+  
+  // Create form templates endpoint
+  app.post('/api/forms/templates/create', createFormTemplates);
     
   // Create HTTP server
   const server = createServer(app);
