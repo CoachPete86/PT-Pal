@@ -1,129 +1,99 @@
-import { motion } from "framer-motion";
+import React from 'react';
+import { Loader2, ArrowUpRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface LoadingStateProps {
-  variant?: "plate" | "dumbbell" | "pulse";
-  size?: "sm" | "md" | "lg";
+  variant?: 'pulse' | 'spinner' | 'skeleton';
+  size?: 'sm' | 'md' | 'lg';
+  text?: string;
   className?: string;
 }
 
 export function LoadingState({
-  variant = "plate",
-  size = "md",
+  variant = 'spinner',
+  size = 'md',
+  text,
   className,
 }: LoadingStateProps) {
-  const sizeClasses = {
-    sm: "w-6 h-6",
-    md: "w-12 h-12",
-    lg: "w-16 h-16",
+  const getSize = () => {
+    switch (size) {
+      case 'sm':
+        return 'h-4 w-4';
+      case 'lg':
+        return 'h-10 w-10';
+      case 'md':
+      default:
+        return 'h-6 w-6';
+    }
   };
 
-  if (variant === "plate") {
-    return (
-      <motion.div
-        className={`relative ${sizeClasses[size]} ${className}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.svg
-          viewBox="0 0 50 50"
-          className="w-full h-full text-primary"
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 2,
-            ease: "linear",
-            repeat: Infinity,
-          }}
-        >
-          <circle
-            cx="25"
-            cy="25"
-            r="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeDasharray="1, 7"
-          />
-          <circle cx="25" cy="25" r="8" fill="currentColor" />
-        </motion.svg>
-      </motion.div>
-    );
-  }
+  const renderContent = () => {
+    switch (variant) {
+      case 'pulse':
+        return (
+          <div className={cn('flex flex-col items-center justify-center space-y-2', className)}>
+            <div className={cn('animate-pulse rounded-full bg-primary', getSize())} />
+            {text && <p className="text-sm text-muted-foreground animate-pulse">{text}</p>}
+          </div>
+        );
+      case 'skeleton':
+        return (
+          <div className={cn('space-y-2', className)}>
+            <div className="h-4 w-[250px] animate-pulse rounded-md bg-muted"></div>
+            <div className="h-4 w-[200px] animate-pulse rounded-md bg-muted"></div>
+            <div className="h-4 w-[230px] animate-pulse rounded-md bg-muted"></div>
+            {text && <p className="text-sm text-muted-foreground animate-pulse mt-2">{text}</p>}
+          </div>
+        );
+      case 'spinner':
+      default:
+        return (
+          <div className={cn('flex flex-col items-center justify-center space-y-2', className)}>
+            <Loader2 className={cn('animate-spin text-primary', getSize())} />
+            {text && <p className="text-sm text-muted-foreground">{text}</p>}
+          </div>
+        );
+    }
+  };
 
-  if (variant === "dumbbell") {
-    return (
-      <motion.div
-        className={`relative ${sizeClasses[size]} ${className}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.svg viewBox="0 0 60 30" className="w-full h-full text-primary">
-          <motion.g
-            animate={{
-              y: [-2, 2, -2],
-            }}
-            transition={{
-              duration: 1.5,
-              ease: "easeInOut",
-              repeat: Infinity,
-            }}
-          >
-            <rect
-              x="5"
-              y="12"
-              width="10"
-              height="6"
-              rx="2"
-              fill="currentColor"
-            />
-            <rect
-              x="45"
-              y="12"
-              width="10"
-              height="6"
-              rx="2"
-              fill="currentColor"
-            />
-            <rect x="15" y="14" width="30" height="2" fill="currentColor" />
-          </motion.g>
-        </motion.svg>
-      </motion.div>
-    );
-  }
+  return renderContent();
+}
 
-  // Pulse variant
+interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean;
+  loadingText?: string;
+  icon?: React.ReactNode;
+}
+
+export function LoadingButton({
+  children,
+  loading = false,
+  loadingText,
+  icon = <ArrowUpRight className="ml-2 h-4 w-4" />,
+  className,
+  disabled,
+  ...props
+}: LoadingButtonProps) {
   return (
-    <motion.div
-      className={`relative ${sizeClasses[size]} ${className}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <button
+      className={cn(
+        'inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+        className
+      )}
+      disabled={disabled || loading}
+      {...props}
     >
-      <motion.div
-        className="absolute inset-0 border-2 border-primary rounded-full"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [1, 0.5, 1],
-        }}
-        transition={{
-          duration: 1.5,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-      <motion.div
-        className="absolute inset-2 bg-primary rounded-full"
-        animate={{
-          scale: [1, 0.8, 1],
-        }}
-        transition={{
-          duration: 1.5,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
-      />
-    </motion.div>
+      {loading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          {loadingText || children}
+        </>
+      ) : (
+        <>
+          {children}
+          {icon}
+        </>
+      )}
+    </button>
   );
 }

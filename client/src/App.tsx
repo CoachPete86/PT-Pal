@@ -17,6 +17,7 @@ import FeaturesPage from "@/pages/features-page";
 import DemoPage from "@/pages/demo-page";
 import CommunicationHubPage from "@/pages/communication-hub-page";
 import GroupSessionPage from "@/pages/group-session-page";
+import FormsPage from "@/pages/forms-page";
 import NotFound from "@/pages/not-found";
 import { ProtectedRoute } from "./lib/protected-route";
 import { Suspense } from "react";
@@ -61,6 +62,7 @@ function Router() {
         <ProtectedRoute path="/meal-plan" component={MealPlanPage} />
         <ProtectedRoute path="/communication-hub" component={CommunicationHubPage} />
         <ProtectedRoute path="/group-session" component={GroupSessionPage} />
+        <ProtectedRoute path="/forms" component={FormsPage} />
         <Route path="/about" component={AboutPage} />
         <Route path="/solutions" component={SolutionsPage} />
         <Route path="/how-it-works" component={HowItWorksPage} />

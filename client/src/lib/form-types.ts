@@ -1,4 +1,3 @@
-// Form field types
 export type FormFieldType = 
   | 'text' 
   | 'number' 
@@ -14,13 +13,11 @@ export type FormFieldType =
   | 'section' 
   | 'boolean';
 
-// Definition of a conditional for form fields
 export interface FieldConditional {
   field: string;
   value: any;
 }
 
-// Base field interface
 export interface FormField {
   id: string;
   type: FormFieldType;
@@ -31,33 +28,28 @@ export interface FormField {
   conditional?: FieldConditional;
 }
 
-// Text field (single line)
 export interface TextField extends FormField {
   type: 'text';
   defaultValue?: string;
   maxLength?: number;
 }
 
-// Email field
 export interface EmailField extends FormField {
   type: 'email';
   defaultValue?: string;
 }
 
-// Phone field
 export interface PhoneField extends FormField {
   type: 'phone';
   defaultValue?: string;
 }
 
-// Textarea field (multi-line)
 export interface TextareaField extends FormField {
   type: 'textarea';
   defaultValue?: string;
   rows?: number;
 }
 
-// Number field
 export interface NumberField extends FormField {
   type: 'number';
   defaultValue?: number;
@@ -66,7 +58,6 @@ export interface NumberField extends FormField {
   step?: number;
 }
 
-// Select field (dropdown)
 export interface SelectField extends FormField {
   type: 'select';
   options: string[];
@@ -74,27 +65,23 @@ export interface SelectField extends FormField {
   multiple?: boolean;
 }
 
-// Checkbox field (single)
 export interface CheckboxField extends FormField {
   type: 'checkbox';
   defaultChecked?: boolean;
 }
 
-// Checkbox group field
 export interface CheckboxGroupField extends FormField {
   type: 'checkbox-group';
   options: string[];
   defaultValues?: string[];
 }
 
-// Radio field
 export interface RadioField extends FormField {
   type: 'radio';
   options: string[];
   defaultValue?: string;
 }
 
-// Date field
 export interface DateField extends FormField {
   type: 'date';
   defaultValue?: string;
@@ -102,24 +89,20 @@ export interface DateField extends FormField {
   max?: string;
 }
 
-// Time field
 export interface TimeField extends FormField {
   type: 'time';
   defaultValue?: string;
 }
 
-// Section field (for grouping)
 export interface SectionField extends FormField {
   type: 'section';
 }
 
-// Boolean field (yes/no)
 export interface BooleanField extends FormField {
   type: 'boolean';
   defaultValue?: boolean;
 }
 
-// Union type of all field types
 export type AnyFormField =
   | TextField
   | EmailField
@@ -135,7 +118,6 @@ export type AnyFormField =
   | SectionField
   | BooleanField;
 
-// Interface for an onboarding form
 export interface OnboardingForm {
   id: number;
   workspaceId: number;
@@ -148,7 +130,6 @@ export interface OnboardingForm {
   updatedAt: string;
 }
 
-// Interface for a form response
 export interface FormResponse {
   id: number;
   formId: number;
@@ -158,7 +139,6 @@ export interface FormResponse {
   status: 'draft' | 'submitted' | 'reviewed';
 }
 
-// Type for creating a new form response
 export interface CreateFormResponse {
   formId: number;
   clientId: number;

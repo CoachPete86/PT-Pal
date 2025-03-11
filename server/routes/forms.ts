@@ -1,27 +1,27 @@
-import { Request, Response } from "express";
-import { storage } from "../storage";
-import { ZodError } from "zod";
-import { insertOnboardingFormSchema, insertFormResponseSchema } from "../../shared/schema";
-import { z } from "zod";
+import { Request, Response } from 'express';
+import { storage } from '../storage';
+import { 
+  insertOnboardingFormSchema, 
+  insertFormResponseSchema 
+} from '../../shared/schema';
+import { z } from 'zod';
 
 /**
  * Get all onboarding forms for a workspace
  */
 export async function getOnboardingForms(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const workspaceId = parseInt(req.params.workspaceId || req.query.workspaceId as string);
+    const workspaceId = Number(req.params.workspaceId || req.query.workspaceId);
     
-    if (isNaN(workspaceId)) {
-      return res.status(400).json({ error: "Invalid workspace ID" });
+    if (!workspaceId) {
+      return res.status(400).json({ error: 'Workspace ID is required' });
     }
-    
+
     const forms = await storage.getOnboardingForms(workspaceId);
-    return res.json(forms);
-  } catch (error) {
-    console.error("Error fetching onboarding forms:", error);
-    return res.status(500).json({ error: "Failed to fetch onboarding forms" });
+    res.json(forms);
+  } catch (error: any) {
+    console.error('Error retrieving onboarding forms:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -29,26 +29,24 @@ export async function getOnboardingForms(req: Request, res: Response) {
  * Get a specific onboarding form by ID
  */
 export async function getOnboardingForm(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const formId = parseInt(req.params.formId);
+    const formId = Number(req.params.id);
     
-    if (isNaN(formId)) {
-      return res.status(400).json({ error: "Invalid form ID" });
+    if (!formId) {
+      return res.status(400).json({ error: 'Form ID is required' });
     }
-    
-    const forms = await storage.getOnboardingForms(0); // Get all forms, then filter
+
+    const forms = await storage.getOnboardingForms(0); // Get all forms, filter in memory
     const form = forms.find(f => f.id === formId);
     
     if (!form) {
-      return res.status(404).json({ error: "Form not found" });
+      return res.status(404).json({ error: 'Form not found' });
     }
     
-    return res.json(form);
-  } catch (error) {
-    console.error("Error fetching onboarding form:", error);
-    return res.status(500).json({ error: "Failed to fetch onboarding form" });
+    res.json(form);
+  } catch (error: any) {
+    console.error('Error retrieving onboarding form:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -56,19 +54,21 @@ export async function getOnboardingForm(req: Request, res: Response) {
  * Create a new onboarding form
  */
 export async function createOnboardingForm(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const formData = insertOnboardingFormSchema.parse(req.body);
-    const newForm = await storage.createOnboardingForm(formData);
-    return res.status(201).json(newForm);
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: "Invalid form data", details: error.errors });
-    }
+    const result = insertOnboardingFormSchema.safeParse(req.body);
     
-    console.error("Error creating onboarding form:", error);
-    return res.status(500).json({ error: "Failed to create onboarding form" });
+    if (!result.success) {
+      return res.status(400).json({ 
+        error: 'Invalid form data', 
+        details: result.error.format() 
+      });
+    }
+
+    const form = await storage.createOnboardingForm(result.data);
+    res.status(201).json(form);
+  } catch (error: any) {
+    console.error('Error creating onboarding form:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -76,21 +76,27 @@ export async function createOnboardingForm(req: Request, res: Response) {
  * Update an existing onboarding form
  */
 export async function updateOnboardingForm(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const formId = parseInt(req.params.formId);
+    const formId = Number(req.params.id);
     
-    if (isNaN(formId)) {
-      return res.status(400).json({ error: "Invalid form ID" });
+    if (!formId) {
+      return res.status(400).json({ error: 'Form ID is required' });
     }
     
-    const formData = req.body;
-    const updatedForm = await storage.updateOnboardingForm(formId, formData);
-    return res.json(updatedForm);
-  } catch (error) {
-    console.error("Error updating onboarding form:", error);
-    return res.status(500).json({ error: "Failed to update onboarding form" });
+    // Get only the fields that can be updated
+    const updateData = z.object({
+      title: z.string().optional(),
+      description: z.string().optional(),
+      fields: z.array(z.any()).optional(),
+      isRequired: z.boolean().optional(),
+      order: z.number().optional(),
+    }).parse(req.body);
+
+    const updatedForm = await storage.updateOnboardingForm(formId, updateData);
+    res.json(updatedForm);
+  } catch (error: any) {
+    console.error('Error updating onboarding form:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -98,20 +104,18 @@ export async function updateOnboardingForm(req: Request, res: Response) {
  * Delete an onboarding form
  */
 export async function deleteOnboardingForm(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const formId = parseInt(req.params.formId);
+    const formId = Number(req.params.id);
     
-    if (isNaN(formId)) {
-      return res.status(400).json({ error: "Invalid form ID" });
+    if (!formId) {
+      return res.status(400).json({ error: 'Form ID is required' });
     }
-    
+
     await storage.deleteOnboardingForm(formId);
-    return res.status(204).send();
-  } catch (error) {
-    console.error("Error deleting onboarding form:", error);
-    return res.status(500).json({ error: "Failed to delete onboarding form" });
+    res.status(204).send();
+  } catch (error: any) {
+    console.error('Error deleting onboarding form:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -119,20 +123,18 @@ export async function deleteOnboardingForm(req: Request, res: Response) {
  * Get form responses for a specific form
  */
 export async function getFormResponses(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const formId = parseInt(req.params.formId);
+    const formId = Number(req.params.formId);
     
-    if (isNaN(formId)) {
-      return res.status(400).json({ error: "Invalid form ID" });
+    if (!formId) {
+      return res.status(400).json({ error: 'Form ID is required' });
     }
-    
+
     const responses = await storage.getFormResponses(formId);
-    return res.json(responses);
-  } catch (error) {
-    console.error("Error fetching form responses:", error);
-    return res.status(500).json({ error: "Failed to fetch form responses" });
+    res.json(responses);
+  } catch (error: any) {
+    console.error('Error retrieving form responses:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -140,20 +142,18 @@ export async function getFormResponses(req: Request, res: Response) {
  * Get form responses for a specific client
  */
 export async function getClientFormResponses(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const clientId = parseInt(req.params.clientId);
+    const clientId = Number(req.params.clientId);
     
-    if (isNaN(clientId)) {
-      return res.status(400).json({ error: "Invalid client ID" });
+    if (!clientId) {
+      return res.status(400).json({ error: 'Client ID is required' });
     }
-    
+
     const responses = await storage.getClientFormResponses(clientId);
-    return res.json(responses);
-  } catch (error) {
-    console.error("Error fetching client form responses:", error);
-    return res.status(500).json({ error: "Failed to fetch client form responses" });
+    res.json(responses);
+  } catch (error: any) {
+    console.error('Error retrieving client form responses:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -161,19 +161,21 @@ export async function getClientFormResponses(req: Request, res: Response) {
  * Create a new form response
  */
 export async function createFormResponse(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const responseData = insertFormResponseSchema.parse(req.body);
-    const newResponse = await storage.createFormResponse(responseData);
-    return res.status(201).json(newResponse);
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return res.status(400).json({ error: "Invalid form response data", details: error.errors });
-    }
+    const result = insertFormResponseSchema.safeParse(req.body);
     
-    console.error("Error creating form response:", error);
-    return res.status(500).json({ error: "Failed to create form response" });
+    if (!result.success) {
+      return res.status(400).json({ 
+        error: 'Invalid form response data', 
+        details: result.error.format() 
+      });
+    }
+
+    const response = await storage.createFormResponse(result.data);
+    res.status(201).json(response);
+  } catch (error: any) {
+    console.error('Error creating form response:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -181,21 +183,24 @@ export async function createFormResponse(req: Request, res: Response) {
  * Update an existing form response
  */
 export async function updateFormResponse(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  
   try {
-    const responseId = parseInt(req.params.responseId);
+    const responseId = Number(req.params.id);
     
-    if (isNaN(responseId)) {
-      return res.status(400).json({ error: "Invalid response ID" });
+    if (!responseId) {
+      return res.status(400).json({ error: 'Response ID is required' });
     }
     
-    const responseData = req.body;
-    const updatedResponse = await storage.updateFormResponse(responseId, responseData);
-    return res.json(updatedResponse);
-  } catch (error) {
-    console.error("Error updating form response:", error);
-    return res.status(500).json({ error: "Failed to update form response" });
+    // Get only the fields that can be updated
+    const updateData = z.object({
+      responses: z.record(z.any()).optional(),
+      status: z.enum(['draft', 'submitted', 'reviewed']).optional(),
+    }).parse(req.body);
+
+    const updatedResponse = await storage.updateFormResponse(responseId, updateData);
+    res.json(updatedResponse);
+  } catch (error: any) {
+    console.error('Error updating form response:', error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -203,767 +208,1033 @@ export async function updateFormResponse(req: Request, res: Response) {
  * Create predefined form templates for the application
  */
 export async function createFormTemplates(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
-  if (req.user.role !== 'admin' && req.user.role !== 'trainer') {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
-  
   try {
-    const workspaceId = parseInt(req.params.workspaceId || req.body.workspaceId);
+    const workspaceId = Number(req.body.workspaceId);
     
-    if (isNaN(workspaceId)) {
-      return res.status(400).json({ error: "Invalid workspace ID" });
+    if (!workspaceId) {
+      return res.status(400).json({ error: 'Workspace ID is required' });
     }
-    
-    // Create PAR-Q form
-    const parQForm = await storage.createOnboardingForm({
+
+    // Create the PAR-Q form template
+    const parqForm = await storage.createOnboardingForm({
       workspaceId,
-      title: "Physical Activity Readiness Questionnaire (PAR-Q)",
-      description: "This questionnaire helps determine if you should consult with a physician before becoming physically active.",
+      title: 'Physical Activity Readiness Questionnaire (PAR-Q)',
+      description: 'A screening tool to determine if you should consult with a doctor before increasing your physical activity.',
       isRequired: true,
       order: 1,
       fields: [
         {
-          id: "heart_condition",
-          type: "boolean",
-          label: "Has your doctor ever said that you have a heart condition and that you should only do physical activity recommended by a doctor?",
-          required: true
+          id: 'section_intro',
+          type: 'section',
+          label: 'Introduction',
         },
         {
-          id: "chest_pain",
-          type: "boolean",
-          label: "Do you feel pain in your chest when you do physical activity?",
-          required: true
-        },
-        {
-          id: "chest_pain_not_active",
-          type: "boolean",
-          label: "In the past month, have you had chest pain when you were not doing physical activity?",
-          required: true
-        },
-        {
-          id: "balance_issues",
-          type: "boolean",
-          label: "Do you lose your balance because of dizziness or do you ever lose consciousness?",
-          required: true
-        },
-        {
-          id: "bone_joint_issues",
-          type: "boolean",
-          label: "Do you have a bone or joint problem that could be made worse by a change in your physical activity?",
-          required: true
-        },
-        {
-          id: "medication",
-          type: "boolean",
-          label: "Is your doctor currently prescribing drugs for your blood pressure or heart condition?",
-          required: true
-        },
-        {
-          id: "other_reasons",
-          type: "boolean",
-          label: "Do you know of any other reason why you should not do physical activity?",
-          required: true
-        },
-        {
-          id: "other_reasons_details",
-          type: "text",
-          label: "If you answered yes to any of the above questions, please provide details:",
+          id: 'instructions',
+          type: 'text',
+          label: 'Instructions',
+          helpText: 'Regular physical activity is fun and healthy, and increasingly more people are starting to become more active every day. Being more active is very safe for most people. However, some people should check with their doctor before they start becoming much more physically active. Please read the following questions carefully and answer each one honestly.',
           required: false,
-          conditional: {
-            field: "other_reasons",
-            value: true
-          }
         },
         {
-          id: "declaration",
-          type: "checkbox",
-          label: "I affirm that I have answered the above questions truthfully and to the best of my ability.",
-          required: true
-        }
+          id: 'heart_condition',
+          type: 'radio',
+          label: 'Has your doctor ever said that you have a heart condition and that you should only do physical activity recommended by a doctor?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'chest_pain',
+          type: 'radio',
+          label: 'Do you feel pain in your chest when you do physical activity?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'chest_pain_no_activity',
+          type: 'radio',
+          label: 'In the past month, have you had chest pain when you were not doing physical activity?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'balance_issues',
+          type: 'radio',
+          label: 'Do you lose your balance because of dizziness or do you ever lose consciousness?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'bone_joint_problems',
+          type: 'radio',
+          label: 'Do you have a bone or joint problem that could be made worse by a change in your physical activity?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'medication_blood_pressure',
+          type: 'radio',
+          label: 'Is your doctor currently prescribing drugs for your blood pressure or heart condition?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'reason_no_exercise',
+          type: 'radio',
+          label: 'Do you know of any other reason why you should not do physical activity?',
+          options: ['Yes', 'No'],
+          required: true,
+        },
+        {
+          id: 'reason_details',
+          type: 'textarea',
+          label: 'If you answered "Yes" to any of the above questions, please provide details:',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'heart_condition', value: 'Yes' },
+          required: false,
+        },
+        {
+          id: 'section_signature',
+          type: 'section',
+          label: 'Signature',
+        },
+        {
+          id: 'name',
+          type: 'text',
+          label: 'Full Name',
+          placeholder: 'Enter your full name',
+          required: true,
+        },
+        {
+          id: 'date',
+          type: 'date',
+          label: 'Date',
+          required: true,
+        },
       ]
     });
 
-    // Create Client Intake Form
+    // Create the Client Intake Form template
     const intakeForm = await storage.createOnboardingForm({
       workspaceId,
-      title: "Client Intake Form",
-      description: "Please complete this form to help us understand your fitness background, goals, and any health concerns.",
+      title: 'Client Intake Form',
+      description: 'Basic information to help us understand your goals and fitness background.',
       isRequired: true,
       order: 2,
       fields: [
         {
-          id: "personal_info",
-          type: "section",
-          label: "Personal Information"
+          id: 'section_personal',
+          type: 'section',
+          label: 'Personal Information',
         },
         {
-          id: "full_name",
-          type: "text",
-          label: "Full Name",
-          required: true
+          id: 'name',
+          type: 'text',
+          label: 'Full Name',
+          placeholder: 'Enter your full name',
+          required: true,
         },
         {
-          id: "date_of_birth",
-          type: "date",
-          label: "Date of Birth",
-          required: true
+          id: 'email',
+          type: 'email',
+          label: 'Email Address',
+          placeholder: 'your.email@example.com',
+          required: true,
         },
         {
-          id: "gender",
-          type: "select",
-          label: "Gender",
-          options: ["Male", "Female", "Non-binary", "Prefer not to say"],
-          required: true
+          id: 'phone',
+          type: 'phone',
+          label: 'Phone Number',
+          placeholder: '(123) 456-7890',
+          required: true,
         },
         {
-          id: "email",
-          type: "email",
-          label: "Email Address",
-          required: true
+          id: 'birthdate',
+          type: 'date',
+          label: 'Date of Birth',
+          required: true,
         },
         {
-          id: "phone",
-          type: "text",
-          label: "Phone Number",
-          required: true
+          id: 'gender',
+          type: 'select',
+          label: 'Gender',
+          options: ['Male', 'Female', 'Non-binary', 'Prefer not to say'],
+          required: true,
         },
         {
-          id: "emergency_contact",
-          type: "text",
-          label: "Emergency Contact Name",
-          required: true
+          id: 'emergency_contact',
+          type: 'text',
+          label: 'Emergency Contact Name',
+          placeholder: 'Enter name',
+          required: true,
         },
         {
-          id: "emergency_phone",
-          type: "text",
-          label: "Emergency Contact Phone",
-          required: true
+          id: 'emergency_phone',
+          type: 'phone',
+          label: 'Emergency Contact Phone',
+          placeholder: '(123) 456-7890',
+          required: true,
         },
         {
-          id: "health_section",
-          type: "section",
-          label: "Health Information"
+          id: 'section_health',
+          type: 'section',
+          label: 'Health Information',
         },
         {
-          id: "height",
-          type: "number",
-          label: "Height (cm)",
-          required: true
+          id: 'height',
+          type: 'text',
+          label: 'Height (ft/in or cm)',
+          placeholder: 'e.g., 5\'10" or 178 cm',
+          required: true,
         },
         {
-          id: "weight",
-          type: "number",
-          label: "Weight (kg)",
-          required: true
+          id: 'weight',
+          type: 'text',
+          label: 'Weight (lbs or kg)',
+          placeholder: 'e.g., 165 lbs or 75 kg',
+          required: true,
         },
         {
-          id: "medical_conditions",
-          type: "checkbox-group",
-          label: "Do you have any of the following medical conditions?",
+          id: 'medical_conditions',
+          type: 'checkbox-group',
+          label: 'Do you have any of the following medical conditions?',
           options: [
-            "Heart Disease", 
-            "High Blood Pressure", 
-            "Diabetes", 
-            "Asthma", 
-            "Arthritis", 
-            "Back Problems", 
-            "Other"
+            'High blood pressure',
+            'Heart disease',
+            'Diabetes',
+            'Asthma',
+            'Arthritis',
+            'Back pain/issues',
+            'Joint pain/issues',
+            'Other'
           ],
-          required: false
-        },
-        {
-          id: "medical_conditions_other",
-          type: "text",
-          label: "If you selected 'Other', please specify:",
           required: false,
-          conditional: {
-            field: "medical_conditions",
-            value: ["Other"]
-          }
         },
         {
-          id: "medications",
-          type: "textarea",
-          label: "Please list any medications you are currently taking:",
-          required: false
+          id: 'medical_conditions_other',
+          type: 'textarea',
+          label: 'Please describe other medical conditions',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'medical_conditions', value: ['Other'] },
+          required: false,
         },
         {
-          id: "injuries",
-          type: "textarea",
-          label: "Please list any injuries or surgeries in the past 2 years:",
-          required: false
+          id: 'medications',
+          type: 'textarea',
+          label: 'Are you currently taking any medications? If yes, please list them.',
+          placeholder: 'List medications or type "None"',
+          required: true,
         },
         {
-          id: "fitness_section",
-          type: "section",
-          label: "Fitness Background"
+          id: 'injuries',
+          type: 'textarea',
+          label: 'Do you have any injuries, past or present, that I should know about?',
+          placeholder: 'Describe any injuries or type "None"',
+          required: true,
         },
         {
-          id: "fitness_level",
-          type: "select",
-          label: "How would you describe your current fitness level?",
-          options: ["Beginner", "Intermediate", "Advanced", "Athletic"],
-          required: true
+          id: 'section_fitness',
+          type: 'section',
+          label: 'Fitness History & Goals',
         },
         {
-          id: "activity_level",
-          type: "select",
-          label: "How active are you currently?",
+          id: 'activity_level',
+          type: 'select',
+          label: 'How would you describe your current activity level?',
           options: [
-            "Sedentary (little to no exercise)", 
-            "Lightly active (1-3 days per week)", 
-            "Moderately active (3-5 days per week)", 
-            "Very active (6-7 days per week)", 
-            "Extremely active (professional athlete level)"
+            'Sedentary (little to no exercise)',
+            'Lightly active (light exercise 1-3 days/week)',
+            'Moderately active (moderate exercise 3-5 days/week)',
+            'Very active (hard exercise 6-7 days/week)',
+            'Extremely active (very hard daily exercise or physical job)'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "exercise_frequency",
-          type: "select",
-          label: "How often do you currently exercise?",
+          id: 'exercise_history',
+          type: 'textarea',
+          label: 'Please describe your exercise history for the past 6 months',
+          placeholder: 'What types of exercise have you been doing?',
+          required: true,
+        },
+        {
+          id: 'fitness_goals',
+          type: 'checkbox-group',
+          label: 'What are your primary fitness goals?',
           options: [
-            "Never", 
-            "1-2 times per week", 
-            "3-4 times per week", 
-            "5+ times per week"
+            'Lose weight',
+            'Build muscle',
+            'Improve endurance',
+            'Increase strength',
+            'Improve flexibility',
+            'Improve athletic performance',
+            'Improve overall health',
+            'Rehabilitation from injury',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "exercise_types",
-          type: "checkbox-group",
-          label: "What types of exercise do you currently do?",
+          id: 'fitness_goals_other',
+          type: 'textarea',
+          label: 'Please describe your other fitness goals',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'fitness_goals', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'goal_timeframe',
+          type: 'select',
+          label: 'What is your timeframe for achieving these goals?',
           options: [
-            "Cardio/Aerobic", 
-            "Strength Training", 
-            "Flexibility/Stretching", 
-            "Sports", 
-            "Group Fitness Classes", 
-            "Other"
+            '1-3 months',
+            '3-6 months',
+            '6-12 months',
+            'Over 12 months'
           ],
-          required: false
+          required: true,
         },
         {
-          id: "goals_section",
-          type: "section",
-          label: "Goals and Preferences"
+          id: 'section_preferences',
+          type: 'section',
+          label: 'Training Preferences',
         },
         {
-          id: "fitness_goals",
-          type: "checkbox-group",
-          label: "What are your primary fitness goals? (Select all that apply)",
+          id: 'training_frequency',
+          type: 'select',
+          label: 'How many days per week would you like to train?',
+          options: ['1-2', '3-4', '5-6', '7 (daily)'],
+          required: true,
+        },
+        {
+          id: 'session_length',
+          type: 'select',
+          label: 'Preferred session length',
+          options: ['30 minutes', '45 minutes', '60 minutes', '90+ minutes'],
+          required: true,
+        },
+        {
+          id: 'workout_preferences',
+          type: 'checkbox-group',
+          label: 'What types of workouts do you enjoy or are interested in?',
           options: [
-            "Weight Loss", 
-            "Muscle Gain", 
-            "Improved Endurance", 
-            "Increased Strength", 
-            "Better Flexibility", 
-            "Sport-Specific Training", 
-            "General Health", 
-            "Rehabilitation"
+            'Strength training',
+            'Cardio (running, biking, etc.)',
+            'High-intensity interval training (HIIT)',
+            'Flexibility/mobility work',
+            'Sports-specific training',
+            'Functional training',
+            'Group classes',
+            'Outdoor activities',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "specific_goals",
-          type: "textarea",
-          label: "Please describe any specific goals you have:",
-          required: false
+          id: 'workout_preferences_other',
+          type: 'textarea',
+          label: 'Please describe other workout preferences',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'workout_preferences', value: ['Other'] },
+          required: false,
         },
         {
-          id: "preferred_days",
-          type: "checkbox-group",
-          label: "Which days are you available to exercise?",
-          options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-          required: true
+          id: 'disliked_exercises',
+          type: 'textarea',
+          label: 'Are there any specific exercises or activities you dislike or want to avoid?',
+          placeholder: 'Enter details here or type "None"',
+          required: true,
         },
         {
-          id: "preferred_times",
-          type: "checkbox-group",
-          label: "What times of day do you prefer to exercise?",
-          options: ["Early Morning (5am-8am)", "Morning (8am-12pm)", "Afternoon (12pm-5pm)", "Evening (5pm-9pm)"],
-          required: true
+          id: 'section_additional',
+          type: 'section',
+          label: 'Additional Information',
         },
         {
-          id: "lifestyle_section",
-          type: "section",
-          label: "Lifestyle and Nutrition"
+          id: 'nutrition_tracking',
+          type: 'radio',
+          label: 'Are you interested in nutrition guidance as part of your fitness program?',
+          options: ['Yes', 'No', 'Maybe later'],
+          required: true,
         },
         {
-          id: "occupation",
-          type: "text",
-          label: "Occupation",
-          required: true
+          id: 'other_info',
+          type: 'textarea',
+          label: 'Is there anything else you would like me to know?',
+          placeholder: 'Any additional information you want to share',
+          required: false,
         },
         {
-          id: "stress_level",
-          type: "select",
-          label: "How would you rate your daily stress level?",
-          options: ["Low", "Moderate", "High", "Very High"],
-          required: true
+          id: 'acknowledgment',
+          type: 'checkbox',
+          label: 'I confirm that the information provided is accurate and complete to the best of my knowledge.',
+          required: true,
         },
-        {
-          id: "sleep_hours",
-          type: "select",
-          label: "How many hours of sleep do you get per night on average?",
-          options: ["Less than 5", "5-6", "7-8", "9+"],
-          required: true
-        },
-        {
-          id: "dietary_restrictions",
-          type: "checkbox-group",
-          label: "Do you have any dietary restrictions?",
-          options: [
-            "Vegetarian", 
-            "Vegan", 
-            "Gluten-Free", 
-            "Dairy-Free", 
-            "Keto", 
-            "Paleo", 
-            "Other", 
-            "None"
-          ],
-          required: false
-        },
-        {
-          id: "water_intake",
-          type: "select",
-          label: "How many glasses of water do you drink daily?",
-          options: ["0-2", "3-5", "6-8", "9+"],
-          required: true
-        },
-        {
-          id: "agreement_section",
-          type: "section",
-          label: "Agreement"
-        },
-        {
-          id: "agreement",
-          type: "checkbox",
-          label: "I understand that my trainer will use this information to develop a personalized fitness program. I affirm that the information provided is accurate and complete.",
-          required: true
-        }
       ]
     });
 
-    // Create Exercise Preferences & Movement Assessment
+    // Create the Exercise Preferences Assessment
     const exercisePreferencesForm = await storage.createOnboardingForm({
       workspaceId,
-      title: "Exercise Preferences & Movement Assessment",
-      description: "Help us understand your exercise preferences and assess your movement capabilities.",
-      isRequired: true,
+      title: 'Exercise Preferences & Movement Assessment',
+      description: 'Help us understand your exercise preferences and current movement patterns.',
+      isRequired: false,
       order: 3,
       fields: [
         {
-          id: "exercise_preferences",
-          type: "section",
-          label: "Exercise Preferences"
+          id: 'section_movement',
+          type: 'section',
+          label: 'Movement Patterns Assessment',
         },
         {
-          id: "preferred_exercises",
-          type: "checkbox-group",
-          label: "Which types of exercises do you enjoy the most?",
+          id: 'movement_difficulty',
+          type: 'checkbox-group',
+          label: 'Which of the following movements do you find difficult or uncomfortable?',
           options: [
-            "Free Weights (dumbbells, barbells)", 
-            "Bodyweight Exercises", 
-            "Cardio Machines (treadmill, elliptical)", 
-            "Functional Training", 
-            "Group Classes", 
-            "Yoga/Pilates", 
-            "Sports", 
-            "Outdoor Activities"
+            'Squat',
+            'Lunge',
+            'Push-up',
+            'Pull-up',
+            'Overhead press',
+            'Hip hinge (deadlift pattern)',
+            'Rotation movements',
+            'Balance exercises',
+            'None of the above'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "disliked_exercises",
-          type: "textarea",
-          label: "Are there any exercises or activities you particularly dislike?",
-          required: false
-        },
-        {
-          id: "exercise_environment",
-          type: "select",
-          label: "Do you prefer exercising indoors or outdoors?",
-          options: ["Indoors", "Outdoors", "Both equally"],
-          required: true
-        },
-        {
-          id: "exercise_time",
-          type: "select",
-          label: "How long do you typically prefer your workout sessions to be?",
-          options: ["15-30 minutes", "30-45 minutes", "45-60 minutes", "60+ minutes"],
-          required: true
-        },
-        {
-          id: "workout_intensity",
-          type: "select",
-          label: "What level of intensity do you prefer for your workouts?",
-          options: ["Light", "Moderate", "Challenging", "Very Intense"],
-          required: true
-        },
-        {
-          id: "variety_preference",
-          type: "select",
-          label: "Do you prefer consistent routines or variety in your workouts?",
-          options: ["Consistent routine", "Occasional changes", "Frequent variety", "Complete variety each session"],
-          required: true
-        },
-        {
-          id: "movement_assessment",
-          type: "section",
-          label: "Movement Assessment"
-        },
-        {
-          id: "mobility_issues",
-          type: "checkbox-group",
-          label: "Do you have any mobility issues or limitations in the following areas?",
-          options: [
-            "Shoulders", 
-            "Hips", 
-            "Knees", 
-            "Ankles", 
-            "Lower back", 
-            "Neck", 
-            "Other", 
-            "None"
-          ],
-          required: true
-        },
-        {
-          id: "mobility_other",
-          type: "text",
-          label: "If you selected 'Other' above, please specify:",
+          id: 'movement_difficulty_details',
+          type: 'textarea',
+          label: 'Please describe any pain or discomfort you experience with the movements selected above',
+          placeholder: 'Where do you feel discomfort? When does it occur?',
+          conditional: { field: 'movement_difficulty', value: ['Squat', 'Lunge', 'Push-up', 'Pull-up', 'Overhead press', 'Hip hinge (deadlift pattern)', 'Rotation movements', 'Balance exercises'] },
           required: false,
-          conditional: {
-            field: "mobility_issues",
-            value: ["Other"]
-          }
         },
         {
-          id: "pain_during_exercise",
-          type: "boolean",
-          label: "Do you frequently experience pain during exercise?",
-          required: true
+          id: 'section_equipment',
+          type: 'section',
+          label: 'Equipment & Environment Preferences',
         },
         {
-          id: "pain_details",
-          type: "textarea",
-          label: "If yes, please describe where and when this pain occurs:",
-          required: false,
-          conditional: {
-            field: "pain_during_exercise",
-            value: true
-          }
-        },
-        {
-          id: "balance_coordination",
-          type: "select",
-          label: "How would you rate your balance and coordination?",
-          options: ["Poor", "Fair", "Good", "Excellent"],
-          required: true
-        },
-        {
-          id: "movement_patterns",
-          type: "section",
-          label: "Basic Movement Patterns"
-        },
-        {
-          id: "squat_ability",
-          type: "select",
-          label: "How would you rate your ability to perform a bodyweight squat?",
-          options: ["Unable to perform", "Can perform with limitations", "Can perform with good form", "Can perform with excellent form"],
-          required: true
-        },
-        {
-          id: "pushup_ability",
-          type: "select",
-          label: "How would you rate your ability to perform a push-up?",
-          options: ["Unable to perform", "Can perform modified push-ups only", "Can perform standard push-ups", "Can perform advanced push-up variations"],
-          required: true
-        },
-        {
-          id: "lunge_ability",
-          type: "select",
-          label: "How would you rate your ability to perform a lunge?",
-          options: ["Unable to perform", "Can perform with support", "Can perform with good form", "Can perform advanced lunge variations"],
-          required: true
-        },
-        {
-          id: "plank_ability",
-          type: "select",
-          label: "How long can you hold a standard plank position?",
-          options: ["Less than 15 seconds", "15-30 seconds", "30-60 seconds", "60+ seconds"],
-          required: true
-        },
-        {
-          id: "equipment_access",
-          type: "section",
-          label: "Equipment Access"
-        },
-        {
-          id: "available_equipment",
-          type: "checkbox-group",
-          label: "What equipment do you have access to?",
+          id: 'equipment_access',
+          type: 'checkbox-group',
+          label: 'What equipment do you have access to?',
           options: [
-            "Gym membership", 
-            "Home gym equipment", 
-            "Cardio machines", 
-            "Free weights (dumbbells, barbells)", 
-            "Resistance bands", 
-            "Kettlebells", 
-            "Stability/Swiss ball", 
-            "TRX/Suspension trainer", 
-            "None"
+            'Full gym membership',
+            'Home gym',
+            'Dumbbells',
+            'Kettlebells',
+            'Resistance bands',
+            'Cardio equipment',
+            'Bodyweight only',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "equipment_notes",
-          type: "textarea",
-          label: "Please provide any additional details about your equipment access:",
-          required: false
+          id: 'equipment_access_other',
+          type: 'textarea',
+          label: 'Please describe other equipment you have access to',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'equipment_access', value: ['Other'] },
+          required: false,
         },
         {
-          id: "additional_notes",
-          type: "textarea",
-          label: "Any additional information you'd like to share about your exercise preferences or movement capabilities?",
-          required: false
-        }
+          id: 'training_environment',
+          type: 'select',
+          label: 'What is your preferred training environment?',
+          options: [
+            'Commercial gym',
+            'Home gym',
+            'Outdoors',
+            'Virtual/online training',
+            'No preference'
+          ],
+          required: true,
+        },
+        {
+          id: 'section_experience',
+          type: 'section',
+          label: 'Exercise Experience',
+        },
+        {
+          id: 'training_experience',
+          type: 'select',
+          label: 'How much experience do you have with structured strength training?',
+          options: [
+            'Beginner (0-6 months)',
+            'Novice (6-18 months)',
+            'Intermediate (1.5-3 years)',
+            'Advanced (3+ years)'
+          ],
+          required: true,
+        },
+        {
+          id: 'lifting_experience',
+          type: 'radio',
+          label: 'Have you worked with free weights before (barbells, dumbbells)?',
+          options: ['Yes, extensively', 'Yes, somewhat', 'Very little', 'No experience'],
+          required: true,
+        },
+        {
+          id: 'cardio_experience',
+          type: 'select',
+          label: 'How would you rate your cardiovascular endurance?',
+          options: [
+            'Poor - I get out of breath easily',
+            'Below average - I struggle with sustained cardio',
+            'Average - I can maintain moderate cardio for 15-20 minutes',
+            'Good - I can maintain cardio for 30+ minutes',
+            'Excellent - I regularly do cardio for 45+ minutes'
+          ],
+          required: true,
+        },
+        {
+          id: 'section_interests',
+          type: 'section',
+          label: 'Exercise Interests',
+        },
+        {
+          id: 'preferred_exercises',
+          type: 'checkbox-group',
+          label: 'Which of these exercise styles interest you most?',
+          options: [
+            'Traditional strength training (sets & reps)',
+            'Circuit training',
+            'HIIT workouts',
+            'Bodyweight training',
+            'Olympic weightlifting',
+            'Powerlifting',
+            'CrossFit-style workouts',
+            'Mobility/flexibility work',
+            'Sport-specific training',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'preferred_exercises_other',
+          type: 'textarea',
+          label: 'Please describe other exercise styles that interest you',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'preferred_exercises', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'section_motivations',
+          type: 'section',
+          label: 'Motivations & Challenges',
+        },
+        {
+          id: 'exercise_motivation',
+          type: 'textarea',
+          label: 'What motivates you to exercise?',
+          placeholder: 'What keeps you going when exercise gets tough?',
+          required: true,
+        },
+        {
+          id: 'exercise_challenges',
+          type: 'checkbox-group',
+          label: 'What challenges do you face with maintaining a consistent exercise routine?',
+          options: [
+            'Lack of time',
+            'Lack of energy',
+            'Lack of motivation',
+            'Physical discomfort/pain',
+            'Boredom with routine',
+            'Inadequate knowledge of what to do',
+            'Difficulty tracking progress',
+            'Schedule constraints',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'exercise_challenges_other',
+          type: 'textarea',
+          label: 'Please describe other challenges you face',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'exercise_challenges', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'learning_style',
+          type: 'select',
+          label: 'How do you learn new exercises best?',
+          options: [
+            'Visual demonstration',
+            'Written instructions',
+            'Verbal cues and guidance',
+            'Hands-on correction',
+            'Video tutorials',
+            'Combination of methods'
+          ],
+          required: true,
+        },
+        {
+          id: 'section_metrics',
+          type: 'section',
+          label: 'Metrics & Tracking',
+        },
+        {
+          id: 'progress_metrics',
+          type: 'checkbox-group',
+          label: 'Which metrics are most important to you for tracking progress?',
+          options: [
+            'Body weight',
+            'Body measurements',
+            'Strength gains',
+            'Endurance improvements',
+            'Body composition changes',
+            'Performance improvements',
+            'Energy levels',
+            'Mood and mental well-being',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'progress_metrics_other',
+          type: 'textarea',
+          label: 'Please describe other metrics important to you',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'progress_metrics', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'tracking_preference',
+          type: 'checkbox-group',
+          label: 'How do you prefer to track your workouts and progress?',
+          options: [
+            'Mobile app',
+            'Paper workout journal',
+            'Wearable fitness tracker',
+            'Spreadsheet',
+            'Don\'t currently track',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'tracking_preference_other',
+          type: 'textarea',
+          label: 'Please describe other tracking methods you prefer',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'tracking_preference', value: ['Other'] },
+          required: false,
+        },
       ]
     });
 
-    // Create Senior Client Assessment
+    // Create the Senior Client Assessment
     const seniorAssessmentForm = await storage.createOnboardingForm({
       workspaceId,
-      title: "Senior Client Assessment Package",
-      description: "A comprehensive assessment for senior clients focusing on functional fitness and specific health considerations.",
+      title: 'Senior Client Assessment Package',
+      description: 'Specialized assessment for clients over 65 or with specific mobility considerations.',
       isRequired: false,
       order: 4,
       fields: [
         {
-          id: "senior_health",
-          type: "section",
-          label: "Senior Health Information"
+          id: 'section_general',
+          type: 'section',
+          label: 'General Information',
         },
         {
-          id: "age",
-          type: "number",
-          label: "Age",
-          required: true
+          id: 'age',
+          type: 'number',
+          label: 'Age',
+          required: true,
+          min: 50,
+          max: 120,
         },
         {
-          id: "chronic_conditions",
-          type: "checkbox-group",
-          label: "Do you have any of the following chronic conditions?",
+          id: 'retirement_status',
+          type: 'select',
+          label: 'Retirement Status',
           options: [
-            "Osteoporosis/Osteopenia", 
-            "Arthritis", 
-            "Hypertension", 
-            "Heart Disease", 
-            "Diabetes", 
-            "COPD/Respiratory Condition", 
-            "Parkinson's Disease", 
-            "Alzheimer's/Dementia", 
-            "Other", 
-            "None"
+            'Fully retired',
+            'Semi-retired/Part-time work',
+            'Still working full-time',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "chronic_other",
-          type: "text",
-          label: "If you selected 'Other' above, please specify:",
-          required: false,
-          conditional: {
-            field: "chronic_conditions",
-            value: ["Other"]
-          }
-        },
-        {
-          id: "joint_replacements",
-          type: "boolean",
-          label: "Have you had any joint replacements?",
-          required: true
-        },
-        {
-          id: "joint_details",
-          type: "textarea",
-          label: "If yes, please provide details including which joints and when:",
-          required: false,
-          conditional: {
-            field: "joint_replacements",
-            value: true
-          }
-        },
-        {
-          id: "fall_history",
-          type: "select",
-          label: "Have you fallen in the past year?",
-          options: ["No falls", "One fall", "Two falls", "Three or more falls"],
-          required: true
-        },
-        {
-          id: "fall_details",
-          type: "textarea",
-          label: "If you've experienced falls, please provide details about the circumstances:",
-          required: false,
-          conditional: {
-            field: "fall_history",
-            value: ["One fall", "Two falls", "Three or more falls"]
-          }
-        },
-        {
-          id: "assistive_devices",
-          type: "checkbox-group",
-          label: "Do you use any assistive devices?",
-          options: ["Cane", "Walker", "Wheelchair", "Hearing Aid", "Other", "None"],
-          required: true
-        },
-        {
-          id: "assistive_other",
-          type: "text",
-          label: "If you selected 'Other' above, please specify:",
-          required: false,
-          conditional: {
-            field: "assistive_devices",
-            value: ["Other"]
-          }
-        },
-        {
-          id: "functional_assessment",
-          type: "section",
-          label: "Functional Assessment"
-        },
-        {
-          id: "daily_activities",
-          type: "select",
-          label: "How would you rate your ability to perform daily activities (dressing, bathing, etc.)?",
-          options: ["Completely independent", "Need minimal assistance", "Need moderate assistance", "Need significant assistance"],
-          required: true
-        },
-        {
-          id: "difficulty_activities",
-          type: "checkbox-group",
-          label: "Which activities do you find difficult to perform?",
+          id: 'living_situation',
+          type: 'select',
+          label: 'Current Living Situation',
           options: [
-            "Getting up from a chair", 
-            "Climbing stairs", 
-            "Reaching overhead", 
-            "Picking items up from the floor", 
-            "Walking long distances", 
-            "Carrying groceries", 
-            "Getting in/out of car", 
-            "Other", 
-            "None"
+            'Independent living - house/apartment',
+            'Independent living with family support',
+            'Retirement community',
+            'Assisted living',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "difficulty_other",
-          type: "text",
-          label: "If you selected 'Other' above, please specify:",
-          required: false,
-          conditional: {
-            field: "difficulty_activities",
-            value: ["Other"]
-          }
+          id: 'section_health',
+          type: 'section',
+          label: 'Health & Medical History',
         },
         {
-          id: "fitness_goals_senior",
-          type: "checkbox-group",
-          label: "What are your primary fitness goals?",
+          id: 'chronic_conditions',
+          type: 'checkbox-group',
+          label: 'Do you have any of these chronic conditions?',
           options: [
-            "Improve balance", 
-            "Increase strength", 
-            "Enhance mobility", 
-            "Reduce pain", 
-            "Maintain independence", 
-            "Increase energy", 
-            "Social engagement", 
-            "Other"
+            'Arthritis',
+            'Osteoporosis/Osteopenia',
+            'Hypertension (high blood pressure)',
+            'Heart disease',
+            'Diabetes (Type 1 or 2)',
+            'COPD/Respiratory issues',
+            'Balance disorders',
+            'Parkinson\'s disease',
+            'Post-stroke',
+            'Joint replacement',
+            'Chronic pain',
+            'None of the above',
+            'Other'
           ],
-          required: true
+          required: true,
         },
         {
-          id: "goals_other",
-          type: "text",
-          label: "If you selected 'Other' above, please specify:",
+          id: 'chronic_conditions_other',
+          type: 'textarea',
+          label: 'Please describe other chronic conditions',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'chronic_conditions', value: ['Other'] },
           required: false,
-          conditional: {
-            field: "fitness_goals_senior",
-            value: ["Other"]
-          }
         },
         {
-          id: "exercise_history",
-          type: "textarea",
-          label: "Please describe any current or past exercise experiences:",
-          required: false
+          id: 'joint_replacements',
+          type: 'radio',
+          label: 'Have you had any joint replacements?',
+          options: ['Yes', 'No'],
+          required: true,
         },
         {
-          id: "balance_confidence",
-          type: "select",
-          label: "How confident are you that you won't lose your balance or become unsteady during daily activities?",
-          options: ["Not confident at all", "Somewhat confident", "Moderately confident", "Completely confident"],
-          required: true
+          id: 'joint_replacements_details',
+          type: 'textarea',
+          label: 'Please provide details about your joint replacements',
+          placeholder: 'Which joints? When was the surgery?',
+          conditional: { field: 'joint_replacements', value: 'Yes' },
+          required: false,
         },
         {
-          id: "additional_info",
-          type: "section",
-          label: "Additional Information"
+          id: 'medications_affect_exercise',
+          type: 'radio',
+          label: 'Are you taking any medications that might affect your exercise response (e.g., beta-blockers, blood thinners)?',
+          options: ['Yes', 'No', 'Unsure'],
+          required: true,
         },
         {
-          id: "safety_concerns",
-          type: "textarea",
-          label: "Do you have any specific safety concerns about exercising?",
-          required: false
+          id: 'medications_affect_exercise_details',
+          type: 'textarea',
+          label: 'Please list medications that might affect exercise',
+          placeholder: 'Enter medication names and effects if known',
+          conditional: { field: 'medications_affect_exercise', value: ['Yes', 'Unsure'] },
+          required: false,
         },
         {
-          id: "physician_clearance",
-          type: "boolean",
-          label: "Have you received clearance from your physician to participate in an exercise program?",
-          required: true
+          id: 'section_mobility',
+          type: 'section',
+          label: 'Mobility & Function Assessment',
         },
         {
-          id: "preferred_activities",
-          type: "checkbox-group",
-          label: "What types of activities are you interested in?",
+          id: 'fall_history',
+          type: 'radio',
+          label: 'Have you experienced any falls in the past year?',
+          options: ['No falls', '1 fall', '2 falls', '3 or more falls'],
+          required: true,
+        },
+        {
+          id: 'fall_history_details',
+          type: 'textarea',
+          label: 'Please describe the circumstances of any falls',
+          placeholder: 'What caused the fall(s)? Were there any injuries?',
+          conditional: { field: 'fall_history', value: ['1 fall', '2 falls', '3 or more falls'] },
+          required: false,
+        },
+        {
+          id: 'mobility_aids',
+          type: 'checkbox-group',
+          label: 'Do you use any mobility aids?',
           options: [
-            "Walking", 
-            "Water exercises", 
-            "Chair exercises", 
-            "Gentle yoga/stretching", 
-            "Resistance training", 
-            "Balance exercises", 
-            "Group fitness classes", 
-            "Other"
+            'None',
+            'Cane',
+            'Walker',
+            'Wheelchair (occasionally)',
+            'Wheelchair (primarily)',
+            'Other'
           ],
-          required: false
+          required: true,
         },
         {
-          id: "additional_notes_senior",
-          type: "textarea",
-          label: "Is there anything else you would like us to know about your health, fitness, or personal goals?",
-          required: false
+          id: 'mobility_aids_other',
+          type: 'textarea',
+          label: 'Please describe other mobility aids used',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'mobility_aids', value: ['Other'] },
+          required: false,
         },
         {
-          id: "agreement",
-          type: "checkbox",
-          label: "I understand the importance of starting slowly and progressing gradually with any exercise program. I will communicate any discomfort, pain, or concerns to my trainer immediately.",
-          required: true
+          id: 'daily_activities',
+          type: 'checkbox-group',
+          label: 'Which daily activities do you find challenging?',
+          options: [
+            'Getting in/out of bed',
+            'Getting in/out of chairs',
+            'Climbing stairs',
+            'Walking for extended periods',
+            'Carrying groceries',
+            'Reaching overhead',
+            'Bending to pick up objects',
+            'Dressing (buttons, zippers, etc.)',
+            'Bathing/personal care',
+            'None of these are challenging',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'daily_activities_other',
+          type: 'textarea',
+          label: 'Please describe other challenging activities',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'daily_activities', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'pain_areas',
+          type: 'checkbox-group',
+          label: 'Do you experience regular pain in any of these areas?',
+          options: [
+            'No regular pain',
+            'Back (upper)',
+            'Back (lower)',
+            'Neck',
+            'Shoulders',
+            'Elbows',
+            'Wrists/hands',
+            'Hips',
+            'Knees',
+            'Ankles/feet',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'pain_areas_other',
+          type: 'textarea',
+          label: 'Please describe other areas of pain',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'pain_areas', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'section_fitness',
+          type: 'section',
+          label: 'Current Fitness & Activity',
+        },
+        {
+          id: 'current_activity',
+          type: 'checkbox-group',
+          label: 'What physical activities do you currently participate in?',
+          options: [
+            'Walking',
+            'Light gardening',
+            'Swimming/water exercises',
+            'Group exercise classes',
+            'Light resistance training',
+            'Yoga/Tai Chi',
+            'Golf',
+            'Cycling',
+            'Dancing',
+            'No regular physical activity',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'current_activity_other',
+          type: 'textarea',
+          label: 'Please describe other physical activities',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'current_activity', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'activity_frequency',
+          type: 'select',
+          label: 'How often do you engage in physical activity?',
+          options: [
+            'Rarely/Never',
+            '1-2 times per month',
+            '1-2 times per week',
+            '3-4 times per week',
+            '5+ times per week'
+          ],
+          required: true,
+        },
+        {
+          id: 'activity_duration',
+          type: 'select',
+          label: 'Typical duration of activity sessions',
+          options: [
+            'Less than 15 minutes',
+            '15-30 minutes',
+            '30-45 minutes',
+            '45-60 minutes',
+            'More than 60 minutes'
+          ],
+          required: true,
+        },
+        {
+          id: 'activity_intensity',
+          type: 'select',
+          label: 'Typical intensity of your activities',
+          options: [
+            'Very light (can carry on a full conversation easily)',
+            'Light (can carry on a conversation with some effort)',
+            'Moderate (can speak in short sentences)',
+            'Somewhat hard (can speak a few words at a time)',
+            'Hard (cannot speak while exercising)'
+          ],
+          required: true,
+        },
+        {
+          id: 'section_goals',
+          type: 'section',
+          label: 'Goals & Preferences',
+        },
+        {
+          id: 'fitness_goals_senior',
+          type: 'checkbox-group',
+          label: 'What are your primary fitness goals?',
+          options: [
+            'Improve balance/reduce fall risk',
+            'Increase strength for daily activities',
+            'Maintain independence',
+            'Manage pain',
+            'Improve mobility/flexibility',
+            'Weight management',
+            'Improve cardiovascular health',
+            'Social interaction',
+            'Cognitive benefits',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'fitness_goals_senior_other',
+          type: 'textarea',
+          label: 'Please describe other fitness goals',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'fitness_goals_senior', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'exercise_preferences_senior',
+          type: 'checkbox-group',
+          label: 'What types of exercise do you enjoy or are interested in?',
+          options: [
+            'Seated exercises',
+            'Standing exercises with support',
+            'Walking programs',
+            'Water-based exercises',
+            'Mind-body (yoga, tai chi)',
+            'Light resistance training',
+            'Balance training',
+            'Stretching/flexibility work',
+            'Group activities',
+            'One-on-one training',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'exercise_preferences_senior_other',
+          type: 'textarea',
+          label: 'Please describe other exercise preferences',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'exercise_preferences_senior', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'section_barriers',
+          type: 'section',
+          label: 'Barriers & Support',
+        },
+        {
+          id: 'exercise_barriers',
+          type: 'checkbox-group',
+          label: 'What barriers might prevent you from exercising regularly?',
+          options: [
+            'Pain or discomfort',
+            'Fear of injury',
+            'Lack of energy',
+            'Transportation issues',
+            'Weather constraints',
+            'Lack of knowledge about appropriate exercises',
+            'Lack of social support',
+            'Financial constraints',
+            'Time constraints',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'exercise_barriers_other',
+          type: 'textarea',
+          label: 'Please describe other barriers to exercise',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'exercise_barriers', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'support_system',
+          type: 'checkbox-group',
+          label: 'Who might support you in your fitness journey?',
+          options: [
+            'Spouse/partner',
+            'Family members',
+            'Friends',
+            'Healthcare providers',
+            'No support system',
+            'Other'
+          ],
+          required: true,
+        },
+        {
+          id: 'support_system_other',
+          type: 'textarea',
+          label: 'Please describe other support systems',
+          placeholder: 'Enter details here...',
+          conditional: { field: 'support_system', value: ['Other'] },
+          required: false,
+        },
+        {
+          id: 'section_additional',
+          type: 'section',
+          label: 'Additional Information',
+        },
+        {
+          id: 'specific_concerns',
+          type: 'textarea',
+          label: 'Do you have any specific concerns about starting an exercise program?',
+          placeholder: 'Please share any concerns or questions you have',
+          required: false,
         }
       ]
     });
 
-    return res.status(201).json({
-      message: "Form templates created successfully",
-      forms: [parQForm, intakeForm, exercisePreferencesForm, seniorAssessmentForm]
+    res.status(201).json({
+      message: 'Form templates created successfully',
+      forms: [parqForm, intakeForm, exercisePreferencesForm, seniorAssessmentForm]
     });
-  } catch (error) {
-    console.error("Error creating form templates:", error);
-    return res.status(500).json({ error: "Failed to create form templates" });
+  } catch (error: any) {
+    console.error('Error creating form templates:', error);
+    res.status(500).json({ error: error.message });
   }
 }
